@@ -76,7 +76,7 @@ def detect_features(images, n_features: int = 8000):
     return features
 
 
-def match_pairs_gpu(features, images, device, ratio_thresh: float = 0.75):
+def match_pairs_gpu(features, images, device, ratio_thresh: float = 0.80):
     """Match features between image pairs using GPU-accelerated brute force."""
     n = len(features)
     matches_map = {}
@@ -119,7 +119,7 @@ def match_pairs_gpu(features, images, device, ratio_thresh: float = 0.75):
             qi = query_indices.cpu().numpy()
             ti = train_indices.cpu().numpy()
 
-            if len(qi) >= 20:
+            if len(qi) >= 12:
                 # Store as list of (queryIdx, trainIdx) tuples
                 matches_map[(i, j)] = list(zip(qi.tolist(), ti.tolist()))
                 if pair_count % 10 == 0 or len(qi) > 100:
@@ -133,16 +133,46 @@ def estimate_cameras(images, features, matches_map):
     """Estimate camera poses using essential matrix decomposition with RANSAC."""
     n = len(images)
 
-    # Camera intrinsics (approximate from image dimensions)
-    h, w = images[0][1].shape[:2]
-    focal = max(w, h) * 1.2
-    K = np.array([[focal, 0, w / 2],
-                  [0, focal, h / 2],
-                  [0, 0, 1]], dtype=np.float64)
+    # Find the best seed pair (most matches)
+    best_seed = max(matches_map.items(), key=lambda x: len(x[1]))
+    seed_i, seed_j = best_seed[0]
+    print(f"  Seed pair: ({seed_i},{seed_j}) with {len(best_seed[1])} matches")
 
-    # Start with camera 0 at origin
-    poses = {0: (np.eye(3), np.zeros(3))}
-    registered = {0}
+    # Per-image camera intrinsics (different image sizes)
+    def get_K(img_idx):
+        h, w = images[img_idx][1].shape[:2]
+        focal = max(w, h) * 1.2
+        return np.array([[focal, 0, w / 2],
+                         [0, focal, h / 2],
+                         [0, 0, 1]], dtype=np.float64)
+
+    # Use seed image for default K
+    K = get_K(seed_i)
+
+    # Initialize seed pair
+    poses = {seed_i: (np.eye(3), np.zeros(3))}
+    registered = {seed_i}
+
+    # Register seed_j via the seed pair
+    pair_key = (min(seed_i, seed_j), max(seed_i, seed_j))
+    seed_matches = matches_map[pair_key]
+    kps_i = features[seed_i][0]
+    kps_j = features[seed_j][0]
+
+    if seed_i < seed_j:
+        pts_i = np.float64([kps_i[m[0]].pt for m in seed_matches])
+        pts_j = np.float64([kps_j[m[1]].pt for m in seed_matches])
+    else:
+        pts_i = np.float64([kps_j[m[1]].pt for m in seed_matches])
+        pts_j = np.float64([kps_i[m[0]].pt for m in seed_matches])
+
+    E, mask = cv2.findEssentialMat(pts_i, pts_j, K, method=cv2.RANSAC, prob=0.999, threshold=1.5)
+    if E is not None:
+        inliers = mask.ravel().astype(bool)
+        _, R, t, _ = cv2.recoverPose(E, pts_i[inliers], pts_j[inliers], K)
+        poses[seed_j] = (R, t.flatten())
+        registered.add(seed_j)
+        print(f"  Camera {seed_j} ({images[seed_j][0]}) registered as second seed")
 
     # Iteratively register cameras by finding best-connected unregistered camera
     max_iter = n * 5
@@ -180,16 +210,21 @@ def estimate_cameras(images, features, matches_map):
             pts_ref = np.float64([kps_ref[m[0]].pt for m in matches])
             pts_new = np.float64([kps_new[m[1]].pt for m in matches])
 
+        # Use the reference camera's K for the essential matrix
+        K_ref = get_K(ref_idx)
+
         E, mask = cv2.findEssentialMat(
-            pts_ref, pts_new, K,
-            method=cv2.RANSAC, prob=0.999, threshold=1.0
+            pts_ref, pts_new, K_ref,
+            method=cv2.RANSAC, prob=0.999, threshold=2.0
         )
         if E is None:
             continue
 
         inliers = mask.ravel().astype(bool)
+        if inliers.sum() < 8:
+            continue
         _, R, t, mask_pose = cv2.recoverPose(
-            E, pts_ref[inliers], pts_new[inliers], K
+            E, pts_ref[inliers], pts_new[inliers], K_ref
         )
 
         R_ref, t_ref = poses[ref_idx]
@@ -207,6 +242,12 @@ def estimate_cameras(images, features, matches_map):
 
 def triangulate_points(images, features, matches_map, poses, K, device):
     """Triangulate 3D points from all matched pairs. GPU-accelerated filtering."""
+
+    def get_K_for(img_idx):
+        h, w = images[img_idx][1].shape[:2]
+        focal = max(w, h) * 1.2
+        return np.array([[focal, 0, w / 2], [0, focal, h / 2], [0, 0, 1]], dtype=np.float64)
+
     all_points = []
     all_colors = []
 
@@ -217,8 +258,11 @@ def triangulate_points(images, features, matches_map, poses, K, device):
         R_i, t_i = poses[i]
         R_j, t_j = poses[j]
 
-        P_i = K @ np.hstack([R_i, t_i.reshape(3, 1)])
-        P_j = K @ np.hstack([R_j, t_j.reshape(3, 1)])
+        K_i = get_K_for(i)
+        K_j = get_K_for(j)
+
+        P_i = K_i @ np.hstack([R_i, t_i.reshape(3, 1)])
+        P_j = K_j @ np.hstack([R_j, t_j.reshape(3, 1)])
 
         kps_i = features[i][0]
         kps_j = features[j][0]
