@@ -352,7 +352,7 @@ def triangulate_points(images, features, matches_map, poses, K, device):
     return points, colors
 
 
-def densify_point_cloud(images, poses, K, points, device, patch_size: int = 7):
+def densify_point_cloud(images, poses, K, points, colors, device, patch_size: int = 7):
     """
     Dense point cloud via patch-based stereo matching on GPU.
     For each pair of nearby cameras, compute dense disparity using
@@ -700,7 +700,7 @@ def main():
     # Step 6: Dense stereo (optional)
     if not args.no_dense:
         print(f"\n[6/7] Dense stereo matching (GPU)")
-        points, colors_dense = densify_point_cloud(images, poses, K, points, device)
+        points, colors_dense = densify_point_cloud(images, poses, K, points, colors, device)
         if colors_dense is not None:
             colors = colors_dense
     else:
