@@ -562,8 +562,12 @@ def create_mesh(points, colors):
                 faces=good,
                 vertex_colors=vertex_colors
             )
-            mesh.remove_degenerate_faces()
-            mesh.remove_duplicate_faces()
+            # Clean degenerate/duplicate faces (API varies across trimesh versions)
+            if hasattr(mesh, 'remove_degenerate_faces'):
+                mesh.remove_degenerate_faces()
+            if hasattr(mesh, 'remove_duplicate_faces'):
+                mesh.remove_duplicate_faces()
+            mesh.update_faces(mesh.nondegenerate_faces())
 
             return mesh
 
