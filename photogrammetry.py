@@ -382,7 +382,8 @@ def densify_point_cloud(images, poses, K, points, device, patch_size: int = 7):
         pairs = [pairs[i] for i in indices]
 
     dense_points = list(points) if len(points) > 0 else []
-    dense_colors = []
+    # Preserve original sparse colors
+    dense_colors = list(colors) if colors is not None and len(colors) > 0 else []
 
     for idx_i, idx_j, baseline in pairs[:6]:  # Limit to 6 pairs
         gray_i = cv2.cvtColor(images[idx_i][1], cv2.COLOR_BGR2GRAY)
