@@ -200,15 +200,19 @@ def estimate_cameras(images, features, matches_map):
         pair_key = (min(ref_idx, new_idx), max(ref_idx, new_idx))
         matches = matches_map[pair_key]
 
-        kps_ref = features[ref_idx][0]
-        kps_new = features[new_idx][0]
+        # pair_key = (first, second) where first < second
+        # m[0] = queryIdx for pair_key[0], m[1] = trainIdx for pair_key[1]
+        first_idx, second_idx = pair_key
+        kps_first = features[first_idx][0]
+        kps_second = features[second_idx][0]
 
-        if swapped:
-            pts_ref = np.float64([kps_new[m[1]].pt for m in matches])
-            pts_new = np.float64([kps_ref[m[0]].pt for m in matches])
+        pts_first = np.float64([kps_first[m[0]].pt for m in matches])
+        pts_second = np.float64([kps_second[m[1]].pt for m in matches])
+
+        if ref_idx == first_idx:
+            pts_ref, pts_new = pts_first, pts_second
         else:
-            pts_ref = np.float64([kps_ref[m[0]].pt for m in matches])
-            pts_new = np.float64([kps_new[m[1]].pt for m in matches])
+            pts_ref, pts_new = pts_second, pts_first
 
         # Use the reference camera's K for the essential matrix
         K_ref = get_K(ref_idx)
