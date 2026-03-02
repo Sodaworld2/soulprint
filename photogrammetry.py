@@ -385,20 +385,41 @@ def densify_point_cloud(images, poses, K, points, device, patch_size: int = 7):
     dense_colors = []
 
     for idx_i, idx_j, baseline in pairs[:6]:  # Limit to 6 pairs
-        img_i = cv2.cvtColor(images[idx_i][1], cv2.COLOR_BGR2GRAY).astype(np.float32) / 255.0
-        img_j = cv2.cvtColor(images[idx_j][1], cv2.COLOR_BGR2GRAY).astype(np.float32) / 255.0
+        gray_i = cv2.cvtColor(images[idx_i][1], cv2.COLOR_BGR2GRAY)
+        gray_j = cv2.cvtColor(images[idx_j][1], cv2.COLOR_BGR2GRAY)
 
-        h, w = img_i.shape
+        # Resize to match dimensions (StereoSGBM requires same size)
+        h_i, w_i = gray_i.shape
+        h_j, w_j = gray_j.shape
+        if (h_i, w_i) != (h_j, w_j):
+            target_h = min(h_i, h_j)
+            target_w = min(w_i, w_j)
+            gray_i = cv2.resize(gray_i, (target_w, target_h))
+            gray_j = cv2.resize(gray_j, (target_w, target_h))
+
+        h, w = gray_i.shape
+
+        # numDisparities must be divisible by 16 and <= image width
+        num_disp = min(128, (w // 16) * 16)
+        if num_disp < 16:
+            continue
+
         R_i, t_i = poses[idx_i]
         R_j, t_j = poses[idx_j]
 
-        P_i = K @ np.hstack([R_i, t_i.reshape(3, 1)])
-        P_j = K @ np.hstack([R_j, t_j.reshape(3, 1)])
+        def get_K_dense(img_idx):
+            ih, iw = images[img_idx][1].shape[:2]
+            f = max(iw, ih) * 1.2
+            return np.array([[f, 0, iw / 2], [0, f, ih / 2], [0, 0, 1]], dtype=np.float64)
 
-        # Semi-global block matching for disparity
+        K_di = get_K_dense(idx_i)
+        K_dj = get_K_dense(idx_j)
+        P_i = K_di @ np.hstack([R_i, t_i.reshape(3, 1)])
+        P_j = K_dj @ np.hstack([R_j, t_j.reshape(3, 1)])
+
         stereo = cv2.StereoSGBM.create(
             minDisparity=0,
-            numDisparities=128,
+            numDisparities=num_disp,
             blockSize=5,
             P1=8 * 5 * 5,
             P2=32 * 5 * 5,
@@ -408,10 +429,7 @@ def densify_point_cloud(images, poses, K, points, device, patch_size: int = 7):
             speckleRange=32,
         )
 
-        disparity = stereo.compute(
-            (img_i * 255).astype(np.uint8),
-            (img_j * 255).astype(np.uint8)
-        ).astype(np.float32) / 16.0
+        disparity = stereo.compute(gray_i, gray_j).astype(np.float32) / 16.0
 
         # Sample valid disparity points
         valid = disparity > 1.0
