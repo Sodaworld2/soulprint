@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soulprint Forensic Lab — Technology Deep Dive</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #06060b;
+    --bg-elevated: #0d0d14;
+    --bg-card: #111119;
+    --bg-accent: #1a1a25;
+    --gold: #d4a847;
+    --gold-dim: #b8922e;
+    --gold-glow: rgba(212, 168, 71, 0.15);
+    --human: #4ade80;
+    --human-glow: rgba(74, 222, 128, 0.15);
+    --ai-detect: #f472b6;
+    --ai-glow: rgba(244, 114, 182, 0.15);
+    --watermark: #60a5fa;
+    --watermark-glow: rgba(96, 165, 250, 0.15);
+    --forensic: #c084fc;
+    --forensic-glow: rgba(192, 132, 252, 0.15);
+    --search: #fb923c;
+    --search-glow: rgba(251, 146, 60, 0.15);
+    --chain: #2dd4bf;
+    --chain-glow: rgba(45, 212, 191, 0.15);
+    --text: #e8e6e3;
+    --text-secondary: #9ca3af;
+    --text-dim: #6b7280;
+    --border: rgba(255, 255, 255, 0.06);
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 800px;
+    height: 800px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--gold);
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    max-width: 900px;
+  }
+
+  .hero h1 span { color: var(--gold); }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat-number {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .hero-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* SECTIONS */
+  .section {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .section-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .section-divider {
+    width: 60px;
+    height: 3px;
+    background: var(--gold);
+    margin: 0 auto 1.5rem;
+    border-radius: 2px;
+  }
+
+  /* LAYER SECTIONS */
+  .layer-section {
+    padding: 5rem 2rem;
+    position: relative;
+  }
+
+  .layer-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    background: var(--border);
+    transform: translateX(-50%);
+    z-index: 0;
+  }
+
+  .layer-header {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .layer-number {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .layer-header-text h3 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .layer-header-text .layer-subtitle {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: var(--font-mono);
+  }
+
+  .layer-header-text p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-top: 0.3rem;
+  }
+
+  /* TECHNIQUE GRID */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tech-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tech-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .tech-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .tech-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .tech-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .tech-card h4 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+
+  .tech-card .tech-origin {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .tech-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .tech-card .tech-fact {
+    margin-top: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 2px solid;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .tech-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.8rem;
+  }
+
+  .tech-tag {
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* LAYER COLORS */
+  .layer-1 .layer-number { background: var(--human-glow); color: var(--human); border: 2px solid var(--human); }
+  .layer-1 .layer-subtitle { color: var(--human); }
+  .layer-1 .tech-card::before { background: var(--human); }
+  .layer-1 .tech-icon { background: var(--human-glow); color: var(--human); }
+  .layer-1 .tech-fact { border-color: var(--human); }
+  .layer-1 .tech-tag { background: var(--human-glow); color: var(--human); }
+
+  .layer-2 .layer-number { background: var(--gold-glow); color: var(--gold); border: 2px solid var(--gold); }
+  .layer-2 .layer-subtitle { color: var(--gold); }
+  .layer-2 .tech-card::before { background: var(--gold); }
+  .layer-2 .tech-icon { background: var(--gold-glow); color: var(--gold); }
+  .layer-2 .tech-fact { border-color: var(--gold); }
+  .layer-2 .tech-tag { background: var(--gold-glow); color: var(--gold); }
+
+  .layer-3 .layer-number { background: var(--forensic-glow); color: var(--forensic); border: 2px solid var(--forensic); }
+  .layer-3 .layer-subtitle { color: var(--forensic); }
+  .layer-3 .tech-card::before { background: var(--forensic); }
+  .layer-3 .tech-icon { background: var(--forensic-glow); color: var(--forensic); }
+  .layer-3 .tech-fact { border-color: var(--forensic); }
+  .layer-3 .tech-tag { background: var(--forensic-glow); color: var(--forensic); }
+
+  .layer-4 .layer-number { background: var(--search-glow); color: var(--search); border: 2px solid var(--search); }
+  .layer-4 .layer-subtitle { color: var(--search); }
+  .layer-4 .tech-card::before { background: var(--search); }
+  .layer-4 .tech-icon { background: var(--search-glow); color: var(--search); }
+  .layer-4 .tech-fact { border-color: var(--search); }
+  .layer-4 .tech-tag { background: var(--search-glow); color: var(--search); }
+
+  .layer-5 .layer-number { background: var(--watermark-glow); color: var(--watermark); border: 2px solid var(--watermark); }
+  .layer-5 .layer-subtitle { color: var(--watermark); }
+  .layer-5 .tech-card::before { background: var(--watermark); }
+  .layer-5 .tech-icon { background: var(--watermark-glow); color: var(--watermark); }
+  .layer-5 .tech-fact { border-color: var(--watermark); }
+  .layer-5 .tech-tag { background: var(--watermark-glow); color: var(--watermark); }
+
+  .layer-6 .layer-number { background: var(--chain-glow); color: var(--chain); border: 2px solid var(--chain); }
+  .layer-6 .layer-subtitle { color: var(--chain); }
+  .layer-6 .tech-card::before { background: var(--chain); }
+  .layer-6 .tech-icon { background: var(--chain-glow); color: var(--chain); }
+  .layer-6 .tech-fact { border-color: var(--chain); }
+  .layer-6 .tech-tag { background: var(--chain-glow); color: var(--chain); }
+
+  /* DIGITAL TWIN SECTION */
+  .twin-section {
+    padding: 6rem 2rem;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 50%, var(--bg) 100%);
+  }
+
+  .twin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .twin-visual {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+
+  .twin-side {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .twin-side h4 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .twin-side .twin-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .twin-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gold);
+  }
+
+  .twin-arrow-line {
+    width: 80px;
+    height: 2px;
+    background: var(--gold);
+    position: relative;
+  }
+
+  .twin-arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--gold);
+    border-top: 2px solid var(--gold);
+    transform: rotate(45deg);
+  }
+
+  .twin-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.2rem;
+    margin-top: 3rem;
+  }
+
+  .twin-feature {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .twin-feature-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .twin-feature h5 {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .twin-feature p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  /* CONVERGENCE SECTION */
+  .convergence {
+    padding: 6rem 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .convergence-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 3rem 0;
+  }
+
+  .conv-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .conv-label {
+    width: 180px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-align: right;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .conv-track {
+    flex: 1;
+    height: 36px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .conv-fill {
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--bg);
+    transition: width 1.5s ease;
+  }
+
+  .conv-weight {
+    width: 50px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* PRICING */
+  .pricing-section {
+    padding: 6rem 2rem;
+    background: var(--bg-elevated);
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 3rem auto 0;
+  }
+
+  .price-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .price-card.featured {
+    border-color: var(--gold);
+    box-shadow: 0 0 40px var(--gold-glow);
+  }
+
+  .price-card.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.2rem 0.8rem;
+    background: var(--gold);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    border-radius: 4px;
+  }
+
+  .price-card h4 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .price-amount {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .price-amount span {
+    font-size: 1rem;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .price-desc {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .price-features {
+    text-align: left;
+    list-style: none;
+  }
+
+  .price-features li {
+    padding: 0.4rem 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .price-features li::before {
+    content: '\2713';
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* MUSEUM COMPARISON */
+  .museum-section {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .museum-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    margin: 3rem 0;
+    align-items: start;
+  }
+
+  .museum-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .museum-col h4 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .museum-col.physical h4 {
+    background: var(--forensic-glow);
+    color: var(--forensic);
+  }
+
+  .museum-col.digital h4 {
+    background: var(--gold-glow);
+    color: var(--gold);
+  }
+
+  .museum-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .museum-item strong {
+    display: block;
+    font-size: 0.82rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .museum-item span {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+  }
+
+  .museum-arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 4.5rem;
+    gap: 3.35rem;
+  }
+
+  .museum-arrow {
+    color: var(--text-dim);
+    font-size: 1.2rem;
+  }
+
+  /* FOOTER */
+  .footer {
+    padding: 3rem 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  .footer strong { color: var(--gold); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .twin-visual { grid-template-columns: 1fr; }
+    .twin-arrow { transform: rotate(90deg); }
+    .museum-grid { grid-template-columns: 1fr; }
+    .museum-arrows { display: none; }
+    .conv-label { width: 120px; font-size: 0.65rem; }
+    .hero-stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Forensic Authentication Lab</div>
+  <h1>Every Creative Work Gets a <span>Digital Twin</span></h1>
+  <p>
+    We don't just register your work. We dissect it. 30+ forensic analysis techniques — the same science museums use to authenticate Vermeers — applied to your creative work in seconds. If anyone steals it, the DNA doesn't lie.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-number">30+</div>
+      <div class="hero-stat-label">Analysis Techniques</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">6</div>
+      <div class="hero-stat-label">Independent Layers</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">0-100</div>
+      <div class="hero-stat-label">Soulprint Index</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">$49</div>
+      <div class="hero-stat-label">One-Time Fee</div>
+    </div>
+  </div>
+</div>
+
+<!-- MUSEUM COMPARISON: Physical vs Digital -->
+<div class="museum-section">
+  <div class="section-header">
+    <div class="section-divider"></div>
+    <h2>Museum Lab Science, Digitised</h2>
+    <p>Every technique used by the Louvre, the Met, and the FBI Art Crime Team has a computational equivalent. We run them all.</p>
+  </div>
+
+  <div class="museum-grid">
+    <div class="museum-col physical">
+      <h4>Physical Lab Technique</h4>
+      <div class="museum-item">
+        <strong>X-Ray Fluorescence (XRF)</strong>
+        <span>Identifies elemental composition of pigments. Caught Beltracchi — one titanium particle in zinc white ended a 35-year forgery career.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Infrared Reflectography</strong>
+        <span>Reveals underdrawings and pentimenti. Original artists revise constantly; copyists reproduce the final image.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Raking Light Analysis</strong>
+        <span>Surface texture reveals brushstroke relief, pressure, speed. Like handwriting — unique to each artist.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Canvas Thread Counting</strong>
+        <span>Weave density maps match canvases from the same bolt. Used to authenticate Vermeer by matching "rollmates."</span>
+      </div>
+      <div class="museum-item">
+        <strong>Raman Spectroscopy</strong>
+        <span>Molecular fingerprint of each pigment. Distinguishes natural from synthetic ultramarine (appeared ~1828).</span>
+      </div>
+      <div class="museum-item">
+        <strong>Radiocarbon Dating</strong>
+        <span>The "bomb peak" — nuclear testing doubled C-14 after 1954. Fresh paint binder betrays modern creation. Period.</span>
+      </div>
+      <div class="museum-item">
+        <strong>UV Fluorescence</strong>
+        <span>First test any conservator runs. Old varnish glows green; fresh retouching shows as dark blotches.</span>
+      </div>
+      <div class="museum-item">
+        <strong>OCT Craquelure Analysis</strong>
+        <span>Authentic age cracks are rectangular in cross-section. Forged cracks are triangular. Like fingerprints — unique.</span>
+      </div>
+    </div>
+
+    <div class="museum-arrows">
+      <div class="museum-arrow">&rarr;</div>
+      <div class="museum-arrow">&rarr;</div>
+      <div class="museum-arrow">&rarr;</div>
+      <div class="museum-arrow">&rarr;</div>
+      <div class="museum-arrow">&rarr;</div>
+      <div class="museum-arrow">&rarr;</div>
+      <div class="museum-arrow">&rarr;</div>
+      <div class="museum-arrow">&rarr;</div>
+    </div>
+
+    <div class="museum-col digital">
+      <h4>Soulprint Digital Equivalent</h4>
+      <div class="museum-item">
+        <strong>Color Channel Separation</strong>
+        <span>RGB, HSV, LAB space analysis. Artists have distinctive palette signatures — statistical fingerprint across 100K+ paintings proven.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Creation Biometrics</strong>
+        <span>Records the creation process: stroke order, revisions, undo/redo patterns. AI has no process to record. Irrefutable.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Edge Detection / Sobel Analysis</strong>
+        <span>Gradient direction distributions capture stroke patterns. Orientation histograms = digital brushstroke signature.</span>
+      </div>
+      <div class="museum-item">
+        <strong>FFT Frequency Analysis</strong>
+        <span>Fourier transform reveals periodic patterns in texture. Canvas weave, brushstroke rhythm, AI upsampling artifacts.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Compressibility Curves</strong>
+        <span>Multi-format compression at 10 quality levels creates a unique curve. Like a molecular fingerprint but mathematical.</span>
+      </div>
+      <div class="museum-item">
+        <strong>AI Generation Detection</strong>
+        <span>FIRE (CVPR 2025): frequency-guided reconstruction error. Diffusion models can't reconstruct mid-band frequencies of real images.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Error Level Analysis</strong>
+        <span>Re-compress, subtract, reveal. Edited regions glow. Uniform = authentic compression history.</span>
+      </div>
+      <div class="museum-item">
+        <strong>Fractal Dimension / Wavelets</strong>
+        <span>Multifractal spectrum + wavelet statistics. Authenticated Bruegel drawings (PNAS). 100% accuracy on Pollock authentication.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LAYER 1: CREATION BIOMETRICS -->
+<div class="layer-section layer-1">
+  <div class="layer-header">
+    <div class="layer-number">1</div>
+    <div class="layer-header-text">
+      <div class="layer-subtitle">PROOF OF PROCESS</div>
+      <h3>Creation Biometrics</h3>
+      <p>AI has no creation process. This layer is impossible to fake.</p>
+    </div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x270D;&#xFE0F;</div>
+        <div>
+          <h4>Stroke Pressure Dynamics</h4>
+          <div class="tech-origin">IEEE 2024 &middot; PEN-TABLET BIOMETRICS</div>
+        </div>
+      </div>
+      <p>Records pressure curves for every stroke. Each artist has a unique pressure signature — their "handwriting" in paint. Dynamic features are more discriminative than static features for authentication.</p>
+      <div class="tech-fact">IEEE found pen-tablet dynamics identify individuals with higher accuracy than static image analysis alone.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">CANVAS API</span>
+        <span class="tech-tag">POINTER EVENTS</span>
+        <span class="tech-tag">BIOMETRIC</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x23F1;&#xFE0F;</div>
+        <div>
+          <h4>Velocity & Acceleration Capture</h4>
+          <div class="tech-origin">MOTOR CONTROL BIOMETRICS</div>
+        </div>
+      </div>
+      <p>Speed, acceleration, and jerk (3rd derivative of position) of each stroke. These capture the biomechanics of the artist's hand movement — involuntary motor patterns that cannot be consciously controlled.</p>
+      <div class="tech-fact">Even involuntary hand tremor micro-movements are biometrically identifiable on graphics tablets (NASA ADS research).</div>
+      <div class="tech-tags">
+        <span class="tech-tag">VELOCITY</span>
+        <span class="tech-tag">ACCELERATION</span>
+        <span class="tech-tag">JERK</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F504;</div>
+        <div>
+          <h4>Undo/Redo Pattern Analysis</h4>
+          <div class="tech-origin">PROCESS INTELLIGENCE</div>
+        </div>
+      </div>
+      <p>AI generates final images in one pass — it never "changes its mind." Human artists constantly revise: undo, redo, paint over. The pattern of revisions is a powerful authenticity signal (like pentimenti in physical paintings).</p>
+      <div class="tech-fact">Pentimenti (artist revisions) are one of the strongest authentication signals in physical art — copyists reproduce the final image, never the mistakes.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">REVISION HISTORY</span>
+        <span class="tech-tag">PROCESS PROOF</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F3A8;</div>
+        <div>
+          <h4>Temporal Creation Heatmap</h4>
+          <div class="tech-origin">SPATIAL-TEMPORAL ANALYSIS</div>
+        </div>
+      </div>
+      <p>Records WHERE the artist worked and WHEN. Creates a time-lapse map of the creation process. Each artist has habitual working patterns — starting points, detail order, areas of focus vs. areas rushed.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">HEATMAP</span>
+        <span class="tech-tag">TIMELAPSE</span>
+        <span class="tech-tag">WORKFLOW DNA</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F9EC;</div>
+        <div>
+          <h4>Per-Artist Biometric Profile</h4>
+          <div class="tech-origin">CUMULATIVE IDENTITY</div>
+        </div>
+      </div>
+      <p>Over time, multiple registered works build a statistical profile of the artist's creation habits. New works can be compared to this profile — proving not just that a human created it, but that THIS SPECIFIC human created it.</p>
+      <div class="tech-fact">Rutgers University: 80,000 strokes from Picasso/Matisse/Modigliani — detected EVERY forgery from a single stroke alone. 96% accuracy.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">ARTIST DNA</span>
+        <span class="tech-tag">PROFILE</span>
+        <span class="tech-tag">ATTRIBUTION</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4F9;</div>
+        <div>
+          <h4>Layer Order & Timing</h4>
+          <div class="tech-origin">DIGITAL STRATIGRAPHY</div>
+        </div>
+      </div>
+      <p>Like cross-sectioning a physical painting to see its layers, we record the order of digital layer creation, modification, and deletion. Captures the structural decisions of the creation process.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">LAYER STACK</span>
+        <span class="tech-tag">STRATIGRAPHY</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LAYER 2: CONTENT DNA -->
+<div class="layer-section layer-2">
+  <div class="layer-header">
+    <div class="layer-number">2</div>
+    <div class="layer-header-text">
+      <div class="layer-subtitle">MATHEMATICAL IDENTITY</div>
+      <h3>Content DNA Fingerprint</h3>
+      <p>Every image has a unique mathematical signature. We extract it in your browser — no upload required.</p>
+    </div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F308;</div>
+        <div>
+          <h4>Color Channel Separation</h4>
+          <div class="tech-origin">RGB &middot; HSV &middot; LAB &middot; YCbCr</div>
+        </div>
+      </div>
+      <p>Splits the image into independent colour spaces. LAB separates lightness from chrominance. Each reveals information invisible in composite view. Analysis of 100,000+ paintings confirms: artists have distinctive palette signatures.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">CANVAS API</span>
+        <span class="tech-tag">CLIENT-SIDE</span>
+        <span class="tech-tag">REAL-TIME</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4CA;</div>
+        <div>
+          <h4>Regional Entropy Maps</h4>
+          <div class="tech-origin">SHANNON ENTROPY &middot; 8x8 GRID</div>
+        </div>
+      </div>
+      <p>Shannon entropy per region measures information density. Creates a unique "complexity heatmap." Natural images have characteristic entropy distributions that differ systematically from AI-generated ones (p < 0.0001).</p>
+      <div class="tech-fact">GLCM entropy analysis: t-statistic of 20.02 between real and AI images. Highly significant.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">ENTROPY</span>
+        <span class="tech-tag">GLCM</span>
+        <span class="tech-tag">INFORMATION THEORY</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4C9;</div>
+        <div>
+          <h4>Compressibility Curves</h4>
+          <div class="tech-origin">KOLMOGOROV COMPLEXITY APPROX</div>
+        </div>
+      </div>
+      <p>Compress the image at 10 quality levels across 3 formats (JPEG, PNG, WebP). The resulting curve is a proxy for Kolmogorov complexity — the mathematical "information content" of the work. Unique per image like a fingerprint.</p>
+      <div class="tech-fact">Kolmogorov complexity distinguishes between different schools of Orthodox iconography (Nature, 2022).</div>
+      <div class="tech-tags">
+        <span class="tech-tag">COMPRESSION</span>
+        <span class="tech-tag">COMPLEXITY</span>
+        <span class="tech-tag">PURE MATH</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4D0;</div>
+        <div>
+          <h4>Edge Orientation Histograms</h4>
+          <div class="tech-origin">SOBEL OPERATORS &middot; GRADIENT ANALYSIS</div>
+        </div>
+      </div>
+      <p>Sobel edge detection computes gradient magnitude and direction per pixel. The distribution of edge orientations captures the artist's stroke patterns — their characteristic "hand" encoded in the image structure.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">SOBEL</span>
+        <span class="tech-tag">CANNY</span>
+        <span class="tech-tag">OPENCV.JS</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">#&#xFE0F;&#x20E3;</div>
+        <div>
+          <h4>Perceptual Hashing (pHash + dHash)</h4>
+          <div class="tech-origin">IMAGE FINGERPRINTING</div>
+        </div>
+      </div>
+      <p>pHash uses Discrete Cosine Transform; dHash compares adjacent pixel brightness. Both survive JPEG compression, resizing, minor edits. The fingerprint matches even after transformation — finds stolen copies everywhere.</p>
+      <div class="tech-fact">TinEye uses perceptual hashing to search 57.7 BILLION images in milliseconds.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">pHASH</span>
+        <span class="tech-tag">dHASH</span>
+        <span class="tech-tag">DCT</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F522;</div>
+        <div>
+          <h4>Statistical Moments</h4>
+          <div class="tech-origin">MEAN &middot; VARIANCE &middot; SKEWNESS &middot; KURTOSIS</div>
+        </div>
+      </div>
+      <p>Four statistical moments computed per colour channel, per region. Mean (brightness), variance (contrast), skewness (asymmetry), kurtosis (tail heaviness). Together they describe the statistical shape of the image's data.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">STATISTICS</span>
+        <span class="tech-tag">PER-REGION</span>
+        <span class="tech-tag">FAST</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LAYER 3: DEEP FORENSICS -->
+<div class="layer-section layer-3">
+  <div class="layer-header">
+    <div class="layer-number">3</div>
+    <div class="layer-header-text">
+      <div class="layer-subtitle">DEEP FORENSIC ANALYSIS</div>
+      <h3>AI Detection & Manipulation Detection</h3>
+      <p>State-of-the-art techniques from CVPR 2025 and forensic research labs.</p>
+    </div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F50D;</div>
+        <div>
+          <h4>FIRE: Frequency-Guided Reconstruction</h4>
+          <div class="tech-origin">CVPR 2025 &middot; OPEN SOURCE</div>
+        </div>
+      </div>
+      <p>The most important AI detection method. Diffusion models struggle to reconstruct mid-band frequency information in real images. Extract frequencies, run through diffusion model, compare reconstruction error. Real = high error. AI = low error.</p>
+      <div class="tech-fact">Generalises to unseen diffusion models. Robust against perturbations. Open source: github.com/Chuchad/FIRE</div>
+      <div class="tech-tags">
+        <span class="tech-tag">CVPR 2025</span>
+        <span class="tech-tag">DIFFUSION</span>
+        <span class="tech-tag">OPEN SOURCE</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F300;</div>
+        <div>
+          <h4>FFT Spectral Artifact Detection</h4>
+          <div class="tech-origin">FOURIER ANALYSIS &middot; >99% ACCURACY</div>
+        </div>
+      </div>
+      <p>Fast Fourier Transform converts the image to frequency domain. ALL GAN architectures leave spectral artifacts from upsampling: CycleGAN/StarGAN produce dots and lines; StyleGAN shows mid/high-frequency anomalies. Over 99% detection accuracy.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">FFT</span>
+        <span class="tech-tag">GAN DETECTION</span>
+        <span class="tech-tag">RESNET50</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F9EA;</div>
+        <div>
+          <h4>Error Level Analysis (ELA)</h4>
+          <div class="tech-origin">JPEG FORENSICS &middot; BROWSER-NATIVE</div>
+        </div>
+      </div>
+      <p>Re-compress the JPEG and compute per-pixel difference. Uniform = authentic compression history. Bright spots = regions with different compression cycles = edits, pastes, or AI generation artifacts. Runs entirely in the browser.</p>
+      <div class="tech-fact">Already implemented at 29a.ch using HTML5 Canvas. Real-time rendering with adjustable quality sliders.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">CANVAS API</span>
+        <span class="tech-tag">JPEG</span>
+        <span class="tech-tag">CLIENT-SIDE</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4E1;</div>
+        <div>
+          <h4>Diffusion Snap-Back Test</h4>
+          <div class="tech-origin">NOVEMBER 2025 &middot; RECONSTRUCTION DISTANCE</div>
+        </div>
+      </div>
+      <p>Add noise to the image, then use a diffusion model to denoise. Real images and generated images "snap back" to different manifold positions. The reconstruction distance reveals whether the image was AI-generated.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">DIFFUSION</span>
+        <span class="tech-tag">MANIFOLD</span>
+        <span class="tech-tag">SERVER-SIDE</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F50E;</div>
+        <div>
+          <h4>JPEG Quantization Table Analysis</h4>
+          <div class="tech-origin">SOURCE IDENTIFICATION</div>
+        </div>
+      </div>
+      <p>Every JPEG encoder uses unique quantization tables — a fingerprint of the camera or software that created the image. Detect double compression, identify the tool chain, spot mismatched blocks as small as 8x8 pixels at quality 98.5%.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">JPEG HEADERS</span>
+        <span class="tech-tag">DCT</span>
+        <span class="tech-tag">QUANTIZATION</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F30A;</div>
+        <div>
+          <h4>Wavelet Decomposition</h4>
+          <div class="tech-origin">PNAS 2004 &middot; BRUEGEL AUTHENTICATION</div>
+        </div>
+      </div>
+      <p>Multi-scale wavelet statistics capture texture at every resolution — from fine brushstroke detail to broad composition. The seminal PNAS paper authenticated 13 Pieter Bruegel the Elder drawings. Applied to van Gogh, Gauguin, Giotto.</p>
+      <div class="tech-fact">Wavelet-based method identified the number of contributing artists in a Perugino painting — matching expert opinion exactly.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">PyWAVELETS</span>
+        <span class="tech-tag">DWT2</span>
+        <span class="tech-tag">MULTI-SCALE</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F52C;</div>
+        <div>
+          <h4>Fractal Dimension Analysis</h4>
+          <div class="tech-origin">POLLOCK AUTHENTICATION &middot; 100% ACCURACY</div>
+        </div>
+      </div>
+      <p>Multifractal spectrum quantifies self-similarity across scales. Richard Taylor's group: distinguished 14 authentic Pollock drip paintings from 51 non-Pollocks with 100% accuracy. Sliding-window colour-FD maps complexity spatially.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">BOX-COUNTING</span>
+        <span class="tech-tag">MULTIFRACTAL</span>
+        <span class="tech-tag">COMPLEXITY</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4F7;</div>
+        <div>
+          <h4>PRNU Camera Sensor Fingerprinting</h4>
+          <div class="tech-origin">SENSOR FORENSICS &middot; INDIVIDUAL DEVICE ID</div>
+        </div>
+      </div>
+      <p>Every imaging sensor has a unique noise pattern from manufacturing. This Photo Response Non-Uniformity is present in EVERY image the sensor produces. Identifies the specific physical camera — not just the model, the individual unit.</p>
+      <div class="tech-fact">PRNU survives JPEG compression, filtering, and most processing. Used by FBI and law enforcement for device attribution.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">DENOISING</span>
+        <span class="tech-tag">CORRELATION</span>
+        <span class="tech-tag">DEVICE ID</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4CB;</div>
+        <div>
+          <h4>Copy-Move Detection (SIFT)</h4>
+          <div class="tech-origin">SCALE INVARIANT FEATURE TRANSFORM</div>
+        </div>
+      </div>
+      <p>Identifies regions within an image that have been duplicated. SIFT extracts keypoints invariant to scale, rotation, illumination. Clusters of matching keypoints in different spatial locations = internal plagiarism.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">SIFT</span>
+        <span class="tech-tag">AKAZE</span>
+        <span class="tech-tag">OPENCV</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4C4;</div>
+        <div>
+          <h4>EXIF & Metadata Forensics</h4>
+          <div class="tech-origin">EXIF &middot; XMP &middot; IPTC &middot; C2PA</div>
+        </div>
+      </div>
+      <p>Extract and validate all embedded metadata: camera model, lens, exposure, GPS, software chain, edit history. Authentic camera images have rich, consistent EXIF. AI-generated images have missing or synthetic metadata — a strong signal.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">EXIF</span>
+        <span class="tech-tag">XMP</span>
+        <span class="tech-tag">VALIDATION</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F50D;</div>
+        <div>
+          <h4>Noise Pattern Analysis</h4>
+          <div class="tech-origin">WAVELET DENOISING &middot; RESIDUAL STATS</div>
+        </div>
+      </div>
+      <p>Subtract denoised image from original to extract noise residual. Authentic photographs: stochastic (random) sensor noise. AI-generated: smoother, structured noise patterns. Analyse variance, kurtosis, spatial correlation.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">DENOISING</span>
+        <span class="tech-tag">RESIDUAL</span>
+        <span class="tech-tag">STATISTICS</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F3AF;</div>
+        <div>
+          <h4>ManiFPT Model Attribution</h4>
+          <div class="tech-origin">CVPR 2024 &middot; WHICH AI MODEL?</div>
+        </div>
+      </div>
+      <p>Not just "was this AI-generated?" but "WHICH AI model generated it?" Defines the formal fingerprint of each generative model as the set of all its artifacts. Identifies Stable Diffusion vs DALL-E vs Midjourney vs others.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">CVPR 2024</span>
+        <span class="tech-tag">ATTRIBUTION</span>
+        <span class="tech-tag">MODEL ID</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LAYER 4: SIMILARITY SEARCH -->
+<div class="layer-section layer-4">
+  <div class="layer-header">
+    <div class="layer-number">4</div>
+    <div class="layer-header-text">
+      <div class="layer-subtitle">PRIOR ART / NOVELTY SEARCH</div>
+      <h3>Similarity Search Engine</h3>
+      <p>Modeled on USPTO's DesignVision — AI-powered image search across registries.</p>
+    </div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F50D;</div>
+        <div>
+          <h4>Perceptual Hash Comparison</h4>
+          <div class="tech-origin">HAMMING DISTANCE &middot; pgVECTOR</div>
+        </div>
+      </div>
+      <p>Compare perceptual hashes of every registered work against all others. Hamming distance measures similarity. pgvector in PostgreSQL enables millisecond similarity search across millions of registered works.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">pgVECTOR</span>
+        <span class="tech-tag">SUPABASE</span>
+        <span class="tech-tag">HAMMING</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F9E0;</div>
+        <div>
+          <h4>CLIP Semantic Similarity</h4>
+          <div class="tech-origin">OPENAI CLIP &middot; VISION-LANGUAGE</div>
+        </div>
+      </div>
+      <p>CLIP embeddings capture semantic meaning — finds works that look similar in concept, not just pixels. "A sunset over mountains" matches other sunset paintings even if the style is completely different. Catches conceptual copying.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">CLIP</span>
+        <span class="tech-tag">EMBEDDINGS</span>
+        <span class="tech-tag">SEMANTIC</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F310;</div>
+        <div>
+          <h4>Reverse Image Web Search</h4>
+          <div class="tech-origin">TinEye MODEL &middot; 57.7B IMAGE INDEX</div>
+        </div>
+      </div>
+      <p>Search the web for copies of your work. TinEye's index covers 57.7 billion images. Find exact and modified matches — cropped, resized, filtered, screenshotted. Getty's PicScout crawls the web continuously for unlicensed uses.</p>
+      <div class="tech-fact">Getty settlement demands: typically $1,000+ per infringing image found via PicScout web crawling.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">WEB CRAWL</span>
+        <span class="tech-tag">TINEYE</span>
+        <span class="tech-tag">MONITORING</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4DD;</div>
+        <div>
+          <h4>Novelty Report Generation</h4>
+          <div class="tech-origin">USPTO DesignVision MODEL</div>
+        </div>
+      </div>
+      <p>Like a patent examiner's prior art search. Produces a report showing the closest existing works with similarity scores, visual comparisons, and a novelty assessment. Modeled on the USPTO's DesignVision tool (July 2025, searches 80+ global IP registries).</p>
+      <div class="tech-tags">
+        <span class="tech-tag">NOVELTY</span>
+        <span class="tech-tag">PRIOR ART</span>
+        <span class="tech-tag">REPORT</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LAYER 5: INVISIBLE WATERMARK -->
+<div class="layer-section layer-5">
+  <div class="layer-header">
+    <div class="layer-number">5</div>
+    <div class="layer-header-text">
+      <div class="layer-subtitle">PROOF OF REGISTRATION</div>
+      <h3>Invisible Watermark Injection</h3>
+      <p>Your certificate ID is woven into the pixels of the image itself. Invisible to the eye. Survives everything.</p>
+    </div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4E1;</div>
+        <div>
+          <h4>Spread-Spectrum Watermarking</h4>
+          <div class="tech-origin">STEGANOGRAPHY &middot; SIGNAL PROCESSING</div>
+        </div>
+      </div>
+      <p>Embeds data by spreading it across the frequency spectrum of the image. Like hiding a message in noise — invisible to the eye, detectable by the decoder. Survives JPEG compression, scaling, cropping, screenshotting.</p>
+      <div class="tech-fact">Google's SynthID has already watermarked over 10 BILLION pieces of content using neural network-based embedding.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">STEGANOGRAPHY</span>
+        <span class="tech-tag">SPREAD SPECTRUM</span>
+        <span class="tech-tag">ROBUST</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F510;</div>
+        <div>
+          <h4>QIM Dual-Layer Watermark</h4>
+          <div class="tech-origin">QUANTIZATION INDEX MODULATION</div>
+        </div>
+      </div>
+      <p>Second independent watermark layer using Quantization Index Modulation. Modifies DCT coefficients to embed bits. Two independent watermarks = if one is stripped, the other remains. Double redundancy for maximum security.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">QIM</span>
+        <span class="tech-tag">DCT</span>
+        <span class="tech-tag">DUAL-LAYER</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x26A0;&#xFE0F;</div>
+        <div>
+          <h4>Watermark Absence Detection</h4>
+          <div class="tech-origin">TAMPER EVIDENCE</div>
+        </div>
+      </div>
+      <p>If someone strips the watermark (using diffusion editing or other attacks), the ABSENCE of the expected watermark itself becomes a tampering signal. A February 2026 paper showed diffusion editing can remove watermarks — so we detect removal too.</p>
+      <div class="tech-fact">"Vanishing Watermarks" (Feb 2026): Proved diffusion editing can strip invisible watermarks. That's why we use 6 layers, not just one.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">TAMPER DETECT</span>
+        <span class="tech-tag">ANTI-STRIP</span>
+        <span class="tech-tag">ALERT</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4E5;</div>
+        <div>
+          <h4>InvisMark Neural Watermarking</h4>
+          <div class="tech-origin">WACV 2025 &middot; 97%+ BIT ACCURACY</div>
+        </div>
+      </div>
+      <p>Neural network learns to embed and extract watermarks that survive arbitrary transformations. Over 97% bit accuracy across JPEG, scaling, cropping, screenshots. Imperceptible to the human eye — the certificate ID lives in the image forever.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">NEURAL NET</span>
+        <span class="tech-tag">WACV 2025</span>
+        <span class="tech-tag">97%+ ACCURACY</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LAYER 6: PROVENANCE CHAIN -->
+<div class="layer-section layer-6">
+  <div class="layer-header">
+    <div class="layer-number">6</div>
+    <div class="layer-header-text">
+      <div class="layer-subtitle">PROOF OF HISTORY</div>
+      <h3>Provenance Chain</h3>
+      <p>Cryptographic timestamps, content credentials, and complete audit trails. Admissible in court.</p>
+    </div>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F552;</div>
+        <div>
+          <h4>RFC 3161 Trusted Timestamps</h4>
+          <div class="tech-origin">IETF STANDARD &middot; HSM-BACKED</div>
+        </div>
+      </div>
+      <p>Hash of your work is cryptographically bound to the current time by a Trusted Timestamping Authority. Signed with the TSA's private key via Hardware Security Module. Proves your work existed at the exact moment of registration. Legally admissible.</p>
+      <div class="tech-fact">WIPO Proof offered this service at CHF 20/token until 2022 — then discontinued. The market needs a replacement.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">RFC 3161</span>
+        <span class="tech-tag">HSM</span>
+        <span class="tech-tag">LEGAL</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4DC;</div>
+        <div>
+          <h4>C2PA Content Credentials</h4>
+          <div class="tech-origin">ISO STANDARD &middot; ADOBE/GOOGLE/MS</div>
+        </div>
+      </div>
+      <p>The emerging global standard for content provenance. Like a "nutrition label" for digital content — who made it, when, with what tools, every edit since. Adopted by Leica, Adobe, Google, LinkedIn, Meta. Becoming ISO standard 2025-2026.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">C2PA</span>
+        <span class="tech-tag">ISO</span>
+        <span class="tech-tag">INTEROP</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x1F4C3;</div>
+        <div>
+          <h4>ISO 27037 Evidence Documentation</h4>
+          <div class="tech-origin">DIGITAL EVIDENCE STANDARD</div>
+        </div>
+      </div>
+      <p>Every action is documented to digital forensics chain-of-custody standards. Identification, collection, acquisition, preservation. Every handler, every transfer, every access logged. "If you didn't write it down, it didn't happen."</p>
+      <div class="tech-tags">
+        <span class="tech-tag">ISO 27037</span>
+        <span class="tech-tag">CHAIN OF CUSTODY</span>
+        <span class="tech-tag">FORENSIC</span>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <div class="tech-icon">&#x26D3;&#xFE0F;</div>
+        <div>
+          <h4>eIDAS Qualified Timestamps</h4>
+          <div class="tech-origin">EU REGULATION 2024/1183</div>
+        </div>
+      </div>
+      <p>EU qualified timestamps have the highest level of legal assurance — admissible as evidence in EU courts. eIDAS 2.0 full rollout expected 2026. Marseille Judicial Court (March 2025) already recognized digital timestamps as legitimate evidence.</p>
+      <div class="tech-fact">EU AI Act Article 50 requires AI-generated content labeling by August 2026. Soulprint provides the proof infrastructure.</div>
+      <div class="tech-tags">
+        <span class="tech-tag">eIDAS 2.0</span>
+        <span class="tech-tag">EU AI ACT</span>
+        <span class="tech-tag">COURT-ADMISSIBLE</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- DIGITAL TWIN SECTION -->
+<div class="twin-section">
+  <div class="twin-container">
+    <div class="section-header">
+      <div class="section-divider"></div>
+      <h2>The Digital Twin</h2>
+      <p>A painting in the real world now has its digital twin in the virtual. It knows it's the original. If anyone uses it without permission and doesn't have a certificate — they're caught.</p>
+    </div>
+
+    <div class="twin-visual">
+      <div class="twin-side">
+        <div class="twin-icon">&#x1F5BC;&#xFE0F;</div>
+        <h4>Physical Original</h4>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">The painting, photograph, sculpture, song, or design as it exists in the real world.</p>
+      </div>
+      <div class="twin-arrow">
+        <div style="font-size: 0.7rem; font-family: var(--font-mono); white-space: nowrap;">SOULPRINT<br>ANALYSIS</div>
+        <div class="twin-arrow-line"></div>
+        <div style="font-size: 0.6rem; color: var(--text-dim);">6-LAYER<br>FORENSICS</div>
+      </div>
+      <div class="twin-side" style="border-color: var(--gold); box-shadow: 0 0 30px var(--gold-glow);">
+        <div class="twin-icon">&#x1F9EC;</div>
+        <h4 style="color: var(--gold);">Digital Twin (Soulprint)</h4>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">Complete forensic profile: Content DNA, creation biometrics, invisible watermark, provenance chain, Soulprint Index score.</p>
+      </div>
+    </div>
+
+    <div class="twin-features">
+      <div class="twin-feature">
+        <div class="twin-feature-icon">&#x1F4A1;</div>
+        <div>
+          <h5>Self-Aware Identity</h5>
+          <p>The digital twin "knows" it's the OG — its DNA fingerprint, watermark, and provenance chain are mathematically unique and cryptographically signed.</p>
+        </div>
+      </div>
+      <div class="twin-feature">
+        <div class="twin-feature-icon">&#x1F6E1;&#xFE0F;</div>
+        <div>
+          <h5>Theft Detection</h5>
+          <p>Web crawlers continuously search for copies. Perceptual hashing finds stolen versions even after cropping, resizing, or filtering. The invisible watermark identifies the work even in screenshots.</p>
+        </div>
+      </div>
+      <div class="twin-feature">
+        <div class="twin-feature-icon">&#x2696;&#xFE0F;</div>
+        <div>
+          <h5>Legal Evidence Package</h5>
+          <p>RFC 3161 timestamp + ISO 27037 chain of custody + eIDAS qualified signature. Court-admissible proof that your work existed first and belongs to you.</p>
+        </div>
+      </div>
+      <div class="twin-feature">
+        <div class="twin-feature-icon">&#x1F916;</div>
+        <div>
+          <h5>AI Detection Shield</h5>
+          <p>If someone runs your work through an AI model and claims the output, the forensic analysis reveals the AI generation artifacts. Your original has human creation biometrics. Theirs doesn't.</p>
+        </div>
+      </div>
+      <div class="twin-feature">
+        <div class="twin-feature-icon">&#x1F3AF;</div>
+        <div>
+          <h5>Attribution Intelligence</h5>
+          <p>Not just "a human made this" but "THIS specific human made this." Stylometric profiles match works to their creators like handwriting analysis. Over time, the profile gets stronger.</p>
+        </div>
+      </div>
+      <div class="twin-feature">
+        <div class="twin-feature-icon">&#x1F4B0;</div>
+        <div>
+          <h5>Enforcement Ready</h5>
+          <p>Automated DMCA takedowns, CCB small claims filing assistance, settlement demand generation. If they're using your work without a certificate — they're caught and they pay.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- CONVERGENCE SCORE -->
+<div class="convergence">
+  <div class="section-header">
+    <div class="section-divider"></div>
+    <h2>The Soulprint Index</h2>
+    <p>No single technique proves authenticity. Six independent forensic signals converge into a single confidence score — the FBI Art Crime Team model, digitised.</p>
+  </div>
+
+  <div class="convergence-visual">
+    <div class="conv-bar">
+      <div class="conv-label">CREATION BIOMETRICS</div>
+      <div class="conv-track">
+        <div class="conv-fill" style="width: 25%; background: var(--human);">25%</div>
+      </div>
+      <div class="conv-weight" style="color: var(--human);">25%</div>
+    </div>
+    <div class="conv-bar">
+      <div class="conv-label">DEEP FORENSICS</div>
+      <div class="conv-track">
+        <div class="conv-fill" style="width: 20%; background: var(--forensic);">20%</div>
+      </div>
+      <div class="conv-weight" style="color: var(--forensic);">20%</div>
+    </div>
+    <div class="conv-bar">
+      <div class="conv-label">CONTENT DNA</div>
+      <div class="conv-track">
+        <div class="conv-fill" style="width: 15%; background: var(--gold);">15%</div>
+      </div>
+      <div class="conv-weight" style="color: var(--gold);">15%</div>
+    </div>
+    <div class="conv-bar">
+      <div class="conv-label">SIMILARITY SEARCH</div>
+      <div class="conv-track">
+        <div class="conv-fill" style="width: 15%; background: var(--search);">15%</div>
+      </div>
+      <div class="conv-weight" style="color: var(--search);">15%</div>
+    </div>
+    <div class="conv-bar">
+      <div class="conv-label">PROVENANCE CHAIN</div>
+      <div class="conv-track">
+        <div class="conv-fill" style="width: 15%; background: var(--chain);">15%</div>
+      </div>
+      <div class="conv-weight" style="color: var(--chain);">15%</div>
+    </div>
+    <div class="conv-bar">
+      <div class="conv-label">WATERMARK INTEGRITY</div>
+      <div class="conv-track">
+        <div class="conv-fill" style="width: 10%; background: var(--watermark);">10%</div>
+      </div>
+      <div class="conv-weight" style="color: var(--watermark);">10%</div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <div style="display: inline-block; background: var(--bg-card); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem 3rem;">
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 0.5rem;">SOULPRINT INDEX</div>
+      <div style="font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--gold); line-height: 1;">87</div>
+      <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); margin-top: 0.3rem;">/ 100</div>
+      <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--human);">STRONG AUTHENTICATION</div>
+      <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem;">5 of 6 layers verified</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PRICING -->
+<div class="pricing-section">
+  <div class="section-header">
+    <div class="section-divider"></div>
+    <h2>One-Time Fee. Your DNA Forever.</h2>
+    <p>No subscriptions. You upload, we analyse, you own the certificate forever.<br>Between a $45 copyright filing (no analysis) and a $2,000+ design patent (full examination).</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="price-card">
+      <h4>Quick Stamp</h4>
+      <div class="price-amount">$9 <span>/ work</span></div>
+      <div class="price-desc">Basic registration</div>
+      <ul class="price-features">
+        <li>Content DNA fingerprint</li>
+        <li>Perceptual hash (pHash + dHash)</li>
+        <li>SHA-256 cryptographic hash</li>
+        <li>Trusted timestamp</li>
+        <li>Basic certificate</li>
+      </ul>
+    </div>
+
+    <div class="price-card featured">
+      <h4>Full Analysis</h4>
+      <div class="price-amount">$49 <span>/ work</span></div>
+      <div class="price-desc">Complete forensic examination</div>
+      <ul class="price-features">
+        <li>Everything in Quick Stamp</li>
+        <li>AI detection (FIRE + FFT + ELA)</li>
+        <li>Similarity search (novelty report)</li>
+        <li>Invisible watermark injection</li>
+        <li>Wavelet + fractal analysis</li>
+        <li>EXIF/metadata forensics</li>
+        <li>Full forensic report</li>
+      </ul>
+    </div>
+
+    <div class="price-card">
+      <h4>Forensic Lab</h4>
+      <div class="price-amount">$149 <span>/ work</span></div>
+      <div class="price-desc">Maximum authentication</div>
+      <ul class="price-features">
+        <li>Everything in Full Analysis</li>
+        <li>Creation biometrics analysis</li>
+        <li>Per-artist profile building</li>
+        <li>PRNU camera identification</li>
+        <li>Expert-level report</li>
+        <li>Priority web monitoring</li>
+        <li>DMCA takedown assistance</li>
+      </ul>
+    </div>
+
+    <div class="price-card">
+      <h4>Portfolio</h4>
+      <div class="price-amount">$299 <span>/ 10 works</span></div>
+      <div class="price-desc">For prolific creators</div>
+      <ul class="price-features">
+        <li>10 Full Analysis certificates</li>
+        <li>Portfolio dashboard</li>
+        <li>Continuous web monitoring</li>
+        <li>Automated infringement alerts</li>
+        <li>Bulk processing</li>
+        <li>API access</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- FOOTER -->
+<div class="footer">
+  <p><strong>Soulprint</strong> &mdash; A Forensic Authentication Lab for Creative Works</p>
+  <p style="margin-top: 0.5rem;">SodaLabs AI &middot; Johannesburg &middot; 2026</p>
+  <p style="margin-top: 1rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);">
+    30+ forensic techniques &middot; 6 independent layers &middot; FBI convergence model<br>
+    Museum science meets computational intelligence
+  </p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soulprint — Case Studies: How It Works</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap');
+:root{--bg:#06060b;--bg2:#0d0d14;--bg3:#111119;--bg4:#1a1a25;--gold:#d4a847;--gold-g:rgba(212,168,71,.15);--green:#4ade80;--green-g:rgba(74,222,128,.12);--pink:#f472b6;--pink-g:rgba(244,114,182,.12);--blue:#60a5fa;--blue-g:rgba(96,165,250,.12);--purple:#c084fc;--purple-g:rgba(192,132,252,.12);--orange:#fb923c;--orange-g:rgba(251,146,60,.12);--teal:#2dd4bf;--teal-g:rgba(45,212,191,.12);--text:#e8e6e3;--text2:#9ca3af;--text3:#6b7280;--border:rgba(255,255,255,.06);--ff:'Space Grotesk',sans-serif;--fb:'Outfit',sans-serif;--fm:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.7}
+a{color:var(--gold);text-decoration:none}
+
+/* HERO */
+.hero{padding:5rem 2rem 3rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:50%;left:50%;width:700px;height:700px;transform:translate(-50%,-50%);background:radial-gradient(circle,var(--gold-g) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-block;padding:.3rem .8rem;border:1px solid var(--gold);border-radius:100px;font-family:var(--fm);font-size:.7rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.5rem}
+.hero h1{font-family:var(--ff);font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.15;margin-bottom:1rem;max-width:800px;margin-left:auto;margin-right:auto}
+.hero h1 span{color:var(--gold)}
+.hero>p{color:var(--text2);max-width:650px;margin:0 auto;font-size:1.05rem}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(6,6,11,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.7rem 1rem;display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.nav a{padding:.35rem 1rem;border-radius:8px;font-family:var(--fm);font-size:.72rem;letter-spacing:.04em;border:1px solid var(--border);color:var(--text2);transition:all .2s}
+.nav a:hover,.nav a.active{border-color:var(--gold);color:var(--gold);background:var(--gold-g)}
+
+/* CASE STUDY */
+.case{max-width:1100px;margin:0 auto;padding:4rem 2rem;scroll-margin-top:4rem}
+.case+.case{border-top:1px solid var(--border)}
+
+.case-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.25rem .7rem;border-radius:6px;font-family:var(--fm);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem}
+.case-1 .case-badge{background:var(--purple-g);color:var(--purple)}
+.case-2 .case-badge{background:var(--orange-g);color:var(--orange)}
+.case-3 .case-badge{background:var(--teal-g);color:var(--teal)}
+
+.case h2{font-family:var(--ff);font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:700;margin-bottom:.5rem}
+.case>p.intro{color:var(--text2);font-size:1.05rem;margin-bottom:2.5rem;max-width:750px}
+
+/* PERSONA */
+.persona{display:flex;gap:1.5rem;align-items:flex-start;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:2.5rem}
+.persona-icon{font-size:3rem;flex-shrink:0}
+.persona h3{font-family:var(--ff);font-size:1.1rem;font-weight:600;margin-bottom:.2rem}
+.persona .persona-role{font-family:var(--fm);font-size:.7rem;color:var(--text3);letter-spacing:.04em;margin-bottom:.5rem}
+.persona p{color:var(--text2);font-size:.9rem}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2.5rem}
+.timeline::before{content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--border)}
+
+.step{position:relative;margin-bottom:2.5rem}
+.step:last-child{margin-bottom:0}
+.step-dot{position:absolute;left:-2.5rem;top:.2rem;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.7rem;font-weight:600;z-index:1}
+.case-1 .step-dot{background:var(--purple-g);color:var(--purple);border:2px solid var(--purple)}
+.case-2 .step-dot{background:var(--orange-g);color:var(--orange);border:2px solid var(--orange)}
+.case-3 .step-dot{background:var(--teal-g);color:var(--teal);border:2px solid var(--teal)}
+
+.step h4{font-family:var(--ff);font-size:1rem;font-weight:600;margin-bottom:.3rem}
+.step>p{color:var(--text2);font-size:.9rem;margin-bottom:.8rem}
+
+/* TECH USED */
+.tech-used{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem}
+.tech-pill{padding:.2rem .5rem;border-radius:4px;font-family:var(--fm);font-size:.6rem;letter-spacing:.03em}
+.case-1 .tech-pill{background:var(--purple-g);color:var(--purple)}
+.case-2 .tech-pill{background:var(--orange-g);color:var(--orange)}
+.case-3 .tech-pill{background:var(--teal-g);color:var(--teal)}
+
+/* DETAIL BOX */
+.detail{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;margin-bottom:.8rem}
+.detail h5{font-family:var(--ff);font-size:.85rem;font-weight:600;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+.detail p,.detail li{color:var(--text2);font-size:.85rem}
+.detail ul{padding-left:1.2rem}
+.detail li{margin-bottom:.2rem}
+
+/* STORED DATA */
+.stored{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-top:2rem}
+.stored h4{font-family:var(--ff);font-size:1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.stored-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.8rem}
+.stored-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.8rem}
+.stored-item h6{font-family:var(--fm);font-size:.65rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.3rem}
+.case-1 .stored-item h6{color:var(--purple)}
+.case-2 .stored-item h6{color:var(--orange)}
+.case-3 .stored-item h6{color:var(--teal)}
+.stored-item p{font-size:.8rem;color:var(--text2)}
+.stored-item code{font-family:var(--fm);font-size:.7rem;color:var(--text3);display:block;margin-top:.3rem;word-break:break-all}
+
+/* OUTCOME */
+.outcome{margin-top:2rem;background:var(--bg3);border-radius:10px;padding:1.5rem;border-left:3px solid}
+.case-1 .outcome{border-color:var(--purple)}
+.case-2 .outcome{border-color:var(--orange)}
+.case-3 .outcome{border-color:var(--teal)}
+.outcome h4{font-family:var(--ff);font-size:1rem;font-weight:600;margin-bottom:.8rem}
+.outcome-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem}
+.outcome-item{display:flex;gap:.5rem;align-items:flex-start}
+.outcome-icon{font-size:1.2rem;flex-shrink:0;margin-top:.1rem}
+.outcome-item p{font-size:.85rem;color:var(--text2)}
+.outcome-item strong{color:var(--text);display:block;font-size:.88rem}
+
+/* SOULPRINT INDEX */
+.index-box{display:inline-flex;flex-direction:column;align-items:center;background:var(--bg3);border:2px solid var(--gold);border-radius:14px;padding:1.2rem 2rem;margin-top:1.5rem}
+.index-label{font-family:var(--fm);font-size:.65rem;color:var(--text3);letter-spacing:.1em}
+.index-score{font-family:var(--ff);font-size:2.5rem;font-weight:700;color:var(--gold);line-height:1}
+.index-desc{font-size:.75rem;color:var(--text2);margin-top:.2rem}
+
+/* FOOTER */
+.foot{padding:3rem 2rem;text-align:center;border-top:1px solid var(--border);color:var(--text3);font-size:.8rem;margin-top:2rem}
+.foot strong{color:var(--gold)}
+
+/* MOCKUP SCREENS */
+.mockup{margin:2.5rem 0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.mockup-bar{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;background:var(--bg4);border-bottom:1px solid var(--border)}
+.mockup-dot{width:8px;height:8px;border-radius:50%;background:var(--text3)}
+.mockup-dot:nth-child(1){background:#ef4444}
+.mockup-dot:nth-child(2){background:#eab308}
+.mockup-dot:nth-child(3){background:#22c55e}
+.mockup-url{margin-left:.5rem;font-family:var(--fm);font-size:.6rem;color:var(--text3);background:var(--bg3);padding:.15rem .6rem;border-radius:4px;flex:1}
+.mockup-body{padding:1.5rem}
+.mockup-label{font-family:var(--fm);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem;text-align:center}
+
+/* Certificate mockup */
+.mock-cert{max-width:500px;margin:0 auto;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.5rem;position:relative;overflow:hidden}
+.mock-cert::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--green),var(--gold))}
+.mock-cert-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.mock-cert-logo{display:flex;align-items:center;gap:.4rem;font-family:var(--ff);font-weight:600;font-size:.9rem}
+.mock-cert-id{font-family:var(--fm);font-size:.7rem;color:var(--text3);background:var(--bg4);padding:.2rem .5rem;border-radius:4px}
+.mock-cert-title{font-family:var(--ff);font-size:1.2rem;font-weight:600;margin-bottom:.15rem}
+.mock-cert-artist{color:var(--text2);font-size:.88rem;margin-bottom:1rem}
+.mock-cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
+.mock-cert-field{background:var(--bg4);border-radius:6px;padding:.5rem .7rem}
+.mock-cert-field label{display:block;font-family:var(--fm);font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:.15rem}
+.mock-cert-field span{font-size:.82rem}
+.mock-cert-hash{font-family:var(--fm);font-size:.55rem;color:var(--text3);background:var(--bg4);padding:.4rem .6rem;border-radius:4px;word-break:break-all;margin-bottom:1rem}
+.mock-cert-hash label{display:block;margin-bottom:.2rem;letter-spacing:.06em;text-transform:uppercase}
+
+/* Score gauge */
+.mock-gauge{display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:1rem;background:var(--bg4);border-radius:8px;margin-bottom:1rem}
+.mock-gauge-ring{width:70px;height:70px;border-radius:50%;border:4px solid var(--bg);position:relative;display:flex;align-items:center;justify-content:center;font-family:var(--ff);font-size:1.4rem;font-weight:700}
+.mock-gauge-bars{flex:1}
+.mock-gauge-bar{display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem}
+.mock-gauge-bar label{width:80px;font-family:var(--fm);font-size:.5rem;letter-spacing:.03em;color:var(--text3);text-align:right}
+.mock-gauge-bar .bar{height:6px;border-radius:3px;flex:1;background:var(--bg)}
+.mock-gauge-bar .bar-fill{height:100%;border-radius:3px}
+
+/* Forensic panel mockup */
+.mock-forensic{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.6rem;margin-top:1rem}
+.mock-forensic-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.6rem;text-align:center}
+.mock-forensic-item .mock-f-icon{font-size:1.5rem;margin-bottom:.2rem}
+.mock-forensic-item .mock-f-label{font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.04em;display:block;margin-bottom:.15rem}
+.mock-forensic-item .mock-f-value{font-family:var(--fm);font-size:.75rem;font-weight:600}
+.mock-f-pass{color:var(--green)}
+.mock-f-score{color:var(--gold)}
+
+/* Edition tracker mockup */
+.mock-edition{max-width:600px;margin:0 auto}
+.mock-edition-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.mock-edition-head h5{font-family:var(--ff);font-size:1rem}
+.mock-edition-head span{font-family:var(--fm);font-size:.7rem;color:var(--text3)}
+.mock-edition-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.mock-ed-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.55rem;font-weight:500;cursor:default;transition:all .2s}
+.mock-ed-sold{background:var(--green-g);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.mock-ed-avail{background:var(--bg4);color:var(--text3);border:1px solid var(--border)}
+.mock-ed-reserved{background:var(--gold-g);color:var(--gold);border:1px solid rgba(212,168,71,.2)}
+.mock-ed-legend{display:flex;gap:1rem;justify-content:center;margin-top:.8rem;font-size:.7rem;color:var(--text3)}
+.mock-ed-legend span{display:flex;align-items:center;gap:.3rem}
+.mock-ed-legend .dot{width:8px;height:8px;border-radius:2px}
+
+@media(max-width:600px){
+  .persona{flex-direction:column;gap:.8rem}
+  .stored-grid{grid-template-columns:1fr}
+  .outcome-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Case Studies</div>
+  <h1>Three Artists. Three Mediums. <span>One Forensic Lab.</span></h1>
+  <p>How Soulprint protects a sculptor's 3D mesh, a painter's original canvas, and an illustrator's limited-edition print — from upload to enforcement.</p>
+</div>
+
+<div class="nav">
+  <a href="#sculptor">Case 1: Sculptor / 3D Mesh</a>
+  <a href="#painter">Case 2: Painting Artist</a>
+  <a href="#printmaker">Case 3: Limited-Edition Print</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CASE 1: SCULPTOR — 3D MESH -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="case case-1" id="sculptor">
+  <div class="case-badge">Case Study 1</div>
+  <h2>The Sculptor: Protecting a 3D Mesh</h2>
+  <p class="intro">A sculptor creates physical works and wants to sell authorised 3D meshes for people to print, display in virtual worlds, or use in games — but only with a valid licence. Anyone using an unauthorised copy is caught.</p>
+
+  <div class="persona">
+    <div class="persona-icon">&#x1F9D1;&#x200D;&#x1F3A8;</div>
+    <div>
+      <h3>Thandiwe Mkhize</h3>
+      <div class="persona-role">SCULPTOR &middot; JOHANNESBURG &middot; BRONZE + DIGITAL</div>
+      <p>Thandiwe creates bronze sculptures inspired by Zulu mythology. She's been approached by a metaverse platform wanting to sell 3D scans of her work. She's seen other sculptors' work ripped from Instagram and turned into 3D prints sold on Etsy without permission. She wants to sell authorised digital twins — but needs proof of ownership and a way to catch pirates.</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-dot">1</div>
+      <h4>Capture: High-Resolution 3D Scan</h4>
+      <p>Thandiwe takes her bronze sculpture to a photogrammetry studio. 200+ photographs from every angle are processed into a high-resolution 3D mesh (.OBJ / .GLB / .USDZ). She also photographs the physical sculpture under controlled lighting for the 2D registration.</p>
+      <div class="tech-used">
+        <span class="tech-pill">PHOTOGRAMMETRY</span>
+        <span class="tech-pill">200+ IMAGES</span>
+        <span class="tech-pill">.OBJ / .GLB</span>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-dot">2</div>
+      <h4>Upload to Soulprint Forensic Lab</h4>
+      <p>Thandiwe uploads both the 3D mesh file AND the reference photographs to Soulprint. She selects the "Forensic Lab" tier ($149) because she needs maximum protection for commercial licensing.</p>
+      <div class="detail">
+        <h5>&#x1F4C1; What she uploads:</h5>
+        <ul>
+          <li><strong>3D Mesh:</strong> .GLB file (12.4 MB) — the complete digital twin of the sculpture</li>
+          <li><strong>Reference Photos:</strong> 8 high-res photographs of the physical bronze under controlled lighting</li>
+          <li><strong>Process Documentation:</strong> Video of the sculpting process (clay maquette to bronze casting)</li>
+          <li><strong>Creator Statement:</strong> Cultural context, technique description, materials used</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-dot">3</div>
+      <h4>Layer 1: Creation Biometrics — Process Verification</h4>
+      <p>Soulprint analyses the creation documentation. The sculpting video is processed frame-by-frame to extract a timeline of the creation process — from initial clay sketch through maquette to final bronze.</p>
+      <div class="detail">
+        <h5>&#x1F9EC; What's extracted:</h5>
+        <ul>
+          <li><strong>Creation timeline:</strong> 47 distinct stages identified across 6 hours of video</li>
+          <li><strong>Material transitions:</strong> Clay &rarr; wax &rarr; ceramic shell &rarr; bronze detected and timestamped</li>
+          <li><strong>Tool marks analysis:</strong> Characteristic sculpting tool patterns identified in close-up frames</li>
+          <li><strong>Artist hand presence:</strong> Confirmed human hands visible throughout — not a 3D print or CNC</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">VIDEO FRAME ANALYSIS</span>
+        <span class="tech-pill">TEMPORAL MAPPING</span>
+        <span class="tech-pill">TOOL MARK ID</span>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-dot">4</div>
+      <h4>Layer 2: Content DNA — 3D Mesh Fingerprint</h4>
+      <p>The 3D mesh is mathematically fingerprinted using techniques adapted from computational geometry.</p>
+      <div class="detail">
+        <h5>&#x1F4CA; 3D-specific analysis:</h5>
+        <ul>
+          <li><strong>Vertex distribution hash:</strong> Statistical fingerprint of the mesh's 487,000 vertices — their spatial distribution is unique like a fingerprint</li>
+          <li><strong>Surface curvature map:</strong> Gaussian and mean curvature computed at every vertex. The curvature signature is unique to this specific sculpture</li>
+          <li><strong>Topology hash:</strong> The mesh's connectivity (which vertices connect to which) is hashed — survives scaling, rotation, and translation</li>
+          <li><strong>Bounding box ratios:</strong> Height:width:depth proportions captured as a quick-match identifier</li>
+          <li><strong>Surface area / volume ratio:</strong> Mathematical constant for this specific form</li>
+        </ul>
+      </div>
+      <div class="detail">
+        <h5>&#x1F5BC;&#xFE0F; 2D reference photo analysis (per photograph):</h5>
+        <ul>
+          <li><strong>Colour DNA:</strong> RGB/HSV/LAB channel separation — the patina colour signature of the bronze</li>
+          <li><strong>Perceptual hash:</strong> pHash + dHash for each angle — finds cropped/resized copies online</li>
+          <li><strong>Regional entropy:</strong> 8&times;8 grid Shannon entropy map — complexity fingerprint of the surface texture</li>
+          <li><strong>Edge orientation:</strong> Sobel gradient histograms capture the sculpture's silhouette signature from each angle</li>
+          <li><strong>Statistical moments:</strong> Mean, variance, skewness, kurtosis per channel per region</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">VERTEX HASH</span>
+        <span class="tech-pill">GAUSSIAN CURVATURE</span>
+        <span class="tech-pill">TOPOLOGY</span>
+        <span class="tech-pill">pHASH</span>
+        <span class="tech-pill">ENTROPY MAP</span>
+        <span class="tech-pill">SOBEL</span>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <div class="step-dot">5</div>
+      <h4>Layer 3: Deep Forensic Analysis</h4>
+      <p>Server-side analysis runs the heavy computation on both the reference photos and the 3D mesh data.</p>
+      <div class="detail">
+        <h5>&#x1F52C; What runs:</h5>
+        <ul>
+          <li><strong>AI generation check (FIRE):</strong> Frequency-guided reconstruction error test on all 8 reference photos. Result: PASS — no AI generation artifacts detected. These are photographs of a real physical object.</li>
+          <li><strong>FFT spectral analysis:</strong> Power spectrum of each photo checked for GAN/diffusion upsampling artifacts. Result: CLEAN — natural frequency distribution consistent with camera capture.</li>
+          <li><strong>EXIF validation:</strong> Camera: Nikon Z7 II, lens: 24-70mm f/2.8, GPS: Johannesburg. Metadata consistent and internally coherent.</li>
+          <li><strong>PRNU camera fingerprint:</strong> Sensor noise pattern extracted. All 8 photos confirmed from the same individual camera unit.</li>
+          <li><strong>3D mesh integrity:</strong> No signs of automated mesh generation (AI-generated meshes have characteristic vertex clustering patterns). Vertex distribution is organic — consistent with photogrammetry from a physical object.</li>
+          <li><strong>ELA on photos:</strong> Uniform error levels — no regions pasted or composited.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">FIRE (CVPR 2025)</span>
+        <span class="tech-pill">FFT</span>
+        <span class="tech-pill">PRNU</span>
+        <span class="tech-pill">ELA</span>
+        <span class="tech-pill">EXIF</span>
+        <span class="tech-pill">MESH INTEGRITY</span>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step">
+      <div class="step-dot">6</div>
+      <h4>Layer 4: Similarity Search — Prior Art Check</h4>
+      <p>Soulprint searches for similar existing works across its registry and the open web.</p>
+      <div class="detail">
+        <h5>&#x1F50D; Search results:</h5>
+        <ul>
+          <li><strong>Soulprint registry:</strong> No matching 3D meshes or reference photos. This work is novel in the database.</li>
+          <li><strong>CLIP semantic search:</strong> 3 visually similar works found (other Zulu mythology sculptures) — all by different artists, different forms. Similarity: 34%, 29%, 22%. Well below the 85% alert threshold.</li>
+          <li><strong>Reverse image search:</strong> Thandiwe's Instagram posts found with the same sculpture. Confirmed as her public portfolio. No unauthorised copies detected yet.</li>
+          <li><strong>3D model databases:</strong> No matching meshes found on Sketchfab, TurboSquid, or CGTrader.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">pgVECTOR</span>
+        <span class="tech-pill">CLIP EMBEDDING</span>
+        <span class="tech-pill">REVERSE IMAGE</span>
+        <span class="tech-pill">3D DATABASE SCAN</span>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step">
+      <div class="step-dot">7</div>
+      <h4>Layer 5: Invisible Watermark Injection</h4>
+      <p>The certificate is embedded directly into the assets — both the 3D mesh and the reference images.</p>
+      <div class="detail">
+        <h5>&#x1F510; What's injected:</h5>
+        <ul>
+          <li><strong>3D mesh watermark:</strong> Certificate ID (SP-TM8K4X2A) embedded by subtly perturbing vertex positions in the least-significant decimal places. Invisible to the eye, survives format conversion (.OBJ &rarr; .FBX &rarr; .GLB), detectable by Soulprint decoder.</li>
+          <li><strong>Photo watermarks:</strong> Spread-spectrum + QIM dual-layer watermark in all 8 reference photos. Certificate ID woven into the pixel data. Survives JPEG, scaling, cropping, screenshots.</li>
+          <li><strong>Licence payload:</strong> The watermark doesn't just contain the certificate ID — it encodes the licence type (commercial, limited edition, personal), the authorised holder, and an expiry timestamp.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">VERTEX PERTURBATION</span>
+        <span class="tech-pill">SPREAD SPECTRUM</span>
+        <span class="tech-pill">QIM</span>
+        <span class="tech-pill">LICENCE ENCODING</span>
+      </div>
+    </div>
+
+    <!-- STEP 8 -->
+    <div class="step">
+      <div class="step-dot">8</div>
+      <h4>Layer 6: Provenance Chain — Legal Timestamp</h4>
+      <p>Everything is cryptographically sealed and timestamped.</p>
+      <div class="detail">
+        <h5>&#x1F552; What's recorded:</h5>
+        <ul>
+          <li><strong>RFC 3161 timestamp:</strong> SHA-512 hash of the complete forensic report sent to a Trusted Timestamping Authority. Cryptographically proves this registration existed at this exact moment. Legally admissible.</li>
+          <li><strong>C2PA content credential:</strong> Embedded in each exported file. Any C2PA-compatible viewer (Adobe, Leica, browser extensions) will show the Soulprint provenance data.</li>
+          <li><strong>Audit trail initiated:</strong> Every future access, verification, licence check, and modification logged with ISO 27037-compliant documentation.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">RFC 3161</span>
+        <span class="tech-pill">C2PA</span>
+        <span class="tech-pill">ISO 27037</span>
+        <span class="tech-pill">SHA-512</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT'S STORED -->
+  <div class="stored">
+    <h4>&#x1F4BE; What's Permanently Stored in Soulprint's Vault</h4>
+    <div class="stored-grid">
+      <div class="stored-item">
+        <h6>Certificate</h6>
+        <p>SP-TM8K4X2A — unique Soulprint ID, creator details, cultural context, work metadata, registration date</p>
+      </div>
+      <div class="stored-item">
+        <h6>3D Mesh Fingerprint</h6>
+        <p>Vertex distribution hash, surface curvature map, topology hash, bounding ratios, volume/area ratio</p>
+        <code>vertex_hash: a7f3c9...e12b</code>
+      </div>
+      <div class="stored-item">
+        <h6>Photo DNA (x8)</h6>
+        <p>Per photo: pHash, dHash, colour histograms, entropy map, edge orientations, statistical moments</p>
+        <code>phash[0]: d4e8b3...91fa</code>
+      </div>
+      <div class="stored-item">
+        <h6>Forensic Report</h6>
+        <p>FIRE result, FFT spectrum, PRNU fingerprint, ELA map, EXIF validation, mesh integrity — all serialised as JSON</p>
+      </div>
+      <div class="stored-item">
+        <h6>Creation Biometrics</h6>
+        <p>47-stage creation timeline extracted from video. Tool mark signatures. Material transition timestamps.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Similarity Report</h6>
+        <p>Top 10 closest matches with similarity scores. Baseline for future infringement detection.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Watermark Keys</h6>
+        <p>Encrypted spread-spectrum and QIM extraction keys for both mesh and photos. Private — never exposed.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Timestamp Token</h6>
+        <p>RFC 3161 signed token from TSA. Immutable proof of registration moment. Legally admissible evidence.</p>
+      </div>
+      <div class="stored-item">
+        <h6>CLIP Embedding</h6>
+        <p>768-dimensional semantic vector stored in pgvector for ongoing similarity search against new registrations.</p>
+        <code>embedding: [0.034, -0.127, ...]</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP: Certificate View -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+      <div class="mockup-url">soulprint.io/certificate/SP-TM8K4X2A</div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-label">Certificate View — What Thandiwe and collectors see</div>
+      <div class="mock-cert">
+        <div class="mock-cert-head">
+          <div class="mock-cert-logo">&#x1F50F; Soulprint</div>
+          <div class="mock-cert-id">SP-TM8K4X2A</div>
+        </div>
+        <div class="mock-cert-title">Umthakathi (The Healer)</div>
+        <div class="mock-cert-artist">by Thandiwe Mkhize &middot; Bronze Sculpture + 3D Mesh</div>
+        <div class="mock-gauge">
+          <div class="mock-gauge-ring" style="border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px var(--gold-g)">92</div>
+          <div class="mock-gauge-bars">
+            <div class="mock-gauge-bar"><label>Creation</label><div class="bar"><div class="bar-fill" style="width:88%;background:var(--green)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Content DNA</label><div class="bar"><div class="bar-fill" style="width:95%;background:var(--gold)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Forensics</label><div class="bar"><div class="bar-fill" style="width:94%;background:var(--purple)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Similarity</label><div class="bar"><div class="bar-fill" style="width:100%;background:var(--orange)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Watermark</label><div class="bar"><div class="bar-fill" style="width:90%;background:var(--blue)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Provenance</label><div class="bar"><div class="bar-fill" style="width:85%;background:var(--teal)"></div></div></div>
+          </div>
+        </div>
+        <div class="mock-cert-grid">
+          <div class="mock-cert-field"><label>Medium</label><span>&#x1F3A8; Bronze Sculpture + 3D Mesh (.GLB)</span></div>
+          <div class="mock-cert-field"><label>Creative Origin</label><span style="color:var(--green)">&#x2728; Fully Human</span></div>
+          <div class="mock-cert-field"><label>AI Detection</label><span style="color:var(--green)">&#x2705; CLEAN — No AI artifacts</span></div>
+          <div class="mock-cert-field"><label>Camera</label><span>Nikon Z7 II #6004823</span></div>
+          <div class="mock-cert-field" style="grid-column:1/-1"><label>Cultural Context</label><span>Zulu mythology, hand-modelled clay to bronze lost-wax casting, Johannesburg studio</span></div>
+        </div>
+        <div class="mock-cert-hash">
+          <label>SHA-512 Certificate Hash</label>
+          a7f3c9d4e8b391fa2c6d7e0b4a8f3c9d4e8b391fa2c6d7e0b4a8f3c9d4e8b391fa2c6d7e0b4a8f...
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text3)">
+          <span>Registered 27 Feb 2026, 14:32 SAST</span>
+          <span style="color:var(--green)">&#x2705; Verified</span>
+        </div>
+      </div>
+
+      <div class="mockup-label" style="margin-top:1.5rem">Forensic Analysis Panel</div>
+      <div class="mock-forensic">
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F50D;</div><span class="mock-f-label">FIRE Score</span><span class="mock-f-value mock-f-pass">0.89 PASS</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F300;</div><span class="mock-f-label">FFT Spectrum</span><span class="mock-f-value mock-f-pass">CLEAN</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F4F7;</div><span class="mock-f-label">PRNU Match</span><span class="mock-f-value mock-f-pass">Z7 #6004823</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F9EA;</div><span class="mock-f-label">ELA</span><span class="mock-f-value mock-f-pass">UNIFORM</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F52C;</div><span class="mock-f-label">Fractal D</span><span class="mock-f-value mock-f-score">1.67</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F9EC;</div><span class="mock-f-label">3D Mesh</span><span class="mock-f-value mock-f-pass">ORGANIC</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F4CB;</div><span class="mock-f-label">Copy-Move</span><span class="mock-f-value mock-f-pass">NONE</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F4C4;</div><span class="mock-f-label">EXIF</span><span class="mock-f-value mock-f-pass">VALID</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT HAPPENS NEXT -->
+  <div class="outcome">
+    <h4>&#x26A1; What Happens Next</h4>
+    <div class="outcome-grid">
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F4B0;</div>
+        <div>
+          <strong>Authorised Sales</strong>
+          <p>Thandiwe sells 3D mesh licences via her website. Each buyer gets a watermarked copy with their licence ID encoded in the vertices. She can verify any mesh in the wild — authorised or pirate.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F6E1;&#xFE0F;</div>
+        <div>
+          <strong>Continuous Monitoring</strong>
+          <p>Soulprint crawls Sketchfab, TurboSquid, CGTrader, Etsy, and the open web weekly. Perceptual hashes match modified copies. 3D mesh fingerprint catches re-topology attempts. She gets alerts.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F6A8;</div>
+        <div>
+          <strong>Pirate Caught</strong>
+          <p>3 months later: an Etsy shop selling 3D-printed copies of her sculpture is detected. The mesh's vertex watermark is intact — proves the seller used her authorised file. Soulprint generates a DMCA takedown with full evidence package.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x2696;&#xFE0F;</div>
+        <div>
+          <strong>Legal Evidence Ready</strong>
+          <p>If the seller disputes: RFC 3161 timestamp proves Thandiwe registered first. Forensic report proves the mesh is derived from her original. The watermark proves the seller used her file. CCB claim ready — no lawyer needed.</p>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <div class="index-box">
+        <div class="index-label">SOULPRINT INDEX</div>
+        <div class="index-score">92</div>
+        <div class="index-desc">6 of 6 layers verified &middot; Forensic Lab tier</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CASE 2: PAINTING ARTIST -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="case case-2" id="painter">
+  <div class="case-badge">Case Study 2</div>
+  <h2>The Painter: Protecting an Original Canvas</h2>
+  <p class="intro">A painter creates original canvases and sells them through galleries. She needs to prove her work is human-made, establish a forensic record before sale, and catch anyone who uses images of her paintings without licence.</p>
+
+  <div class="persona">
+    <div class="persona-icon">&#x1F3A8;</div>
+    <div>
+      <h3>Amara Okafor</h3>
+      <div class="persona-role">OIL PAINTER &middot; CAPE TOWN &middot; LARGE-FORMAT CANVASES</div>
+      <p>Amara paints large-format oil canvases — vibrant landscapes with thick impasto technique. Her gallery sells originals for R80K-R250K. She's discovered AI models trained on her Instagram photos can now generate "Amara-style" paintings. Collectors are asking: "How do I know this is really yours, not AI?" She needs proof.</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <div class="step">
+      <div class="step-dot">1</div>
+      <h4>Capture: Painting the Work with Soulprint Recording</h4>
+      <p>Amara installs the Soulprint plugin for Procreate on her iPad, where she sketches compositions before painting on canvas. The plugin silently records her creation process as she works on the initial sketch.</p>
+      <div class="detail">
+        <h5>&#x270D;&#xFE0F; What the plugin captures during sketching:</h5>
+        <ul>
+          <li><strong>Pressure curves:</strong> 4,200 strokes recorded with full pressure data (0.0–1.0 range) per sample at 120Hz</li>
+          <li><strong>Velocity + acceleration:</strong> Speed and direction changes for every stroke — her characteristic "swooping" technique is captured</li>
+          <li><strong>Jerk (3rd derivative):</strong> The rate of acceleration change — captures involuntary hand tremor patterns unique to Amara</li>
+          <li><strong>Tilt + azimuth:</strong> Apple Pencil tilt data showing her habitual 35-degree working angle</li>
+          <li><strong>Undo/redo log:</strong> 47 undos, 12 redos — the pattern of revision that AI cannot produce</li>
+          <li><strong>Temporal heatmap:</strong> She starts top-left, works in spirals — a habitual working pattern building her biometric profile</li>
+        </ul>
+      </div>
+      <p>When the canvas painting is complete, she photographs it under controlled lighting using her Nikon Z7 II with a colour reference card.</p>
+      <div class="tech-used">
+        <span class="tech-pill">PROCREATE PLUGIN</span>
+        <span class="tech-pill">120Hz SAMPLING</span>
+        <span class="tech-pill">PRESSURE</span>
+        <span class="tech-pill">VELOCITY</span>
+        <span class="tech-pill">JERK</span>
+        <span class="tech-pill">TILT</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">2</div>
+      <h4>Upload to Soulprint: Full Forensic Submission</h4>
+      <p>Amara uploads: (1) the high-res photograph of the finished canvas, (2) the Procreate sketch with embedded creation biometrics, (3) 4 detail shots of impasto texture under raking light.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">3</div>
+      <h4>Layer 1: Creation Biometrics — The Unfakeable Layer</h4>
+      <div class="detail">
+        <h5>&#x1F9EC; Biometric analysis results:</h5>
+        <ul>
+          <li><strong>Stroke velocity profile:</strong> Amara's mean stroke velocity: 340 px/sec (std dev: 89). Consistent with her previous 12 registered works. This IS her hand.</li>
+          <li><strong>Pressure distribution:</strong> Characteristic heavy-light-heavy pattern on horizontal strokes. Matches her profile with 94% confidence.</li>
+          <li><strong>Tremor signature:</strong> 7.2Hz micro-tremor detected — consistent across all her works. This is an involuntary physiological signal she cannot change.</li>
+          <li><strong>Pause pattern:</strong> Average 2.3-second pauses between strokes, longer pauses (8-12 sec) when switching areas. Human creative rhythm confirmed.</li>
+          <li><strong>Revision pattern:</strong> 47 undos clustered in the sky region — she struggles with skies (confirmed by her artist statement). AI doesn't struggle.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">VELOCITY PROFILE</span>
+        <span class="tech-pill">TREMOR 7.2Hz</span>
+        <span class="tech-pill">94% IDENTITY MATCH</span>
+        <span class="tech-pill">REVISION MAP</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">4</div>
+      <h4>Layer 2: Content DNA — Painting Fingerprint</h4>
+      <div class="detail">
+        <h5>&#x1F4CA; Extracted from the canvas photograph:</h5>
+        <ul>
+          <li><strong>Colour palette DNA:</strong> LAB colour space analysis reveals 7 dominant colour clusters. Her signature cadmium orange appears in 34% of the canvas — consistent with her oeuvre.</li>
+          <li><strong>Regional entropy map:</strong> High entropy in impasto areas (thick texture = high information density). Low entropy in sky washes. The pattern is unique to this specific painting.</li>
+          <li><strong>Edge orientation histogram:</strong> Strong 30-degree diagonal dominance — her characteristic brushstroke angle confirmed across 12 works.</li>
+          <li><strong>Compressibility curve:</strong> The painting's JPEG/PNG/WebP compression ratios at 10 quality levels create a unique curve. Serves as a mathematical fingerprint.</li>
+          <li><strong>Detail texture analysis:</strong> The 4 raking-light detail shots capture impasto relief patterns. Wavelet decomposition at 5 scales creates a texture signature unique to her brush and technique.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">LAB COLOUR</span>
+        <span class="tech-pill">ENTROPY 8x8</span>
+        <span class="tech-pill">SOBEL EDGE</span>
+        <span class="tech-pill">WAVELET</span>
+        <span class="tech-pill">COMPRESS CURVE</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">5</div>
+      <h4>Layer 3: Deep Forensics — Proving It's Not AI</h4>
+      <div class="detail">
+        <h5>&#x1F52C; Analysis results:</h5>
+        <ul>
+          <li><strong>FIRE AI detection:</strong> PASS. Mid-band frequency reconstruction error is HIGH (0.87) — consistent with a photograph of a physical painting. AI-generated images typically score below 0.3.</li>
+          <li><strong>FFT spectrum:</strong> CLEAN. Natural frequency falloff. No GAN upsampling artifacts. No diffusion model signatures.</li>
+          <li><strong>PRNU sensor fingerprint:</strong> All 5 photographs confirmed from the same Nikon Z7 II unit (serial #6004823). Camera identified at individual-device level.</li>
+          <li><strong>EXIF coherence:</strong> All metadata internally consistent. GPS: Cape Town studio. Date: sequential timestamps over 2 hours. Lens: 50mm f/1.4. No signs of manipulation.</li>
+          <li><strong>ELA (Error Level Analysis):</strong> Uniform error levels across all photographs. No compositing, no pasting, no region replacement detected.</li>
+          <li><strong>Fractal dimension:</strong> D = 1.73 — consistent with oil painting on textured canvas. Her previous works range D = 1.68–1.81. Within her signature range.</li>
+          <li><strong>Wavelet statistics:</strong> First-order wavelet coefficients at scales 2-5 match her stylometric profile with 89% confidence. The brushwork is verifiably hers.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">FIRE 0.87</span>
+        <span class="tech-pill">FFT CLEAN</span>
+        <span class="tech-pill">PRNU #6004823</span>
+        <span class="tech-pill">FRACTAL D=1.73</span>
+        <span class="tech-pill">WAVELET 89%</span>
+        <span class="tech-pill">ELA PASS</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">6</div>
+      <h4>Layer 4: Similarity Search</h4>
+      <div class="detail">
+        <h5>&#x1F50D; Results:</h5>
+        <ul>
+          <li><strong>Soulprint registry:</strong> 2 of her own previous works match at 41% and 38% (same style, different compositions). No other artist's work above 25%.</li>
+          <li><strong>Web search:</strong> Her Instagram post of the work-in-progress found. 3 Pinterest reposts. 1 art blog feature (credited). No unauthorised commercial use detected.</li>
+          <li><strong>AI training data check:</strong> No evidence this specific painting has been ingested into known AI model training sets (LAION-5B checked via known hash lists).</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">CLIP SEARCH</span>
+        <span class="tech-pill">WEB CRAWL</span>
+        <span class="tech-pill">LAION CHECK</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">7</div>
+      <h4>Layer 5: Invisible Watermark</h4>
+      <p>Certificate SP-AO3R7K9M embedded in the high-res photograph via spread-spectrum + QIM dual-layer watermark. Any future export, screenshot, or print of this image carries Amara's certificate invisibly.</p>
+      <div class="tech-used">
+        <span class="tech-pill">SPREAD SPECTRUM</span>
+        <span class="tech-pill">QIM DUAL-LAYER</span>
+        <span class="tech-pill">SP-AO3R7K9M</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">8</div>
+      <h4>Layer 6: Provenance Chain</h4>
+      <p>RFC 3161 timestamp sealed. C2PA content credential embedded. Full audit trail initiated. The painting now has an unbreakable digital birth certificate.</p>
+      <div class="tech-used">
+        <span class="tech-pill">RFC 3161</span>
+        <span class="tech-pill">C2PA</span>
+        <span class="tech-pill">SHA-512</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STORED DATA -->
+  <div class="stored">
+    <h4>&#x1F4BE; What's Permanently Stored</h4>
+    <div class="stored-grid">
+      <div class="stored-item">
+        <h6>Certificate</h6>
+        <p>SP-AO3R7K9M — Amara Okafor, oil on canvas, 120x180cm, Cape Town, cultural context + materials</p>
+      </div>
+      <div class="stored-item">
+        <h6>Creation Biometrics</h6>
+        <p>4,200 stroke profiles with pressure/velocity/acceleration/jerk/tilt. 47 undo events. Temporal heatmap. Tremor signature 7.2Hz.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Artist Profile (cumulative)</h6>
+        <p>13th registered work. Profile now contains 52,000+ stroke samples. Identity confidence increasing with each registration.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Content DNA</h6>
+        <p>5 perceptual hashes, colour histograms, entropy map, edge orientations, compressibility curve, statistical moments</p>
+      </div>
+      <div class="stored-item">
+        <h6>Forensic Report</h6>
+        <p>FIRE score 0.87, FFT clean, PRNU device ID, fractal D=1.73, wavelet match 89%, ELA pass, EXIF validated</p>
+      </div>
+      <div class="stored-item">
+        <h6>Texture Signatures</h6>
+        <p>Wavelet decomposition at 5 scales from raking-light detail shots. Impasto relief fingerprint.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Watermark Keys</h6>
+        <p>Encrypted extraction parameters for spread-spectrum and QIM layers. Private.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Timestamp + Chain</h6>
+        <p>RFC 3161 token, C2PA credential, ISO 27037 audit trail. Court-admissible evidence package.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP: Painter Certificate + Biometric View -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+      <div class="mockup-url">soulprint.io/certificate/SP-AO3R7K9M</div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-label">Certificate View — Amara's painting</div>
+      <div class="mock-cert">
+        <div class="mock-cert-head">
+          <div class="mock-cert-logo">&#x1F50F; Soulprint</div>
+          <div class="mock-cert-id">SP-AO3R7K9M</div>
+        </div>
+        <div class="mock-cert-title">Storm Over Table Mountain</div>
+        <div class="mock-cert-artist">by Amara Okafor &middot; Oil on Canvas, 120 &times; 180cm</div>
+        <div class="mock-gauge">
+          <div class="mock-gauge-ring" style="border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px var(--gold-g)">91</div>
+          <div class="mock-gauge-bars">
+            <div class="mock-gauge-bar"><label>Creation</label><div class="bar"><div class="bar-fill" style="width:94%;background:var(--green)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Content DNA</label><div class="bar"><div class="bar-fill" style="width:92%;background:var(--gold)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Forensics</label><div class="bar"><div class="bar-fill" style="width:89%;background:var(--purple)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Similarity</label><div class="bar"><div class="bar-fill" style="width:96%;background:var(--orange)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Watermark</label><div class="bar"><div class="bar-fill" style="width:88%;background:var(--blue)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Provenance</label><div class="bar"><div class="bar-fill" style="width:85%;background:var(--teal)"></div></div></div>
+          </div>
+        </div>
+        <div class="mock-cert-grid">
+          <div class="mock-cert-field"><label>Medium</label><span>&#x1F3A8; Oil on Canvas</span></div>
+          <div class="mock-cert-field"><label>Creative Origin</label><span style="color:var(--green)">&#x2728; Fully Human — Biometric Verified</span></div>
+          <div class="mock-cert-field"><label>AI Detection</label><span style="color:var(--green)">&#x2705; FIRE 0.87 — No AI artifacts</span></div>
+          <div class="mock-cert-field"><label>Identity Match</label><span style="color:var(--green)">&#x1F9EC; 94% — Amara Okafor profile</span></div>
+          <div class="mock-cert-field"><label>Tremor Signature</label><span>7.2Hz — matches 12 prior works</span></div>
+          <div class="mock-cert-field"><label>Camera</label><span>Nikon Z7 II #6004823</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text3);margin-top:.8rem">
+          <span>Registered 27 Feb 2026, 16:08 SAST</span>
+          <span style="color:var(--green)">&#x2705; Verified</span>
+        </div>
+      </div>
+
+      <div class="mockup-label" style="margin-top:1.5rem">Creation Biometrics Panel — The Unfakeable Data</div>
+      <div style="max-width:500px;margin:0 auto">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem;text-align:center">
+            <div style="font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase">Total Strokes</div>
+            <div style="font-family:var(--ff);font-size:1.8rem;font-weight:700;color:var(--green)">4,200</div>
+            <div style="font-size:.7rem;color:var(--text3)">with pressure + velocity data</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem;text-align:center">
+            <div style="font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase">Undo Events</div>
+            <div style="font-family:var(--ff);font-size:1.8rem;font-weight:700;color:var(--orange)">47</div>
+            <div style="font-size:.7rem;color:var(--text3)">clustered in sky region</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem;text-align:center">
+            <div style="font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase">Mean Velocity</div>
+            <div style="font-family:var(--ff);font-size:1.8rem;font-weight:700;color:var(--gold)">340</div>
+            <div style="font-size:.7rem;color:var(--text3)">px/sec (std dev: 89)</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem;text-align:center">
+            <div style="font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase">Tremor</div>
+            <div style="font-family:var(--ff);font-size:1.8rem;font-weight:700;color:var(--purple)">7.2<span style="font-size:.8rem">Hz</span></div>
+            <div style="font-size:.7rem;color:var(--text3)">involuntary — consistent</div>
+          </div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem">
+          <div style="font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem">Stroke Pressure Distribution</div>
+          <div style="display:flex;align-items:flex-end;gap:2px;height:50px">
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:30%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:45%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:70%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:95%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:100%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:88%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:72%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:55%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:80%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:95%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:85%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:60%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:40%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:25%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:15%"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:10%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:.5rem;color:var(--text3);margin-top:.2rem">
+            <span>Light</span><span>Heavy</span>
+          </div>
+          <div style="font-size:.7rem;color:var(--text2);margin-top:.3rem;font-style:italic">Heavy-light-heavy pattern on horizontal strokes — matches Amara's signature</div>
+        </div>
+      </div>
+
+      <div class="mockup-label" style="margin-top:1.5rem">Forensic Analysis Results</div>
+      <div class="mock-forensic">
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F50D;</div><span class="mock-f-label">FIRE Score</span><span class="mock-f-value mock-f-pass">0.87 PASS</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F300;</div><span class="mock-f-label">FFT Spectrum</span><span class="mock-f-value mock-f-pass">CLEAN</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F52C;</div><span class="mock-f-label">Fractal D</span><span class="mock-f-value mock-f-score">1.73</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F30A;</div><span class="mock-f-label">Wavelet Match</span><span class="mock-f-value mock-f-pass">89%</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F9EA;</div><span class="mock-f-label">ELA</span><span class="mock-f-value mock-f-pass">UNIFORM</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F4F7;</div><span class="mock-f-label">PRNU</span><span class="mock-f-value mock-f-pass">Z7 #6004823</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F4CB;</div><span class="mock-f-label">Copy-Move</span><span class="mock-f-value mock-f-pass">NONE</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F4C4;</div><span class="mock-f-label">EXIF</span><span class="mock-f-value mock-f-pass">VALID</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTCOME -->
+  <div class="outcome">
+    <h4>&#x26A1; What Happens Next</h4>
+    <div class="outcome-grid">
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F3DB;&#xFE0F;</div>
+        <div>
+          <strong>Gallery Confidence</strong>
+          <p>The gallery includes the Soulprint Index score (91/100) in the catalogue. Collectors see: "Forensically authenticated. Human creation verified. AI detection: CLEAN." It becomes a selling point.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F916;</div>
+        <div>
+          <strong>AI Style Theft Detected</strong>
+          <p>6 months later: an AI art generator starts producing "Amara Okafor-style" landscapes. The outputs are tested against Soulprint — FIRE detects AI artifacts. They have NO creation biometrics, NO PRNU camera data, NO impasto texture. Exposed.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F4B8;</div>
+        <div>
+          <strong>Print Licence Revenue</strong>
+          <p>Amara sells authorised high-res print licences. Each buyer's print carries a unique watermarked version. She monitors web/print-on-demand sites. Unauthorised prints found on Redbubble — DMCA takedown with evidence.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F9EC;</div>
+        <div>
+          <strong>Growing Artist Profile</strong>
+          <p>With each new registration, her biometric profile strengthens. After 20 works: 94% identity confidence. After 50: 99%. Her "soulprint" becomes as unique as a signature — but impossible to forge.</p>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <div class="index-box">
+        <div class="index-label">SOULPRINT INDEX</div>
+        <div class="index-score">91</div>
+        <div class="index-desc">6 of 6 layers verified &middot; Full biometric profile</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CASE 3: LIMITED-EDITION PRINT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="case case-3" id="printmaker">
+  <div class="case-badge">Case Study 3</div>
+  <h2>The Printmaker: Protecting a Limited Edition</h2>
+  <p class="intro">An illustrator creates a digital artwork and sells it as a limited edition of 50 signed prints. Each print needs to be individually authenticated, numbered, and traceable. Unauthorised reproductions must be detectable.</p>
+
+  <div class="persona">
+    <div class="persona-icon">&#x1F5A8;&#xFE0F;</div>
+    <div>
+      <h3>Kenji Matsuda</h3>
+      <div class="persona-role">DIGITAL ILLUSTRATOR &middot; TOKYO/ONLINE &middot; LIMITED EDITIONS</div>
+      <p>Kenji creates highly detailed digital illustrations in Clip Studio Paint. He sells limited-edition gicl&eacute;e prints via his website — 50 prints per edition at $200 each ($10K per edition). He's found unauthorised prints being sold on AliExpress for $15 each. He needs each legitimate print to carry an invisible proof of authenticity, and he needs to catch the fakes.</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <div class="step">
+      <div class="step-dot">1</div>
+      <h4>Create: Full Process Recorded in Clip Studio Paint</h4>
+      <p>Kenji has the Soulprint plugin for Clip Studio Paint. It records his entire 14-hour creation session — every stroke, every layer, every undo.</p>
+      <div class="detail">
+        <h5>&#x270D;&#xFE0F; Creation data captured:</h5>
+        <ul>
+          <li><strong>38,700 strokes</strong> with full pressure/velocity/tilt data at 120Hz sampling</li>
+          <li><strong>147 layers</strong> created, 23 deleted, 34 merged — full layer timeline</li>
+          <li><strong>312 undo operations</strong> — clustered in fine detail areas (faces, hands)</li>
+          <li><strong>14 hours 23 minutes</strong> — start to finish with natural breaks (meals, sleep)</li>
+          <li><strong>Tool switching:</strong> G-pen (62%), flat brush (18%), airbrush (12%), eraser (8%)</li>
+          <li><strong>Zoom/pan patterns:</strong> 2,400 zoom events showing his working distance preferences</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">CLIP STUDIO PLUGIN</span>
+        <span class="tech-pill">38,700 STROKES</span>
+        <span class="tech-pill">14 HOURS</span>
+        <span class="tech-pill">147 LAYERS</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">2</div>
+      <h4>Register: Master Artwork + Edition Setup</h4>
+      <p>Kenji uploads the master file (8000x5000px, 16-bit PNG, 180MB) to Soulprint at the "Portfolio" tier ($299 for 10 works — he registers multiple editions). He declares this as "Edition of 50."</p>
+      <div class="detail">
+        <h5>&#x1F4C1; What he submits:</h5>
+        <ul>
+          <li><strong>Master file:</strong> Full-resolution 16-bit PNG with all colour profile data</li>
+          <li><strong>Clip Studio Paint file:</strong> .CLIP file with all 147 layers preserved</li>
+          <li><strong>Creation biometrics:</strong> Automatically exported from the plugin (38,700 stroke profiles)</li>
+          <li><strong>Edition declaration:</strong> 50 prints, gicl&eacute;e on Hahnem&uuml;hle Photo Rag 308gsm, signed + numbered</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">3</div>
+      <h4>Layers 1-4: Full Forensic Analysis</h4>
+      <p>All 6 layers run simultaneously. The 38,700 strokes provide the richest creation biometric profile in the system. Content DNA extracted at full 8000x5000 resolution. AI detection confirms human creation. Similarity search finds no prior art.</p>
+      <div class="detail">
+        <h5>&#x1F9EC; Biometric highlights:</h5>
+        <ul>
+          <li><strong>Identity match:</strong> 97% confidence — Kenji has 8 previous registered works, 280,000+ total stroke samples in his profile</li>
+          <li><strong>G-pen signature:</strong> His characteristic 0.3-second hesitation before starting fine detail strokes — unique motor pattern confirmed</li>
+          <li><strong>Layer architecture:</strong> His habitual layer naming convention and grouping structure matches his profile — consistent working methodology</li>
+        </ul>
+      </div>
+      <div class="detail">
+        <h5>&#x1F52C; Forensic highlights:</h5>
+        <ul>
+          <li><strong>FIRE score:</strong> 0.91 — extremely high reconstruction error. This is definitively a human-created work, not AI.</li>
+          <li><strong>Fractal dimension:</strong> D = 1.89 — high complexity consistent with detailed illustration</li>
+          <li><strong>Colour DNA:</strong> 12 dominant colour clusters extracted. His signature teal-and-amber palette confirmed.</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">97% IDENTITY</span>
+        <span class="tech-pill">FIRE 0.91</span>
+        <span class="tech-pill">D=1.89</span>
+        <span class="tech-pill">280K STROKES IN PROFILE</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">4</div>
+      <h4>Layer 5: Edition Watermarking — 50 Unique Copies</h4>
+      <p>This is where Soulprint's edition system shines. Each of the 50 prints gets a UNIQUE watermark with its own sub-certificate.</p>
+      <div class="detail">
+        <h5>&#x1F510; Edition watermark system:</h5>
+        <ul>
+          <li><strong>Master certificate:</strong> SP-KM5N8R2D — the master artwork registration</li>
+          <li><strong>Print #1:</strong> SP-KM5N8R2D-001 — unique spread-spectrum watermark embedding "001/050" + buyer licence</li>
+          <li><strong>Print #2:</strong> SP-KM5N8R2D-002 — different watermark pattern, same certificate family</li>
+          <li><strong>... through Print #50:</strong> SP-KM5N8R2D-050</li>
+          <li><strong>Each watermark encodes:</strong> Edition number, total edition size, buyer ID (if sold), print date, authorised print shop</li>
+          <li><strong>If an unauthorised #51 appears:</strong> Its watermark either (a) matches an existing number (proving it's a copy of a specific authorised print) or (b) has no watermark at all (proving it's not from Soulprint's edition system)</li>
+        </ul>
+      </div>
+      <div class="detail">
+        <h5>&#x1F5A8;&#xFE0F; Print production workflow:</h5>
+        <ul>
+          <li>Kenji requests print files from Soulprint dashboard</li>
+          <li>Soulprint generates 50 high-res TIFF files, each with unique watermark</li>
+          <li>Files sent to authorised print shop (encrypted transfer, logged)</li>
+          <li>Print shop confirmed via Soulprint partnership — their printer ICC profile is on record</li>
+          <li>Each printed gicl&eacute;e carries the invisible watermark in its fibres — even a photograph of the print can be verified</li>
+        </ul>
+      </div>
+      <div class="tech-used">
+        <span class="tech-pill">50 UNIQUE WATERMARKS</span>
+        <span class="tech-pill">EDITION TRACKING</span>
+        <span class="tech-pill">BUYER LICENCE</span>
+        <span class="tech-pill">PRINT SHOP VERIFIED</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">5</div>
+      <h4>Layer 6: Provenance Chain — Per-Print Tracking</h4>
+      <p>Each print gets its own audit trail. When print #17 is sold to a collector in Berlin, the sale is logged. If print #17 later appears on eBay, the chain of custody shows exactly who had it.</p>
+      <div class="tech-used">
+        <span class="tech-pill">PER-PRINT AUDIT</span>
+        <span class="tech-pill">SALE LOGGING</span>
+        <span class="tech-pill">TRANSFER TRACKING</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STORED DATA -->
+  <div class="stored">
+    <h4>&#x1F4BE; What's Permanently Stored</h4>
+    <div class="stored-grid">
+      <div class="stored-item">
+        <h6>Master Certificate</h6>
+        <p>SP-KM5N8R2D — Kenji Matsuda, digital illustration, 8000x5000px, edition of 50</p>
+      </div>
+      <div class="stored-item">
+        <h6>Creation Biometrics</h6>
+        <p>38,700 stroke profiles. 147 layer operations. 312 undos. 14h 23m creation time. Full .CLIP file preserved.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Artist Profile</h6>
+        <p>9th registration. 280,000+ cumulative strokes. 97% identity confidence. G-pen signature, teal-amber palette, layer naming convention.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Content DNA</h6>
+        <p>Full 8000x5000 analysis: perceptual hashes, entropy map, colour clusters, edge histograms, compressibility curve, fractal D=1.89</p>
+      </div>
+      <div class="stored-item">
+        <h6>Edition Registry</h6>
+        <p>50 sub-certificates (SP-KM5N8R2D-001 through -050). Each with unique watermark keys, buyer ID (when sold), print date, print shop.</p>
+      </div>
+      <div class="stored-item">
+        <h6>50 Watermark Key Sets</h6>
+        <p>Each print has its own encrypted spread-spectrum + QIM extraction parameters. Private, per-print.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Forensic Report</h6>
+        <p>FIRE 0.91, FFT clean, fractal D=1.89, wavelet match 97%, ELA pass. Master file hash: SHA-512.</p>
+      </div>
+      <div class="stored-item">
+        <h6>Provenance Chain</h6>
+        <p>Master: RFC 3161 + C2PA. Per-print: individual audit trails with sale/transfer history.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP: Edition Tracker + Certificate -->
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+      <div class="mockup-url">soulprint.io/edition/SP-KM5N8R2D</div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-label">Edition Tracker Dashboard — Kenji's 50-print edition</div>
+      <div class="mock-edition">
+        <div class="mock-edition-head">
+          <h5>&#x1F5BC;&#xFE0F; Neon Koi — Edition of 50</h5>
+          <span>SP-KM5N8R2D &middot; 34 sold &middot; 12 available &middot; 4 reserved</span>
+        </div>
+        <div class="mock-edition-grid">
+          <div class="mock-ed-cell mock-ed-sold">01</div>
+          <div class="mock-ed-cell mock-ed-sold">02</div>
+          <div class="mock-ed-cell mock-ed-sold">03</div>
+          <div class="mock-ed-cell mock-ed-sold">04</div>
+          <div class="mock-ed-cell mock-ed-sold">05</div>
+          <div class="mock-ed-cell mock-ed-sold">06</div>
+          <div class="mock-ed-cell mock-ed-sold">07</div>
+          <div class="mock-ed-cell mock-ed-sold">08</div>
+          <div class="mock-ed-cell mock-ed-sold">09</div>
+          <div class="mock-ed-cell mock-ed-sold">10</div>
+          <div class="mock-ed-cell mock-ed-sold">11</div>
+          <div class="mock-ed-cell mock-ed-sold">12</div>
+          <div class="mock-ed-cell mock-ed-sold">13</div>
+          <div class="mock-ed-cell mock-ed-sold">14</div>
+          <div class="mock-ed-cell mock-ed-sold">15</div>
+          <div class="mock-ed-cell mock-ed-sold">16</div>
+          <div class="mock-ed-cell mock-ed-sold">17</div>
+          <div class="mock-ed-cell mock-ed-sold">18</div>
+          <div class="mock-ed-cell mock-ed-sold">19</div>
+          <div class="mock-ed-cell mock-ed-sold">20</div>
+          <div class="mock-ed-cell mock-ed-sold">21</div>
+          <div class="mock-ed-cell mock-ed-sold">22</div>
+          <div class="mock-ed-cell mock-ed-sold">23</div>
+          <div class="mock-ed-cell mock-ed-sold">24</div>
+          <div class="mock-ed-cell mock-ed-sold">25</div>
+          <div class="mock-ed-cell mock-ed-sold">26</div>
+          <div class="mock-ed-cell mock-ed-sold">27</div>
+          <div class="mock-ed-cell mock-ed-sold">28</div>
+          <div class="mock-ed-cell mock-ed-sold">29</div>
+          <div class="mock-ed-cell mock-ed-sold">30</div>
+          <div class="mock-ed-cell mock-ed-sold">31</div>
+          <div class="mock-ed-cell mock-ed-sold">32</div>
+          <div class="mock-ed-cell mock-ed-sold">33</div>
+          <div class="mock-ed-cell mock-ed-sold">34</div>
+          <div class="mock-ed-cell mock-ed-reserved">35</div>
+          <div class="mock-ed-cell mock-ed-reserved">36</div>
+          <div class="mock-ed-cell mock-ed-reserved">37</div>
+          <div class="mock-ed-cell mock-ed-reserved">38</div>
+          <div class="mock-ed-cell mock-ed-avail">39</div>
+          <div class="mock-ed-cell mock-ed-avail">40</div>
+          <div class="mock-ed-cell mock-ed-avail">41</div>
+          <div class="mock-ed-cell mock-ed-avail">42</div>
+          <div class="mock-ed-cell mock-ed-avail">43</div>
+          <div class="mock-ed-cell mock-ed-avail">44</div>
+          <div class="mock-ed-cell mock-ed-avail">45</div>
+          <div class="mock-ed-cell mock-ed-avail">46</div>
+          <div class="mock-ed-cell mock-ed-avail">47</div>
+          <div class="mock-ed-cell mock-ed-avail">48</div>
+          <div class="mock-ed-cell mock-ed-avail">49</div>
+          <div class="mock-ed-cell mock-ed-avail">50</div>
+        </div>
+        <div class="mock-ed-legend">
+          <span><div class="dot" style="background:var(--green)"></div> Sold</span>
+          <span><div class="dot" style="background:var(--gold)"></div> Reserved</span>
+          <span><div class="dot" style="background:var(--text3)"></div> Available</span>
+        </div>
+      </div>
+
+      <div class="mockup-label" style="margin-top:2rem">Individual Print Certificate — Print #17</div>
+      <div class="mock-cert">
+        <div class="mock-cert-head">
+          <div class="mock-cert-logo">&#x1F50F; Soulprint</div>
+          <div class="mock-cert-id">SP-KM5N8R2D-017</div>
+        </div>
+        <div class="mock-cert-title">Neon Koi — Print 17 of 50</div>
+        <div class="mock-cert-artist">by Kenji Matsuda &middot; Gicl&eacute;e on Hahnem&uuml;hle Photo Rag 308gsm</div>
+        <div class="mock-gauge">
+          <div class="mock-gauge-ring" style="border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px var(--gold-g)">94</div>
+          <div class="mock-gauge-bars">
+            <div class="mock-gauge-bar"><label>Creation</label><div class="bar"><div class="bar-fill" style="width:97%;background:var(--green)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Content DNA</label><div class="bar"><div class="bar-fill" style="width:95%;background:var(--gold)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Forensics</label><div class="bar"><div class="bar-fill" style="width:91%;background:var(--purple)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Similarity</label><div class="bar"><div class="bar-fill" style="width:100%;background:var(--orange)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Watermark</label><div class="bar"><div class="bar-fill" style="width:92%;background:var(--blue)"></div></div></div>
+            <div class="mock-gauge-bar"><label>Provenance</label><div class="bar"><div class="bar-fill" style="width:88%;background:var(--teal)"></div></div></div>
+          </div>
+        </div>
+        <div class="mock-cert-grid">
+          <div class="mock-cert-field"><label>Edition</label><span>&#x1F5A8;&#xFE0F; Print 17 of 50</span></div>
+          <div class="mock-cert-field"><label>Owner</label><span>Lars Eriksen, Berlin</span></div>
+          <div class="mock-cert-field"><label>Identity Match</label><span style="color:var(--green)">&#x1F9EC; 97% — Kenji Matsuda profile</span></div>
+          <div class="mock-cert-field"><label>Creation Data</label><span>38,700 strokes &middot; 14h 23m &middot; 147 layers</span></div>
+          <div class="mock-cert-field"><label>AI Detection</label><span style="color:var(--green)">&#x2705; FIRE 0.91 — Human verified</span></div>
+          <div class="mock-cert-field"><label>Print Shop</label><span>Hahnem&uuml;hle Certified, Tokyo</span></div>
+        </div>
+        <div style="margin-top:.8rem;padding:.6rem;background:var(--bg4);border-radius:6px">
+          <div style="font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem">Provenance Chain</div>
+          <div style="font-size:.78rem;color:var(--text2)">
+            <div style="display:flex;gap:.5rem;margin-bottom:.2rem"><span style="color:var(--teal)">&#x25CF;</span> <strong>Created</strong> 15 Feb 2026 &mdash; Kenji Matsuda, Tokyo</div>
+            <div style="display:flex;gap:.5rem;margin-bottom:.2rem"><span style="color:var(--gold)">&#x25CF;</span> <strong>Registered</strong> 16 Feb 2026 &mdash; Soulprint SP-KM5N8R2D</div>
+            <div style="display:flex;gap:.5rem;margin-bottom:.2rem"><span style="color:var(--blue)">&#x25CF;</span> <strong>Printed</strong> 20 Feb 2026 &mdash; Hahnem&uuml;hle Certified, Print #17</div>
+            <div style="display:flex;gap:.5rem;margin-bottom:.2rem"><span style="color:var(--green)">&#x25CF;</span> <strong>Sold</strong> 24 Feb 2026 &mdash; to Lars Eriksen, Berlin</div>
+            <div style="display:flex;gap:.5rem"><span style="color:var(--purple)">&#x25CF;</span> <strong>Verified</strong> 27 Feb 2026 &mdash; QR scan by current owner</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text3);margin-top:.8rem">
+          <span>Master registered 16 Feb 2026</span>
+          <span style="color:var(--green)">&#x2705; Verified &middot; 3 ownership transfers</span>
+        </div>
+      </div>
+
+      <div class="mockup-label" style="margin-top:1.5rem">Forensic Analysis — Master Artwork</div>
+      <div class="mock-forensic">
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F50D;</div><span class="mock-f-label">FIRE Score</span><span class="mock-f-value mock-f-pass">0.91 PASS</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F300;</div><span class="mock-f-label">FFT Spectrum</span><span class="mock-f-value mock-f-pass">CLEAN</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F52C;</div><span class="mock-f-label">Fractal D</span><span class="mock-f-value mock-f-score">1.89</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F9EC;</div><span class="mock-f-label">Identity</span><span class="mock-f-value mock-f-pass">97%</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x270D;&#xFE0F;</div><span class="mock-f-label">Strokes</span><span class="mock-f-value mock-f-score">38,700</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x23F1;&#xFE0F;</div><span class="mock-f-label">Duration</span><span class="mock-f-value mock-f-score">14h 23m</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F4CB;</div><span class="mock-f-label">Copy-Move</span><span class="mock-f-value mock-f-pass">NONE</span></div>
+        <div class="mock-forensic-item"><div class="mock-f-icon">&#x1F5A8;&#xFE0F;</div><span class="mock-f-label">Edition</span><span class="mock-f-value mock-f-score">34/50 sold</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTCOME -->
+  <div class="outcome">
+    <h4>&#x26A1; What Happens Next</h4>
+    <div class="outcome-grid">
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F6D2;</div>
+        <div>
+          <strong>Authenticated Sales</strong>
+          <p>Each print ships with a Soulprint QR code linking to its individual certificate. Buyer scans it — sees "Print 17 of 50, authenticity verified, Soulprint Index 94." Collectors pay premium for provenance.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F6A8;</div>
+        <div>
+          <strong>AliExpress Fakes Caught</strong>
+          <p>Soulprint's web crawler finds $15 prints on AliExpress. Photos of the fakes are analysed: no watermark detected. The print's perceptual hash matches the master. Evidence package generated automatically — DMCA sent to AliExpress.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F4B0;</div>
+        <div>
+          <strong>Secondary Market Tracking</strong>
+          <p>Print #23 appears on an auction site. The watermark identifies it as #23 — originally sold to a collector in Paris. The sale is legitimate. The new buyer can verify provenance by scanning the Soulprint QR. Transparency builds trust.</p>
+        </div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-icon">&#x1F30D;</div>
+        <div>
+          <strong>EU AI Act Compliance</strong>
+          <p>A European retailer wants to sell Kenji's prints. EU AI Act Article 50 requires proof of human creation for commercial content by August 2026. Kenji's Soulprint certificate provides the compliance documentation. Without it, the retailer can't sell.</p>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <div class="index-box">
+        <div class="index-label">SOULPRINT INDEX</div>
+        <div class="index-score">94</div>
+        <div class="index-desc">6 of 6 layers &middot; 280K strokes in profile &middot; Edition tracked</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="foot">
+  <p><strong>Soulprint</strong> &mdash; A Forensic Authentication Lab for Creative Works</p>
+  <p style="margin-top:.3rem">Three artists. Three mediums. One unbreakable forensic system.</p>
+  <p style="margin-top:.5rem">SodaLabs AI &middot; Johannesburg &middot; 2026</p>
+</div>
+
+</body>
+</html>

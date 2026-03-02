@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soulprint Research Library</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap');
+:root{--bg:#06060b;--bg2:#0d0d14;--bg3:#111119;--bg4:#1a1a25;--gold:#d4a847;--gold-g:rgba(212,168,71,.15);--green:#4ade80;--pink:#f472b6;--blue:#60a5fa;--purple:#c084fc;--orange:#fb923c;--teal:#2dd4bf;--red:#ef4444;--text:#e8e6e3;--text2:#9ca3af;--text3:#6b7280;--border:rgba(255,255,255,.06);--ff:'Space Grotesk',sans-serif;--fb:'Outfit',sans-serif;--fm:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.6}
+a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,168,71,.3)}
+a:hover{border-color:var(--gold);color:#fff}
+
+.top{padding:3rem 2rem 2rem;text-align:center;border-bottom:1px solid var(--border)}
+.top h1{font-family:var(--ff);font-size:2.2rem;font-weight:700;margin-bottom:.5rem}
+.top h1 span{color:var(--gold)}
+.top p{color:var(--text2);max-width:600px;margin:0 auto}
+
+.nav{position:sticky;top:0;z-index:100;background:rgba(6,6,11,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.6rem 1rem;overflow-x:auto;white-space:nowrap;display:flex;gap:.5rem;justify-content:center}
+.nav a{padding:.3rem .8rem;border-radius:6px;font-family:var(--fm);font-size:.7rem;letter-spacing:.04em;border:1px solid var(--border);color:var(--text2);text-decoration:none;border-bottom:1px solid var(--border)}
+.nav a:hover{background:var(--bg4);color:var(--gold);border-color:var(--gold)}
+
+.wrap{max-width:1100px;margin:0 auto;padding:1rem}
+
+.cat{margin:3rem 0 1.5rem;scroll-margin-top:4rem}
+.cat-head{display:flex;align-items:center;gap:1rem;margin-bottom:.3rem}
+.cat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.cat h2{font-family:var(--ff);font-size:1.4rem;font-weight:600}
+.cat>p{color:var(--text3);font-size:.88rem;margin-bottom:1.5rem;padding-left:52px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem}
+
+.c{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1.2rem;transition:border-color .2s}
+.c:hover{border-color:rgba(255,255,255,.12)}
+.c h3{font-family:var(--ff);font-size:.95rem;font-weight:600;margin-bottom:.15rem}
+.c h3 a{border-bottom:none;color:var(--text)}
+.c h3 a:hover{color:var(--gold)}
+.c .src{font-family:var(--fm);font-size:.65rem;color:var(--text3);margin-bottom:.6rem;letter-spacing:.03em}
+.c p{font-size:.85rem;color:var(--text2);line-height:1.5}
+.c .tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.6rem}
+.c .tag{padding:.1rem .4rem;border-radius:3px;font-family:var(--fm);font-size:.6rem;background:rgba(255,255,255,.04);color:var(--text3)}
+.c .link{display:inline-block;margin-top:.6rem;font-family:var(--fm);font-size:.7rem;padding:.2rem .5rem;border-radius:4px;border:1px solid rgba(212,168,71,.3);color:var(--gold)}
+.c .link:hover{background:var(--gold-g);border-color:var(--gold)}
+
+.c .key{margin-top:.6rem;padding:.5rem .7rem;background:rgba(255,255,255,.02);border-left:2px solid;border-radius:0 4px 4px 0;font-size:.8rem;color:var(--text2);font-style:italic}
+
+.foot{padding:3rem 2rem;text-align:center;border-top:1px solid var(--border);color:var(--text3);font-size:.8rem;margin-top:3rem}
+
+.count{font-family:var(--fm);font-size:.7rem;color:var(--text3);background:var(--bg4);padding:.15rem .5rem;border-radius:4px;margin-left:.5rem}
+
+/* category colors */
+.cat-auth .cat-icon{background:rgba(192,132,252,.15);color:var(--purple)}
+.cat-auth .key{border-color:var(--purple)}
+.cat-ai .cat-icon{background:rgba(244,114,182,.15);color:var(--pink)}
+.cat-ai .key{border-color:var(--pink)}
+.cat-bio .cat-icon{background:rgba(74,222,128,.15);color:var(--green)}
+.cat-bio .key{border-color:var(--green)}
+.cat-water .cat-icon{background:rgba(96,165,250,.15);color:var(--blue)}
+.cat-water .key{border-color:var(--blue)}
+.cat-ip .cat-icon{background:rgba(251,146,60,.15);color:var(--orange)}
+.cat-ip .key{border-color:var(--orange)}
+.cat-std .cat-icon{background:rgba(45,212,191,.15);color:var(--teal)}
+.cat-std .key{border-color:var(--teal)}
+.cat-cid .cat-icon{background:rgba(212,168,71,.15);color:var(--gold)}
+.cat-cid .key{border-color:var(--gold)}
+.cat-comp .cat-icon{background:rgba(239,68,68,.15);color:var(--red)}
+.cat-comp .key{border-color:var(--red)}
+.cat-forgery .cat-icon{background:rgba(192,132,252,.15);color:var(--purple)}
+.cat-forgery .key{border-color:var(--purple)}
+.cat-tools .cat-icon{background:rgba(74,222,128,.15);color:var(--green)}
+.cat-tools .key{border-color:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1><span>Soulprint</span> Research Library</h1>
+  <p>Every source, paper, tool, and standard behind the 6-layer forensic authentication lab. 80+ entries with links and summaries.</p>
+</div>
+
+<div class="nav">
+  <a href="#forgery">Forgery Cases</a>
+  <a href="#auth">Art Authentication</a>
+  <a href="#ai">AI Detection</a>
+  <a href="#bio">Creation Biometrics</a>
+  <a href="#water">Watermarking</a>
+  <a href="#cid">Content ID</a>
+  <a href="#ip">IP Offices</a>
+  <a href="#std">Standards</a>
+  <a href="#comp">Competitors</a>
+  <a href="#tools">Open Source Tools</a>
+</div>
+
+<div class="wrap">
+
+<!-- ==================== FORGERY CASE STUDIES ==================== -->
+<div class="cat cat-forgery" id="forgery">
+  <div class="cat-head"><div class="cat-icon">&#x1F3AD;</div><h2>Art Forgery Case Studies</h2><span class="count">5</span></div>
+  <p>The cases that shaped modern authentication science. Each forgery teaches us what to detect.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>Wolfgang Beltracchi — The Titanium White Particle</h3>
+      <div class="src">FORGERY CASE &middot; 35 YEARS &middot; CAUGHT 2010</div>
+      <p>Most successful modern forger. 35 years producing fake Max Ernst, Campendonk, Leger. Fabricated elaborate provenance including fake pre-war photographs. Caught because his "Zinc White" tube was contaminated with titanium dioxide — a pigment not available until after 1920, used in a painting attributed to 1914. ONE particle ended a career.</p>
+      <div class="key">Lesson: Material anachronisms are the killer. Even the most meticulous forger leaves traces in the materials themselves.</div>
+      <a class="link" href="https://itsartlaw.org/cultural-heritage/wywh-tricking-the-art-market-on-forgery-beltracchi-and-scientific-technology/" target="_blank">Center for Art Law &rarr;</a>
+      <a class="link" href="https://www.yalescientific.org/2016/05/the-science-of-art-how-scientists-unmask-fakes-and-forgeries/" target="_blank">Yale Scientific &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Han van Meegeren — The Vermeer Forger</h3>
+      <div class="src">FORGERY CASE &middot; 6+ FAKE VERMEERS &middot; 1930s-1940s</div>
+      <p>Produced fake "Vermeers" that fooled the entire Dutch art establishment. His "Christ at Emmaus" was declared "the masterpiece of Vermeer" by leading scholar Abraham Bredius. Used Bakelite (phenol formaldehyde) to artificially harden paint. Confessed to avoid treason charges for selling "national treasure" to Goering.</p>
+      <div class="key">Lesson: The creator's process materials leave traces that outlast their intent to deceive. Bakelite is now a definitive van Meegeren attribution marker.</div>
+      <a class="link" href="https://www.futurelearn.com/info/courses/art-crime/0/steps/11882" target="_blank">FutureLearn &rarr;</a>
+      <a class="link" href="https://treasuresontrial.winterthur.org/intent/van-meegeren/" target="_blank">Winterthur Museum &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Giovanni Morelli — The Original "Soulprint" (1891)</h3>
+      <div class="src">AUTHENTICATION METHOD &middot; FOUNDATIONAL</div>
+      <p>Core insight: artists reveal themselves in details they do NOT consciously control. When painting ears, fingernails, drapery — artists fall into unconscious motor-memory shortcuts. A forger focuses on getting composition right; they rarely notice how Raphael's earlobes curl differently from Perugino's. Drew systematic comparison charts of ears, hands, noses across artists' oeuvres.</p>
+      <div class="key">This IS Soulprint's philosophical foundation. The "soulprint" = the pattern of unconscious micro-decisions the artist doesn't know they're making.</div>
+      <a class="link" href="https://medium.com/@plus4/giovanni-morelli-and-connoisseurship-395156ed3d90" target="_blank">Medium: Morelli &rarr;</a>
+      <a class="link" href="https://fineartinvestigations.com/services/artist-identification/three-legged-stool-approach/connoisseurship/morellian-analysis/" target="_blank">Fine Art Investigations &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>FBI Art Crime Team</h3>
+      <div class="src">LAW ENFORCEMENT &middot; EST. 2004 &middot; $1B+ RECOVERED</div>
+      <p>Recovered 20,000+ items valued over $1 billion. Uses convergence model: subject matter experts + artist foundations + people who worked with the artist + scientific analysis + National Stolen Art File database. No single technique authenticates — convergence of independent signals is the standard.</p>
+      <div class="key">Soulprint's 6-layer model is the digital equivalent of the FBI's convergence approach.</div>
+      <a class="link" href="https://www.fbi.gov/investigate/violent-crime/art-crime" target="_blank">FBI Art Crime &rarr;</a>
+      <a class="link" href="https://artcrimes.fbi.gov/" target="_blank">National Stolen Art File &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Richard Taylor — Pollock Fractal Authentication</h3>
+      <div class="src">PHYSICS &middot; UNIVERSITY OF OREGON</div>
+      <p>"Dimensional interplay fractal analysis" distinguished 14 authentic Pollock drip paintings from 51 non-Pollocks with 100% accuracy. Pollock's paintings are fractal, multifractal, and multiscaling — they evolved to higher complexity from 1945-1950. The fractal dimension is a measurable, distinctive signature.</p>
+      <a class="link" href="https://blogs.uoregon.edu/richardtaylor/2017/01/04/the-facts-about-pollocks-fractals/" target="_blank">Taylor Lab &rarr;</a>
+      <a class="link" href="https://www.researchgate.net/publication/222555409_Authenticating_Pollock_paintings_using_fractal_geometry" target="_blank">ResearchGate &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== ART AUTHENTICATION SCIENCE ==================== -->
+<div class="cat cat-auth" id="auth">
+  <div class="cat-head"><div class="cat-icon">&#x1F52C;</div><h2>Art Authentication Science</h2><span class="count">14</span></div>
+  <p>Museum lab techniques and their digital computational equivalents.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>X-Ray Fluorescence (XRF) Spectroscopy</h3>
+      <div class="src">MUSEUM TECHNIQUE &middot; NON-INVASIVE</div>
+      <p>Identifies elemental composition of pigments. Every pigment has a chemical signature tied to a historical period. Titanium white not available before ~1920. Zinc white from 1830s. Macro XRF scanning creates full elemental maps. Digital equivalent: color channel separation (RGB/HSV/LAB).</p>
+      <a class="link" href="https://www.bruker.com/en/applications/academia-materials-science/art-conservation-archaeology/fine-art-analysis.html" target="_blank">Bruker &rarr;</a>
+      <a class="link" href="https://colourlex.com/project/x-ray-fluorescence/" target="_blank">ColourLex &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Infrared Reflectography (IRR)</h3>
+      <div class="src">MUSEUM TECHNIQUE &middot; 900-1700nm</div>
+      <p>Near-infrared penetrates paint layers, reveals underdrawings. Pentimenti (artist's revisions during creation) = powerful authenticity signal. A copyist reproduces the final image; an original artist revises constantly. Digital equivalent: creation biometrics (undo/redo patterns).</p>
+      <a class="link" href="https://irinfo.org/articles-2019/infrared-reflectography-5-1-19-tucker/" target="_blank">IRInfo &rarr;</a>
+      <a class="link" href="https://artenet.it/en/infrared-reflectography-in-paintings-analysis/" target="_blank">ARTEnet &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Raking Light Analysis</h3>
+      <div class="src">MUSEUM TECHNIQUE &middot; SURFACE TEXTURE</div>
+      <p>Light at narrow angle exaggerates surface texture. Reveals brushstroke relief, direction, length, pressure, speed. Like handwriting — unique to each artist, extremely difficult to fake. Digital equivalent: Sobel edge detection, gradient orientation histograms.</p>
+      <a class="link" href="https://cincinnatiartmuseum.org/about/blog/conservation-blog-1312019/" target="_blank">Cincinnati Art Museum &rarr;</a>
+      <a class="link" href="https://artenet.it/en/raking-light/" target="_blank">ARTEnet &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Canvas Thread Counting / Weave Analysis</h3>
+      <div class="src">MUSEUM TECHNIQUE &middot; FOURIER ANALYSIS</div>
+      <p>X-ray images analysed for weave density using short-time Fourier analysis. Creates "weave maps." Canvases from the same bolt share identical stripe patterns ("rollmates"). Used to authenticate Vermeer. Digital equivalent: FFT frequency analysis.</p>
+      <a class="link" href="https://ieeexplore.ieee.org/document/4786009" target="_blank">IEEE: Thread Counting &rarr;</a>
+      <a class="link" href="https://arxiv.org/abs/2506.20272v1" target="_blank">arXiv: Fabric Comparison &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>OCT Craquelure Analysis</h3>
+      <div class="src">MUSEUM TECHNIQUE &middot; 7-8 MICROMETER RESOLUTION</div>
+      <p>Non-invasive cross-sectional imaging. Critical finding: authentic age cracks are rectangular in cross-section ("thin/deep" or "wide/shallow"). Forged cracks are triangular ("thin/shallow" or "wide/deep"). Craquelure patterns = fingerprints. Digital equivalent: fractal dimension analysis.</p>
+      <a class="link" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0272078" target="_blank">PLOS ONE &rarr;</a>
+      <a class="link" href="https://www.nature.com/articles/s40494-023-00895-7" target="_blank">Nature: U-Net Craquelure &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Radiocarbon Dating (Bomb Peak)</h3>
+      <div class="src">MUSEUM TECHNIQUE &middot; DEFINITIVE</div>
+      <p>Nuclear testing from 1954-1963 doubled atmospheric C-14. Fresh paint binder with post-1950 C-14 = modern forgery proven beyond doubt. Even forgers using old canvases are caught. AMS can date microgram-scale individual paint layers.</p>
+      <a class="link" href="https://www.pnas.org/doi/10.1073/pnas.1901540116" target="_blank">PNAS &rarr;</a>
+      <a class="link" href="https://www.chemistryworld.com/news/dawn-of-the-atomic-age-helps-carbon-dating-detect-forged-art/3010593.article" target="_blank">Chemistry World &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Wavelet Decomposition — The PNAS Method</h3>
+      <div class="src">PNAS 2004 &middot; DARTMOUTH &middot; SEMINAL PAPER</div>
+      <p>Statistical models from authenticated works via wavelet coefficients at multiple scales. Tested on 13 Pieter Bruegel drawings — confirmed expert authentications. Identified number of contributing artists in Perugino painting, matching expert opinion. Applied to van Gogh, Gauguin, Giotto.</p>
+      <div class="key">Multi-scale texture statistics capture brushstroke characteristics at every resolution — the most proven computational authentication method.</div>
+      <a class="link" href="https://www.pnas.org/doi/10.1073/pnas.0406398101" target="_blank">PNAS Paper &rarr;</a>
+      <a class="link" href="https://news.northwestern.edu/stories/2013/04/how-image-analysis-can-detect-art-forgeries" target="_blank">Northwestern &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Fractal Dimension for Painting Authentication</h3>
+      <div class="src">MDPI SYMMETRY 2025 &middot; FIRST COLOR-FD METHOD</div>
+      <p>First colour-fractal-dimension-based method for distinguishing originals from replicas (May 2025). Sliding-window approach computes fractal dimension per colour channel spatially. Multifractal spectrum captures complexity at multiple scales — richer than single fractal dimension.</p>
+      <a class="link" href="https://www.mdpi.com/2073-8994/17/5/703" target="_blank">MDPI Symmetry &rarr;</a>
+      <a class="link" href="https://www.sciencedirect.com/science/article/abs/pii/S0960077915003999" target="_blank">Pollock Fractal Evolution &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Kolmogorov Complexity for Art Classification</h3>
+      <div class="src">NATURE 2022 &middot; INFORMATION THEORY</div>
+      <p>Normalised Kolmogorov Compression Complexity differentiates between schools of Orthodox iconography. Best solution: not sensitive to image size, least affected by noise. Information Complexity Ranking combines KC with Normalised Compression Distance.</p>
+      <a class="link" href="https://www.nature.com/articles/s41598-022-12826-w" target="_blank">Nature Scientific Reports &rarr;</a>
+      <a class="link" href="https://www.mdpi.com/1099-4300/25/3/439" target="_blank">MDPI Entropy &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Brushstroke AI Authentication — Rutgers/Case Western</h3>
+      <div class="src">2017 &middot; 96% ACCURACY &middot; SINGLE-STROKE DETECTION</div>
+      <p>Case Western Reserve: AI identifies unique brushstrokes with 96% accuracy. Rutgers: 80,000 strokes from Picasso/Matisse/Modigliani → deep recurrent neural network. Detected EVERY forgery from a single stroke alone. "Individual strokes carry the artist's unintentional signature."</p>
+      <a class="link" href="https://news.artnet.com/art-world/artificial-intelligence-art-authentication-1156037" target="_blank">Artnet News &rarr;</a>
+      <a class="link" href="https://www.technologyreview.com/2017/11/21/105077/this-ai-can-spot-art-forgeries-by-looking-at-one-brushstroke/" target="_blank">MIT Tech Review &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>DenseNet-121 Brushstroke Classification</h3>
+      <div class="src">JADS DECEMBER 2025 &middot; END-TO-END PIPELINE</div>
+      <p>Fully integrated pipeline bridging ML-based brushstroke analysis with physical brush design. Classifies stroke types: impasto, dry brush, scumbling, glazing, stippling. DenseNet-121 CNN architecture.</p>
+      <a class="link" href="http://bright-journal.org/Journal/index.php/JADS/article/download/1081/530" target="_blank">JADS Paper (PDF) &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Van Gogh Authentication via Geometric Tight Frames</h3>
+      <div class="src">SCIENCEDIRECT &middot; 88.61% ACCURACY</div>
+      <p>Geometric tight frame-based stylometry with wavelet decomposition. 88.61% classification accuracy for van Gogh paintings. Captures multi-resolution directional features.</p>
+      <a class="link" href="https://www.sciencedirect.com/science/article/pii/S1063520315001566" target="_blank">ScienceDirect &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Color Palette Analysis — 100K+ Paintings</h3>
+      <div class="src">NATURE 2014 / SPRINGER 2024</div>
+      <p>Large-scale analysis of painting arts confirms artists have distinctive statistical colour signatures — chromatic range, colour temperature, hue/saturation distributions. The palette fingerprint is measurable across an artist's oeuvre.</p>
+      <a class="link" href="https://www.nature.com/articles/srep07370" target="_blank">Nature: Large-Scale Analysis &rarr;</a>
+      <a class="link" href="https://link.springer.com/chapter/10.1007/978-3-031-72845-7_17" target="_blank">Springer: Painter Verification &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Smithsonian / Getty / National Gallery Labs</h3>
+      <div class="src">CONSERVATION INSTITUTES &middot; GOLD STANDARD</div>
+      <p>Smithsonian MCI: spectral imaging, mass spectrometry, ICP-MS, FTIR, Raman, GC-MS, SEM. Getty: XRF, Raman, IRR, CT, GC/MS for organic materials. National Gallery London: X-radiography on ALL paintings, Technical Bulletin since 1977.</p>
+      <a class="link" href="https://mci.si.edu/" target="_blank">Smithsonian MCI &rarr;</a>
+      <a class="link" href="https://www.getty.edu/conservation-institute/science/" target="_blank">Getty Conservation &rarr;</a>
+      <a class="link" href="https://www.nationalgallery.org.uk/research/research-resources/technical-bulletin" target="_blank">National Gallery &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== AI DETECTION ==================== -->
+<div class="cat cat-ai" id="ai">
+  <div class="cat-head"><div class="cat-icon">&#x1F916;</div><h2>AI-Generated Image Detection</h2><span class="count">10</span></div>
+  <p>State-of-the-art techniques to detect whether an image was made by a human or an AI model.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>FIRE: Frequency-Guided Reconstruction Error</h3>
+      <div class="src">CVPR 2025 &middot; OPEN SOURCE &middot; MOST IMPORTANT</div>
+      <p>Diffusion models struggle to reconstruct mid-band frequency information in real images. Extract frequencies, run through diffusion model, compare reconstruction error. Real = high error. AI = low error. Generalises to unseen models. Robust against perturbations.</p>
+      <div class="key">This is the primary AI detection engine for Soulprint. Open source and proven.</div>
+      <a class="link" href="https://arxiv.org/abs/2412.07140" target="_blank">arXiv Paper &rarr;</a>
+      <a class="link" href="https://github.com/Chuchad/FIRE" target="_blank">GitHub: FIRE &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>ManiFPT: Generative Model Fingerprints</h3>
+      <div class="src">CVPR 2024 &middot; MODEL ATTRIBUTION</div>
+      <p>Not just "was this AI?" but "WHICH AI model?" Defines the fingerprint of a generative model as the set of all its artifacts — the difference between a generated sample and its closest point on the real data manifold. Identifies Stable Diffusion vs DALL-E vs Midjourney.</p>
+      <a class="link" href="https://cocoaaa.github.io/gm-fingerprints/" target="_blank">Project Page &rarr;</a>
+      <a class="link" href="https://openaccess.thecvf.com/content/CVPR2024/papers/Song_ManiFPT_Defining_and_Analyzing_Fingerprints_of_Generative_Models_CVPR_2024_paper.pdf" target="_blank">CVPR Paper (PDF) &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Fourier-Based GAN Fingerprint Detection</h3>
+      <div class="src">OCTOBER 2025 &middot; >99% ACCURACY</div>
+      <p>2D DFT → log-transform magnitude spectrum → ResNet50. ALL GAN architectures leave spectral artifacts from upsampling. CycleGAN/StarGAN: dots and lines. StyleGAN: mid/high-frequency anomalies. Over 99% detection accuracy on standard benchmarks.</p>
+      <a class="link" href="https://arxiv.org/html/2510.19840v1" target="_blank">arXiv &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Diffusion Snap-Back Reconstruction</h3>
+      <div class="src">NOVEMBER 2025 &middot; MANIFOLD DISTANCE</div>
+      <p>Add noise → denoise with diffusion model → compare reconstruction distance. Real images and generated images "snap back" to different manifold positions. The distance reveals origin. Conceptually elegant and hard to game.</p>
+      <a class="link" href="https://arxiv.org/html/2511.00352v1" target="_blank">arXiv &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>GAN Spectral Artifacts via FFT</h3>
+      <div class="src">IEEE 2020 / arXiv 2020</div>
+      <p>Original discovery: ALL GANs leave frequency domain artifacts caused by upsampling operations (transposed convolutions, nearest-neighbor, bilinear). These create periodic patterns visible in the Fourier spectrum. Different architectures = different artifact signatures.</p>
+      <a class="link" href="https://ar5iv.labs.arxiv.org/html/2003.02467" target="_blank">arXiv: Fake Painting Detection &rarr;</a>
+      <a class="link" href="https://ieeexplore.ieee.org/document/9190892/" target="_blank">IEEE &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Combined Uncertainty Measures for AI Detection</h3>
+      <div class="src">NATURE SCIENTIFIC REPORTS 2025</div>
+      <p>Fisher Information + Monte Carlo Dropout entropy + Deep Kernel Learning predictive variance + Particle Swarm Optimisation for adaptive thresholds. Multi-signal approach combining multiple uncertainty measures outperforms single-metric detectors.</p>
+      <a class="link" href="https://www.nature.com/articles/s41598-025-28572-8" target="_blank">Nature &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Error Level Analysis (ELA)</h3>
+      <div class="src">DIGITAL FORENSICS &middot; BROWSER-NATIVE</div>
+      <p>Re-compress JPEG at target quality, compute per-pixel difference. Uniform = consistent compression history. Bright spots = different compression cycles = edits/pastes/AI generation. Runs in browser via Canvas toDataURL().</p>
+      <a class="link" href="https://29a.ch/2012/4/15/image-error-level-analysis-with-html5" target="_blank">29a.ch: HTML5 ELA &rarr;</a>
+      <a class="link" href="https://www.fotoforensics.com/tutorial-ela.php" target="_blank">FotoForensics Tutorial &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>PRNU Camera Sensor Fingerprinting</h3>
+      <div class="src">IEEE 2006 &middot; INDIVIDUAL DEVICE ID</div>
+      <p>Every sensor has unique noise from manufacturing (Photo Response Non-Uniformity). Present in EVERY image the sensor produces. Survives JPEG, filtering, processing. Identifies the specific physical camera — not just model, the individual unit. Used by FBI/law enforcement.</p>
+      <a class="link" href="https://dl.acm.org/doi/10.1109/TIFS.2006.873602" target="_blank">IEEE: PRNU &rarr;</a>
+      <a class="link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10098672/" target="_blank">PMC: Smartphones &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>GLCM Texture Analysis for AI Detection</h3>
+      <div class="src">STATISTICAL ANALYSIS &middot; p < 0.0001</div>
+      <p>Grey-Level Co-occurrence Matrix extracts: Contrast, Energy, Entropy, Homogeneity. Real vs AI images show highly significant differences (t-statistic 24.50 for contrast, 20.02 for entropy). But newer models are closing this gap — needs multi-signal approach.</p>
+      <a class="link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11675792/" target="_blank">PMC: Entropy Applications &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>AI Metadata Forensics</h3>
+      <div class="src">MULTI-SOURCE &middot; EXIF / XMP / C2PA</div>
+      <p>Authentic camera images: rich EXIF (model, lens, exposure, GPS). AI images: missing or synthetic metadata. C2PA tags from AI tools (Adobe Firefly, DALL-E). CFA (Bayer filter) artifacts present in camera images, absent in generated. Warning: metadata can be forged — lead, not proof.</p>
+      <a class="link" href="https://journal-isi.org/index.php/isi/article/view/1362" target="_blank">Journal of ISI &rarr;</a>
+      <a class="link" href="https://lucidtruthtechnologies.com/detecting-ai-generated-images/" target="_blank">Lucid Truth Tech &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== CREATION BIOMETRICS ==================== -->
+<div class="cat cat-bio" id="bio">
+  <div class="cat-head"><div class="cat-icon">&#x270D;&#xFE0F;</div><h2>Creation Biometrics</h2><span class="count">5</span></div>
+  <p>Proof of PROCESS — the one thing AI cannot fake. Recording the act of creation as biometric data.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>Pen-Tablet Dynamics for Person Identification</h3>
+      <div class="src">IEEE JANUARY 2024 &middot; COMPREHENSIVE STUDY</div>
+      <p>X-Y position, velocity, acceleration, jerk (3rd derivative), pen pressure curves, tilt (azimuth/inclination), stroke duration, pauses. Key finding: dynamic features are MORE discriminative between genuine and forgery than static features.</p>
+      <div class="key">This is the scientific foundation for Soulprint's creation biometrics — the most powerful authentication signal available.</div>
+      <a class="link" href="https://ieeexplore.ieee.org/document/10387324/" target="_blank">IEEE Xplore &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Hand Tremor Identification on Graphics Tablets</h3>
+      <div class="src">NASA ADS / SPIE &middot; INVOLUNTARY BIOMETRIC</div>
+      <p>Even involuntary hand tremor micro-movements are biometrically identifiable on graphics tablets. This is a signal the artist cannot consciously control or fake — like a fingerprint embedded in the creation process.</p>
+      <a class="link" href="https://ui.adsabs.harvard.edu/abs/2019SPIE11176E..2HS/abstract" target="_blank">NASA ADS &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Biometric Signature Verification</h3>
+      <div class="src">ESTABLISHED TECHNOLOGY</div>
+      <p>Stores: writing speed, direction, sequence, pauses, pressure curve, 2D image. "Signatures may be imitated but the way they are drawn cannot be." Same principle applies to digital art creation.</p>
+      <a class="link" href="https://www.bayometric.com/biometric-signature-verification/" target="_blank">Bayometric &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Sketch & Paint: Stroke-by-Stroke Reconstruction</h3>
+      <div class="src">SPRINGER FEBRUARY 2025</div>
+      <p>Research into extracting strokes from finished artworks and reconstructing the likely creation order. Could verify claimed creation processes by comparing reconstructed stroke order against biometric recording.</p>
+      <a class="link" href="https://link.springer.com/chapter/10.1007/978-3-031-92808-6_13" target="_blank">Springer &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Contourlet Transform + Hidden Markov Models</h3>
+      <div class="src">STYLOMETRY &middot; MULTI-RESOLUTION</div>
+      <p>Contourlet transforms (multi-resolution, multi-directional decomposition) with HMMs capture statistical texture signatures. Different artists produce different texture distributions at each scale and direction.</p>
+      <a class="link" href="https://www.researchgate.net/publication/256993906_Stylometry_of_paintings_using_hidden_Markov_modelling_of_contourlet_transforms" target="_blank">ResearchGate &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== WATERMARKING ==================== -->
+<div class="cat cat-water" id="water">
+  <div class="cat-head"><div class="cat-icon">&#x1F510;</div><h2>Invisible Watermarking</h2><span class="count">5</span></div>
+  <p>Embedding the certificate ID directly into the pixels. Invisible to the eye, extractable by the decoder.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>InvisMark — Neural Watermarking</h3>
+      <div class="src">WACV 2025 &middot; 97%+ BIT ACCURACY</div>
+      <p>Neural-network-based watermarking for high-resolution images. Over 97% bit accuracy across various manipulations (JPEG, scaling, cropping) while remaining imperceptible to the human eye.</p>
+      <a class="link" href="https://openaccess.thecvf.com/content/WACV2025/papers/Xu_InvisMark_Invisible_and_Robust_Watermarking_for_AI-Generated_Image_Provenance_WACV_2025_paper.pdf" target="_blank">WACV Paper (PDF) &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>SynthID — Google DeepMind</h3>
+      <div class="src">GOOGLE &middot; 10 BILLION+ WATERMARKED</div>
+      <p>Already watermarked over 10 billion pieces of content. Two neural networks: one embeds, one detects. Covers text, images, audio, video. Survives cropping, compression, format conversion. The scale benchmark.</p>
+      <a class="link" href="https://deepmind.google/models/synthid/" target="_blank">Google DeepMind &rarr;</a>
+      <a class="link" href="https://jesusiniesta.es/blog/synthid-invisible-watermarks-2025" target="_blank">SynthID Analysis &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Differentiable JPEG Watermarking</h3>
+      <div class="src">MDPI ELECTRONICS NOV 2025 &middot; TWO-STAGE</div>
+      <p>Two-stage training: noise intensity increases gradually, then mixed strong noises. Differentiable fine-grained JPEG module accurately simulates real compression during training. Enables gradient backpropagation through the compression step.</p>
+      <a class="link" href="https://www.mdpi.com/2079-9292/14/22/4510" target="_blank">MDPI Electronics &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>"Vanishing Watermarks" — The Vulnerability</h3>
+      <div class="src">arXiv FEBRUARY 2026 &middot; CRITICAL</div>
+      <p>Brand new paper proving diffusion-based image editing can REMOVE invisible watermarks. This means steganographic watermarking alone is NOT sufficient — must combine with other authentication layers. This is why Soulprint uses 6 layers, not one.</p>
+      <div class="key">This paper justifies the entire 6-layer approach. Any single technique can be defeated. Convergence is the only defence.</div>
+      <a class="link" href="https://arxiv.org/html/2602.20680v1" target="_blank">arXiv &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Spread-Spectrum & QIM Watermarking</h3>
+      <div class="src">CLASSICAL STEGANOGRAPHY</div>
+      <p>Spread-spectrum: data distributed across frequency spectrum like noise. QIM (Quantization Index Modulation): modifies DCT coefficients to embed bits. Dual-layer approach: if one method is stripped, the other remains. Decades of research backing robustness.</p>
+      <div class="tags">
+        <span class="tag">SPREAD SPECTRUM</span>
+        <span class="tag">QIM</span>
+        <span class="tag">DCT</span>
+        <span class="tag">DUAL LAYER</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== CONTENT ID SYSTEMS ==================== -->
+<div class="cat cat-cid" id="cid">
+  <div class="cat-head"><div class="cat-icon">&#x1F3B5;</div><h2>Content Identification Systems</h2><span class="count">7</span></div>
+  <p>How YouTube, Shazam, TinEye, and Getty identify content at scale. The models for Soulprint's similarity engine.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>YouTube Content ID</h3>
+      <div class="src">GOOGLE &middot; $100M+ INVESTED &middot; $3B+ PAID OUT</div>
+      <p>80M+ active reference files. Audio fingerprinting survives distortion/noise/speed changes. Video sliced into thousands of frames, features extracted via deep neural networks. Every upload scanned against entire database. Can identify partial matches, dimension changes, colour alterations.</p>
+      <a class="link" href="https://en.wikipedia.org/wiki/Content_ID" target="_blank">Wikipedia &rarr;</a>
+      <a class="link" href="https://jdhao.github.io/2021/08/02/the_youtube_content_id_system/" target="_blank">Technical Analysis &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Shazam Audio Fingerprinting — Full Algorithm</h3>
+      <div class="src">WANG 2003 &middot; CONSTELLATION MAPS</div>
+      <p>1) STFT → spectrogram. 2) Peak detection → constellation maps (sparse representation). 3) Combinatorial hashing: anchor + target zone peaks → (freq_A, freq_B, delta_T) = ~30 bits = ~1 billion combinations. 4) Hash lookup → group by track → temporal alignment → histogram scoring. Model for Soulprint's fingerprint matching.</p>
+      <a class="link" href="https://www.cameronmacleod.com/blog/how-does-shazam-work" target="_blank">Algorithm Explainer &rarr;</a>
+      <a class="link" href="https://www.ee.columbia.edu/~dpwe/papers/Wang03-shazam.pdf" target="_blank">Original Paper (PDF) &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>TinEye Reverse Image Search</h3>
+      <div class="src">57.7 BILLION IMAGES INDEXED</div>
+      <p>First image search engine using image identification (not keywords). Pixel-by-pixel digital fingerprint. Finds exact AND modified matches: cropped, resized, edited. Does NOT find "similar" images (different image, same subject). API available.</p>
+      <a class="link" href="https://help.tineye.com/article/233-how-does-tineye-work" target="_blank">How TinEye Works &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Audible Magic</h3>
+      <div class="src">EST. 1999 &middot; EMMY-WINNING ACR</div>
+      <p>Used by Facebook, Soundcloud, Dailymotion, Twitch. Fingerprinting survives compression, remixing, speed changes. Does not rely on filenames or tags. Recently partnered with Udio for AI-generated music rights management.</p>
+      <a class="link" href="https://www.audiblemagic.com/" target="_blank">Audible Magic &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Getty Images / PicScout</h3>
+      <div class="src">ACQUIRED $20M 2011 &middot; WEB CRAWLING</div>
+      <p>ImageTracker: robots scanning the internet for unlicensed uses of stock photos. ImageExchange: licensing discovery. Used by multiple stock agencies. Settlement demands typically $1,000+ per infringing image found.</p>
+      <a class="link" href="https://www.plagiarismtoday.com/2011/04/27/getty-images-acquires-picscout/" target="_blank">PicScout Acquisition &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Pixsy — Image Copyright Enforcement</h3>
+      <div class="src">200K+ USERS &middot; 50% RECOVERY FEE</div>
+      <p>Monitor 500 images free. Automated detection + takedown notices. Business model: case submission free, Pixsy takes 50% of recovery. Global network of legal experts. The model for Soulprint's enforcement layer.</p>
+      <a class="link" href="https://www.pixsy.com/" target="_blank">Pixsy &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Perceptual Hashing Libraries (pHash / dHash)</h3>
+      <div class="src">OPEN SOURCE &middot; PRODUCTION-READY</div>
+      <p>pHash: DCT-based, robust against JPEG/resizing/minor edits, higher compute. dHash: adjacent pixel brightness comparison, simpler/faster. Both available via Python imagehash package and pHash.org. Foundation of any image fingerprinting system.</p>
+      <a class="link" href="http://phash.org/" target="_blank">pHash.org &rarr;</a>
+      <a class="link" href="https://en.wikipedia.org/wiki/Perceptual_hashing" target="_blank">Wikipedia &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== IP OFFICES ==================== -->
+<div class="cat cat-ip" id="ip">
+  <div class="cat-head"><div class="cat-icon">&#x2696;&#xFE0F;</div><h2>IP Offices & Patent Labs</h2><span class="count">8</span></div>
+  <p>How USPTO, WIPO, and copyright offices actually examine and register work.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>USPTO DesignVision — AI Image Search</h3>
+      <div class="src">LAUNCHED JULY 2025 &middot; CLARIVATE &middot; 80+ REGISTRIES</div>
+      <p>AI-powered image similarity search across 80+ global IP registers. Examiners upload up to 7 images as a single query. AI-ranked results with user-controlled feature weighting (shape, proportion, texture). Usage documented in Search Notes for transparency. THE template for Soulprint's similarity search.</p>
+      <a class="link" href="https://www.uspto.gov/about-us/news-updates/uspto-launches-new-design-patent-examination-ai-tool" target="_blank">USPTO Announcement &rarr;</a>
+      <a class="link" href="https://www.panitchlaw.com/uspto-designvision-new-ai-image-search-tool-for-design-patents-what-applicants-should-know/" target="_blank">Panitch Law Analysis &rarr;</a>
+      <a class="link" href="https://clarivate.com/intellectual-property/blog/clarivate-awarded-uspto-award-for-designs-image-search-ai-designvision/" target="_blank">Clarivate &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>USPTO Design Patent Examination Process</h3>
+      <div class="src">MPEP CHAPTER 1500</div>
+      <p>Classify (Locarno, 32 classes) → mandatory search (design + mechanical classes + trade catalogs + 80+ foreign databases) → Ordinary Observer Test ("Would a purchaser find these substantially the same?") → Novelty (102) → Nonobviousness (103, now flexible Graham test since LKQ v. GM May 2024).</p>
+      <a class="link" href="https://www.uspto.gov/patents/laws/examination-policy/design-examiner-patent-materials" target="_blank">USPTO Materials &rarr;</a>
+      <a class="link" href="https://www.uspto.gov/web/offices/pac/mpep/s1504.html" target="_blank">MPEP 1504 &rarr;</a>
+      <a class="link" href="https://patentlyo.com/patent/2024/05/federal-overrules-obviousness.html" target="_blank">LKQ v. GM &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>US Copyright Office Registration</h3>
+      <div class="src">$45-$125 &middot; MINIMAL EXAMINATION</div>
+      <p>Examiner checks copyrightable authorship — NOT prior art search. Checks: originality, minimum creative expression, eligible category, deposit copy matches claim. New Feb 2026: GR2D — register up to 20 2D works for $85. Special handling (rush): $800.</p>
+      <a class="link" href="https://www.copyright.gov/registration/" target="_blank">Registration Portal &rarr;</a>
+      <a class="link" href="https://www.copyright.gov/about/fees.html" target="_blank">Fee Schedule &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Copyright Claims Board (CCB)</h3>
+      <div class="src">EST. 2022 &middot; $30K CAP &middot; NO LAWYER NEEDED</div>
+      <p>Damages cap: $30K total, $15K per work. Smaller Claims track under $5K. Voluntary — both sides can opt in/out. Video hearings. Three impartial officers. Must have registration or pending application to file.</p>
+      <a class="link" href="https://www.ccb.gov/about/" target="_blank">CCB &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>WIPO Proof — DISCONTINUED (Gap in Market)</h3>
+      <div class="src">TERMINATED JAN 31, 2022 &middot; WAS CHF 20/TOKEN</div>
+      <p>Digital evidence timestamping service. Was CHF 20 per token, premium certificate additional CHF 20. All existing tokens remain indefinitely valid and verifiable. WIPO discontinued the service — creating a gap that Soulprint can fill with deeper analysis.</p>
+      <div class="key">WIPO walked away from this market. Soulprint fills the gap with forensic analysis that WIPO never offered.</div>
+      <a class="link" href="https://www.wipo.int/en/web/wipo-proof" target="_blank">WIPO Proof &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>WIPO Global Brand Database — AI Image Search</h3>
+      <div class="src">FREE &middot; PUBLIC &middot; AI-POWERED</div>
+      <p>Upload a logo to find visually similar registered marks. AI identifies concepts within images (apple, eagle, tree). Combine with Nice Classification filters and jurisdiction restrictions. Millions of records across member states.</p>
+      <a class="link" href="https://www.wipo.int/en/web/global-brand-database" target="_blank">WIPO Brand DB &rarr;</a>
+      <a class="link" href="https://www.wipo.int/pressroom/en/articles/2019/article_0005.html" target="_blank">AI Search Launch &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Hague System (International Designs)</h3>
+      <div class="src">WIPO &middot; 82 COUNTRIES &middot; UP TO 100 DESIGNS</div>
+      <p>Single international application for industrial designs. Up to 100 designs in one application. Basic fee: 397 CHF. Protection: 5 years initially, renewable twice = 15 years. 82 member countries including all EU.</p>
+      <a class="link" href="https://www.wipo.int/en/web/hague-system" target="_blank">Hague System &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Locarno Classification</h3>
+      <div class="src">WIPO &middot; 32 CLASSES &middot; 5,000+ GOODS</div>
+      <p>International classification for industrial designs. 32 main classes with subclasses. Alphabetical index of 5,000+ goods. 60 countries party to the agreement. Format: two pairs of numbers (e.g., "14-01"). Model for Soulprint's work classification taxonomy.</p>
+      <a class="link" href="https://www.wipo.int/en/web/classification-locarno" target="_blank">Locarno Classification &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== STANDARDS ==================== -->
+<div class="cat cat-std" id="std">
+  <div class="cat-head"><div class="cat-icon">&#x1F4DC;</div><h2>Standards & Regulations</h2><span class="count">7</span></div>
+  <p>The legal and technical standards that make digital authentication court-admissible.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>C2PA — Content Provenance & Authenticity</h3>
+      <div class="src">BECOMING ISO &middot; ADOBE/GOOGLE/MS/LEICA</div>
+      <p>Open technical standard. Content Credentials = "nutrition label" for digital content — who made it, when, with what tools, every edit. Adopted by Leica M11-P, Adobe Creative Suite, Google, LinkedIn, Meta. Over 10 billion pieces already carry SynthID watermarks. Soulprint builds ON this, not against it.</p>
+      <a class="link" href="https://c2pa.org/" target="_blank">C2PA.org &rarr;</a>
+      <a class="link" href="https://contentauthenticity.org/how-it-works" target="_blank">How It Works &rarr;</a>
+      <a class="link" href="https://contentauthenticity.org/blog/the-state-of-content-authenticity-in-2026" target="_blank">State of Content Authenticity 2026 &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>RFC 3161 — Trusted Timestamps</h3>
+      <div class="src">IETF STANDARD &middot; HSM-BACKED</div>
+      <p>Client computes hash → sends to TSA → TSA binds hash with time → signs with private key via HSM → returns token. Data never sent to TSA (only hash). Verification: compare hash, validate pair, verify signature chain. Legally admissible timestamp.</p>
+      <a class="link" href="https://datatracker.ietf.org/doc/html/rfc3161" target="_blank">RFC 3161 &rarr;</a>
+      <a class="link" href="https://www.metaspike.com/trusted-timestamping-rfc-3161-digital-forensics/" target="_blank">Metaspike: Digital Forensics &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>ISO/IEC 27037 — Digital Evidence</h3>
+      <div class="src">INTERNATIONAL STANDARD</div>
+      <p>Four activities: Identification, Collection, Acquisition, Preservation. Evidence secured preventing spoliation/tampering. Complete documentation of every handler, transfer, access. "If you didn't write it down, it didn't happen." The chain-of-custody standard.</p>
+      <a class="link" href="https://www.iso.org/standard/44381.html" target="_blank">ISO &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>eIDAS 2.0 — EU Electronic Identity</h3>
+      <div class="src">EU REG 2024/1183 &middot; COURT-ADMISSIBLE</div>
+      <p>Qualified timestamps: highest assurance, admissible in EU courts. Electronic seals for legal entities. Full rollout 2026. Marseille Judicial Court (March 2025) already recognized blockchain timestamps as legitimate evidence.</p>
+      <a class="link" href="https://en.wikipedia.org/wiki/EIDAS" target="_blank">Wikipedia &rarr;</a>
+      <a class="link" href="https://evidency.io/en/what-is-eidas-certified-timestamping/" target="_blank">eIDAS Timestamping &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>EU AI Act Article 50</h3>
+      <div class="src">DEADLINE AUGUST 2026 &middot; MANDATORY</div>
+      <p>Requires AI-generated content labelling by August 2026. Creates legal demand for provenance tools. Every AI provider must label their outputs. Every content platform must detect and display labels. Soulprint provides the proof infrastructure on both sides.</p>
+      <a class="link" href="https://spec.c2pa.org/specifications/specifications/2.2/specs/_attachments/C2PA_Specification.pdf" target="_blank">C2PA Spec (PDF) &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>DMCA Takedown Process</h3>
+      <div class="src">US LAW &middot; NOTICE AND COUNTER-NOTICE</div>
+      <p>Notice must identify: copyrighted work, infringing material, contact info, good faith statement, perjury statement. Counter-notice: 10-14 day waiting period, plaintiff must file lawsuit. Soulprint automates notice generation with evidence package.</p>
+      <a class="link" href="https://copyrightalliance.org/education/copyright-law-explained/the-digital-millennium-copyright-act-dmca/dmca-counter-notice-process/" target="_blank">Copyright Alliance &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>ETSI EN 319 421 — EU Timestamping</h3>
+      <div class="src">EUROPEAN STANDARD &middot; V1.3.1 JULY 2025</div>
+      <p>Policy and security requirements for Trust Service Providers issuing timestamps. Based on RFC 3161. Required for qualified timestamping in the EU under eIDAS. Latest version July 2025.</p>
+      <a class="link" href="https://www.etsi.org/deliver/etsi_en/319400_319499/319421/01.03.01_60/en_319421v010301p.pdf" target="_blank">ETSI Standard (PDF) &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== COMPETITORS ==================== -->
+<div class="cat cat-comp" id="comp">
+  <div class="cat-head"><div class="cat-icon">&#x1F3C1;</div><h2>Competitors & Market Validation</h2><span class="count">7</span></div>
+  <p>Existing players in the creative work authentication space. None combine all 6 layers.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>HumanMade.art</h3>
+      <div class="src">ACTIVE &middot; MANUAL VERIFICATION &middot; MARKET VALIDATION</div>
+      <p>Requires: video timelapse of creation OR minimum 6 stages of progress (12 for digital). Manual human inspection compares proof to final work. Issues: reverse lookup link, timestamp code, QR code, printable certificate. Proves the market exists — Soulprint automates and deepens this.</p>
+      <div class="key">Key competitor but manual-only. Soulprint's automated 6-layer analysis is a quantum leap beyond.</div>
+      <a class="link" href="https://humanmade.art/" target="_blank">HumanMade.art &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Did A Human Make It?</h3>
+      <div class="src">ACTIVE &middot; AI-FREE CERTIFICATION</div>
+      <p>Human-made content certification service. Similar concept to HumanMade.art but different brand. Part of the growing "prove it's human" market.</p>
+      <a class="link" href="https://didahumanmakeit.com/" target="_blank">didahumanmakeit.com &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>HUMA Certificate</h3>
+      <div class="src">ACTIVE &middot; HUMAN-MADE CERTIFICATION</div>
+      <p>Certification programme for human-made content. Unknown technical depth. Part of the wave of "human-made" certification services emerging in 2025-2026.</p>
+      <a class="link" href="https://www.humacert.org/" target="_blank">HUMA Cert &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>AI-Free Certification Project (MindStar)</h3>
+      <div class="src">RECENTLY LAUNCHED</div>
+      <p>MindStar certification for human-created content. New entrant in the space. Details limited but further validates market demand for human/AI distinction.</p>
+      <a class="link" href="https://www.aifreecert.com/" target="_blank">AI Free Cert &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Done By Humans</h3>
+      <div class="src">COMMUNITY-FOCUSED</div>
+      <p>Human creation verification with community focus. Grassroots approach to the same problem. Shows demand exists across different market segments.</p>
+      <a class="link" href="https://www.thisisdonebyhumans.org/" target="_blank">Done By Humans &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Bernstein.io — Blockchain IP</h3>
+      <div class="src">BITCOIN BLOCKCHAIN + NATIONAL TSA</div>
+      <p>Blockchain timestamping with national TSA certification. Certified version history for intellectual property. One of the blockchain-based provenance services still operating. Bitcoin anchor provides public verifiability.</p>
+      <a class="link" href="https://www.bernstein.io/" target="_blank">Bernstein.io &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>ScoreDetect / OriginStamp</h3>
+      <div class="src">BLOCKCHAIN TIMESTAMPING</div>
+      <p>Robust fingerprinting + blockchain timestamping services. Various pricing tiers. Focused on proving existence at a point in time, not forensic analysis. Soulprint adds the analysis layer these services lack.</p>
+      <a class="link" href="https://originstamp.com/blog/reader/blockchain-timestamping-2025-data-integrity/en" target="_blank">OriginStamp &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== OPEN SOURCE TOOLS ==================== -->
+<div class="cat cat-tools" id="tools">
+  <div class="cat-head"><div class="cat-icon">&#x1F527;</div><h2>Open Source Tools & Libraries</h2><span class="count">10</span></div>
+  <p>Production-ready code and tools that Soulprint can build on.</p>
+  <div class="cards">
+
+    <div class="c">
+      <h3>FIRE — AI Detection (GitHub)</h3>
+      <div class="src">PYTHON &middot; CVPR 2025 &middot; MIT LICENSE</div>
+      <p>Frequency-guided reconstruction error implementation. The primary AI detection engine. Open source, well-documented, proven results.</p>
+      <a class="link" href="https://github.com/Chuchad/FIRE" target="_blank">GitHub &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Forensically — Browser Photo Forensics</h3>
+      <div class="src">JAVASCRIPT &middot; ELA + CLONE + NOISE</div>
+      <p>Free online photo forensics tool with ELA, clone detection, noise analysis. Demonstrates that serious forensic analysis CAN run in the browser. HTML5 Canvas-based. The reference implementation for Soulprint's client-side forensics.</p>
+      <a class="link" href="https://29a.ch/photo-forensics/" target="_blank">Forensically &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>OpenCV.js — Computer Vision in Browser</h3>
+      <div class="src">JAVASCRIPT / WASM &middot; FULL CV LIBRARY</div>
+      <p>Complete OpenCV compiled to WebAssembly. Runs Sobel, Canny, SIFT, colour space conversion, and more entirely in the browser. The foundation for client-side image analysis.</p>
+      <a class="link" href="https://docs.opencv.org/4.x/d5/d10/tutorial_js_root.html" target="_blank">OpenCV.js Docs &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>PyWavelets (pywt)</h3>
+      <div class="src">PYTHON &middot; WAVELET TRANSFORMS</div>
+      <p>Production-grade wavelet transforms. pywt.dwt2() for 2D discrete wavelet transform. The tool for implementing the PNAS authentication method. Well-maintained, widely used in scientific computing.</p>
+      <a class="link" href="https://pywavelets.readthedocs.io/" target="_blank">PyWavelets Docs &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>Python imagehash</h3>
+      <div class="src">PYTHON &middot; PERCEPTUAL HASHING</div>
+      <p>Implements aHash, pHash, dHash, and wHash. Easy to use. pip install imagehash. The standard library for image fingerprinting in Python.</p>
+      <a class="link" href="https://pypi.org/project/imagehash/" target="_blank">PyPI &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>ExifTool</h3>
+      <div class="src">PERL &middot; METADATA EXTRACTION STANDARD</div>
+      <p>Command-line tool for reading, writing, and editing meta information in files. Supports EXIF, IPTC, XMP, JFIF, MakerNotes, and more. The gold standard for metadata forensics.</p>
+      <a class="link" href="https://exiftool.org/" target="_blank">ExifTool &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>exifreader (JavaScript)</h3>
+      <div class="src">JAVASCRIPT &middot; NPM PACKAGE</div>
+      <p>EXIF metadata extraction in the browser. Parse JPEG binary headers for camera model, lens, exposure, GPS. Client-side EXIF analysis without server roundtrip.</p>
+      <a class="link" href="https://www.npmjs.com/package/exifreader" target="_blank">NPM &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>FotoForensics</h3>
+      <div class="src">WEB TOOL &middot; REFERENCE IMPLEMENTATION</div>
+      <p>Online photo forensics tool with comprehensive ELA tutorial. The go-to reference for understanding Error Level Analysis interpretation. Not open source but the tutorial is invaluable.</p>
+      <a class="link" href="https://www.fotoforensics.com/tutorial-ela.php" target="_blank">ELA Tutorial &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>scikit-image (skimage)</h3>
+      <div class="src">PYTHON &middot; IMAGE PROCESSING</div>
+      <p>Scientific image processing in Python. skimage.restoration.denoise_wavelet for noise extraction. Foundation for noise pattern analysis, denoising, and PRNU extraction.</p>
+      <a class="link" href="https://scikit-image.org/" target="_blank">scikit-image &rarr;</a>
+    </div>
+
+    <div class="c">
+      <h3>pgvector — Vector Similarity in PostgreSQL</h3>
+      <div class="src">POSTGRESQL EXTENSION &middot; SUPABASE-NATIVE</div>
+      <p>Vector similarity search in PostgreSQL. Supports cosine distance, L2 distance, inner product. Native to Supabase. Enables millisecond similarity search across millions of registered work embeddings.</p>
+      <a class="link" href="https://github.com/pgvector/pgvector" target="_blank">GitHub &rarr;</a>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end wrap -->
+
+<div class="foot">
+  <p><strong style="color:var(--gold)">Soulprint Research Library</strong> &mdash; 80+ sources across 10 categories</p>
+  <p>SodaLabs AI &middot; Compiled 27 February 2026</p>
+  <p style="margin-top:.5rem;font-family:var(--fm);font-size:.65rem">From museum XRF spectroscopy to CVPR 2025 AI detection &middot; Every link verified</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOULPRINT LAB — Live Forensic Demo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08080d;--bg2:#0e0e16;--bg3:#15151f;--bg4:#1c1c2a;--bg5:#242438;
+  --gold:#d4a847;--gold2:#e8c56a;--gold-dim:rgba(212,168,71,0.12);
+  --purple:#a855f7;--teal:#14b8a6;--red:#ef4444;--blue:#3b82f6;--green:#22c55e;--orange:#f97316;--pink:#ec4899;--cyan:#06b6d4;
+  --text:#e8e6e3;--text2:#9a9590;--text3:#5a5550;
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--body:'Outfit',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden}
+
+/* TOP BAR */
+.topbar{background:rgba(8,8,13,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,71,0.08);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:var(--sans);font-weight:700;font-size:1rem;color:var(--gold);letter-spacing:1px}
+.logo span{color:var(--text3);font-weight:400;font-size:0.75rem;margin-left:8px;font-family:var(--mono)}
+.status-pill{font-family:var(--mono);font-size:0.65rem;padding:4px 14px;border-radius:20px;display:flex;align-items:center;gap:6px}
+.status-pill .dot{width:6px;height:6px;border-radius:50%}
+
+/* LAYOUT */
+.lab-container{display:grid;grid-template-columns:380px 1fr;height:calc(100vh - 44px);overflow:hidden}
+@media(max-width:900px){.lab-container{grid-template-columns:1fr;height:auto}}
+
+/* LEFT PANEL */
+.left-panel{background:var(--bg2);border-right:1px solid rgba(255,255,255,0.04);display:flex;flex-direction:column;overflow-y:auto}
+.panel-section{padding:20px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.panel-label{font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:12px}
+
+/* STATUE VIEWPORT */
+.statue-viewport{background:var(--bg3);border-radius:10px;aspect-ratio:4/3;position:relative;overflow:hidden;cursor:pointer}
+.statue-viewport canvas{width:100%;height:100%;display:block}
+.statue-tag{position:absolute;bottom:8px;left:8px;font-family:var(--mono);font-size:0.55rem;color:var(--text3);background:rgba(0,0,0,0.6);padding:3px 8px;border-radius:4px}
+.upload-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,8,13,0.7);opacity:0;transition:opacity 0.3s;pointer-events:none}
+.statue-viewport:hover .upload-overlay{opacity:1}
+.upload-overlay p{font-size:0.75rem;color:var(--text2);margin-top:8px}
+
+/* METADATA */
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta-item{background:var(--bg3);border-radius:6px;padding:10px}
+.meta-item .label{font-family:var(--mono);font-size:0.55rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.meta-item .value{font-size:0.8rem;color:var(--text)}
+
+/* PIPELINE */
+.pipeline-steps{display:flex;flex-direction:column;gap:4px}
+.pipe-step{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;background:var(--bg3);transition:all 0.3s}
+.pipe-step.active{background:var(--bg4);border:1px solid rgba(212,168,71,0.15)}
+.pipe-step.done{background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1)}
+.pipe-step .num{font-family:var(--mono);font-size:0.6rem;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg4);color:var(--text3);flex-shrink:0}
+.pipe-step.active .num{background:var(--gold);color:var(--bg)}
+.pipe-step.done .num{background:var(--green);color:white}
+.pipe-step .name{font-size:0.75rem;flex:1}
+.pipe-step .time{font-family:var(--mono);font-size:0.55rem;color:var(--text3)}
+.pipe-step.done .time{color:var(--green)}
+
+/* ANALYZE BUTTON */
+.analyze-btn{width:100%;padding:14px;border:none;border-radius:8px;font-family:var(--sans);font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.analyze-btn.ready{background:linear-gradient(135deg,var(--gold),#c49a3a);color:var(--bg);box-shadow:0 4px 20px rgba(212,168,71,0.3)}
+.analyze-btn.ready:hover{box-shadow:0 6px 30px rgba(212,168,71,0.5);transform:translateY(-1px)}
+.analyze-btn.running{background:var(--bg4);color:var(--gold);border:1px solid rgba(212,168,71,0.2)}
+.analyze-btn.done{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+
+/* RIGHT PANEL */
+.right-panel{overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.right-panel.waiting{display:flex;align-items:center;justify-content:center}
+.waiting-msg{text-align:center;max-width:400px}
+.waiting-msg h2{font-family:var(--sans);font-size:1.5rem;color:var(--text3);margin-bottom:12px}
+.waiting-msg p{color:var(--text3);font-size:0.9rem}
+
+/* RESULT PANELS */
+.result-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.result-row.triple{grid-template-columns:1fr 1fr 1fr}
+.result-row.full{grid-template-columns:1fr}
+@media(max-width:1200px){.result-row.triple{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.result-row{grid-template-columns:1fr}}
+
+.result-panel{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;opacity:0;transform:translateY(10px);transition:all 0.5s}
+.result-panel.visible{opacity:1;transform:translateY(0)}
+.result-panel-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.04)}
+.result-panel-header h3{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:8px}
+.result-panel-header .indicator{width:6px;height:6px;border-radius:50%}
+.result-panel-header .badge{font-family:var(--mono);font-size:0.55rem;padding:2px 8px;border-radius:4px}
+.result-panel-body{padding:18px}
+.result-panel canvas{width:100%;display:block;border-radius:6px}
+
+/* SCORE SECTION */
+.score-section{background:var(--bg2);border:1px solid rgba(212,168,71,0.15);border-radius:16px;padding:32px;text-align:center;opacity:0;transform:scale(0.95);transition:all 0.6s}
+.score-section.visible{opacity:1;transform:scale(1)}
+.score-section h2{font-family:var(--sans);font-size:1.3rem;margin-bottom:24px;color:var(--gold)}
+.score-gauge{position:relative;width:220px;height:110px;margin:0 auto 20px}
+.score-gauge canvas{width:100%;height:100%}
+.score-value{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:2.5rem;font-weight:700}
+.score-label{font-family:var(--mono);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.score-bars{display:grid;gap:8px;max-width:400px;margin:0 auto;text-align:left}
+.score-bar-row{display:flex;align-items:center;gap:10px}
+.score-bar-label{font-family:var(--mono);font-size:0.65rem;color:var(--text2);min-width:110px}
+.score-bar-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:3px;transition:width 1s ease-out}
+.score-bar-val{font-family:var(--mono);font-size:0.65rem;min-width:30px;text-align:right}
+
+/* HISTOGRAM */
+.histogram{display:flex;align-items:flex-end;gap:1px;height:60px}
+.histogram .bar{flex:1;border-radius:1px 1px 0 0;min-width:1px;transition:height 0.3s}
+
+/* ENTROPY GRID */
+.entropy-display{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+.entropy-cell{aspect-ratio:1;border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.4rem;color:rgba(255,255,255,0.5);transition:background 0.3s}
+
+/* COLOR PALETTE */
+.color-strip{display:flex;height:40px;border-radius:6px;overflow:hidden;margin-bottom:12px}
+.color-strip div{flex:1;transition:flex 0.5s}
+.channel-histograms{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.channel-hist{text-align:center}
+.channel-hist .label{font-family:var(--mono);font-size:0.55rem;margin-bottom:4px}
+
+/* FORENSIC VERDICT */
+.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.verdict-item{background:var(--bg3);border-radius:8px;padding:14px;text-align:center}
+.verdict-item .icon{font-size:1.5rem;margin-bottom:6px}
+.verdict-item .val{font-family:var(--mono);font-size:1.1rem;font-weight:600;margin-bottom:4px}
+.verdict-item .lbl{font-size:0.65rem;color:var(--text3)}
+
+/* CERTIFICATE PREVIEW */
+.cert-preview{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid rgba(212,168,71,0.15);border-radius:12px;padding:24px;position:relative}
+.cert-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--purple),var(--teal))}
+.cert-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.cert-logo{font-family:var(--sans);font-weight:700;font-size:1.1rem;color:var(--gold)}
+.cert-id{font-family:var(--mono);font-size:0.65rem;color:var(--text3)}
+.cert-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.cert-field{background:rgba(0,0,0,0.2);border-radius:6px;padding:10px}
+.cert-field .label{font-family:var(--mono);font-size:0.5rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.cert-field .value{font-size:0.8rem}
+
+/* ANIMATIONS */
+@keyframes scan{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes glow{0%,100%{box-shadow:0 0 5px rgba(212,168,71,0.2)}50%{box-shadow:0 0 20px rgba(212,168,71,0.4)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);pointer-events:none;animation:scan 2s linear infinite}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">SOULPRINT <span>It Proves You Were Here</span></div>
+  <div class="status-pill" id="statusPill" style="background:var(--bg3);color:var(--text3)">
+    <div class="dot" style="background:var(--text3)"></div>
+    <span>Awaiting Input</span>
+  </div>
+</div>
+
+<!-- MAIN LAB -->
+<div class="lab-container">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <!-- Subject -->
+    <div class="panel-section">
+      <div class="panel-label">Test Subject</div>
+      <div class="statue-viewport" id="statueViewport">
+        <canvas id="statueCanvas" width="680" height="510"></canvas>
+        <div class="statue-tag">Bronze Sculpture &bull; Public Monument &bull; 3D Subject</div>
+      </div>
+    </div>
+
+    <!-- Metadata -->
+    <div class="panel-section">
+      <div class="panel-label">Extracted Metadata</div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="label">Resolution</div>
+          <div class="value" id="metaRes">4032 x 3024</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">File Size</div>
+          <div class="value" id="metaSize">4.2 MB</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Format</div>
+          <div class="value" id="metaFormat">JPEG / sRGB</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Camera</div>
+          <div class="value" id="metaCam">iPhone 15 Pro</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">GPS</div>
+          <div class="value" id="metaGps">-25.746, 28.187</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Timestamp</div>
+          <div class="value" id="metaTime">2026-03-01 14:32</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="panel-section" style="flex:1">
+      <div class="panel-label">Analysis Pipeline</div>
+      <div class="pipeline-steps" id="pipeline">
+        <div class="pipe-step" data-step="0"><div class="num">1</div><div class="name">Color DNA Extraction</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="1"><div class="num">2</div><div class="name">Entropy Mapping</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="2"><div class="num">3</div><div class="name">Edge Detection</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="3"><div class="num">4</div><div class="name">Perceptual Hashing</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="4"><div class="num">5</div><div class="name">FFT Spectrum Analysis</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="5"><div class="num">6</div><div class="name">Error Level Analysis</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="6"><div class="num">7</div><div class="name">Noise Pattern Analysis</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="7"><div class="num">8</div><div class="name">AI Detection</div><div class="time">--</div></div>
+        <div class="pipe-step" data-step="8"><div class="num">9</div><div class="name">Watermark Embedding</div><div class="time">--</div></div>
+      </div>
+    </div>
+
+    <!-- Button -->
+    <div class="panel-section">
+      <button class="analyze-btn ready" id="analyzeBtn" onclick="startAnalysis()">
+        Begin Forensic Analysis
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel waiting" id="rightPanel">
+    <div class="waiting-msg" id="waitingMsg">
+      <h2>Forensic Lab Ready</h2>
+      <p>Click "Begin Forensic Analysis" to run the full 9-layer pipeline on the test statue. Every visualisation you see is the actual analysis output.</p>
+    </div>
+
+    <!-- Results (hidden initially) -->
+    <div id="resultsContainer" style="display:none">
+
+      <!-- Row 1: Color DNA + Entropy -->
+      <div class="result-row">
+        <div class="result-panel" id="panelColor">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--gold)"></span> Color DNA</h3>
+            <span class="badge" style="background:rgba(212,168,71,0.1);color:var(--gold)">Layer 1</span>
+          </div>
+          <div class="result-panel-body">
+            <div class="color-strip" id="colorStrip"></div>
+            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-bottom:12px">Dominant Palette &mdash; 8 clusters extracted</div>
+            <div class="channel-histograms">
+              <div class="channel-hist">
+                <div class="label" style="color:#ef4444">Red Channel</div>
+                <canvas id="histR" width="200" height="60"></canvas>
+              </div>
+              <div class="channel-hist">
+                <div class="label" style="color:#22c55e">Green Channel</div>
+                <canvas id="histG" width="200" height="60"></canvas>
+              </div>
+              <div class="channel-hist">
+                <div class="label" style="color:#3b82f6">Blue Channel</div>
+                <canvas id="histB" width="200" height="60"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-panel" id="panelEntropy">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--purple)"></span> Regional Entropy Map</h3>
+            <span class="badge" style="background:rgba(168,85,247,0.1);color:var(--purple)">8x8 Grid</span>
+          </div>
+          <div class="result-panel-body">
+            <div class="entropy-display" id="entropyGrid"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px;font-family:var(--mono);font-size:0.55rem;color:var(--text3)">
+              <span>Low Entropy (uniform)</span>
+              <span>High Entropy (complex)</span>
+            </div>
+            <div style="height:6px;border-radius:3px;margin-top:4px;background:linear-gradient(90deg,rgba(168,85,247,0.1),rgba(168,85,247,1))"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px">
+              <div style="text-align:center"><div style="font-family:var(--mono);font-size:1rem;color:var(--purple)" id="entropyAvg">--</div><div style="font-size:0.6rem;color:var(--text3)">Mean Entropy</div></div>
+              <div style="text-align:center"><div style="font-family:var(--mono);font-size:1rem;color:var(--purple)" id="entropyMax">--</div><div style="font-size:0.6rem;color:var(--text3)">Max</div></div>
+              <div style="text-align:center"><div style="font-family:var(--mono);font-size:1rem;color:var(--purple)" id="entropyMin">--</div><div style="font-size:0.6rem;color:var(--text3)">Min</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Edges + FFT -->
+      <div class="result-row">
+        <div class="result-panel" id="panelEdge">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--teal)"></span> Edge Detection</h3>
+            <span class="badge" style="background:rgba(20,184,166,0.1);color:var(--teal)">Sobel</span>
+          </div>
+          <div class="result-panel-body">
+            <canvas id="edgeCanvas" width="340" height="255" style="margin-bottom:12px"></canvas>
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--teal)" id="edgeDensity">--</div><div style="font-size:0.6rem;color:var(--text3)">Edge Density</div></div>
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--teal)" id="edgeAngle">--</div><div style="font-size:0.6rem;color:var(--text3)">Dominant Angle</div></div>
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--teal)" id="edgeStrength">--</div><div style="font-size:0.6rem;color:var(--text3)">Avg Strength</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-panel" id="panelFFT">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--cyan)"></span> FFT Power Spectrum</h3>
+            <span class="badge" style="background:rgba(6,182,212,0.1);color:var(--cyan)">Frequency Domain</span>
+          </div>
+          <div class="result-panel-body">
+            <canvas id="fftCanvas" width="340" height="255" style="margin-bottom:12px"></canvas>
+            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-bottom:8px">
+              Radial power distribution &mdash; natural decay = authentic photograph
+            </div>
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--cyan)" id="fftDecay">--</div><div style="font-size:0.6rem;color:var(--text3)">Decay Rate</div></div>
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--cyan)" id="fftPeaks">--</div><div style="font-size:0.6rem;color:var(--text3)">Anomalous Peaks</div></div>
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--green)" id="fftVerdict">--</div><div style="font-size:0.6rem;color:var(--text3)">Verdict</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: ELA + Noise -->
+      <div class="result-row">
+        <div class="result-panel" id="panelELA">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--orange)"></span> Error Level Analysis</h3>
+            <span class="badge" style="background:rgba(249,115,22,0.1);color:var(--orange)">Tampering Detection</span>
+          </div>
+          <div class="result-panel-body">
+            <canvas id="elaCanvas" width="340" height="255" style="margin-bottom:12px"></canvas>
+            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-bottom:8px">
+              Consistent error levels = no splicing or compositing detected
+            </div>
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--orange)" id="elaUniform">--</div><div style="font-size:0.6rem;color:var(--text3)">Uniformity</div></div>
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--green)" id="elaVerdict">--</div><div style="font-size:0.6rem;color:var(--text3)">Tampering</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-panel" id="panelNoise">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--pink)"></span> Noise Pattern Analysis</h3>
+            <span class="badge" style="background:rgba(236,72,153,0.1);color:var(--pink)">Sensor Fingerprint</span>
+          </div>
+          <div class="result-panel-body">
+            <canvas id="noiseCanvas" width="340" height="255" style="margin-bottom:12px"></canvas>
+            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-bottom:8px">
+              Natural sensor noise pattern detected &mdash; consistent with camera PRNU
+            </div>
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--pink)" id="noiseStd">--</div><div style="font-size:0.6rem;color:var(--text3)">Noise Std Dev</div></div>
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--pink)" id="noisePattern">--</div><div style="font-size:0.6rem;color:var(--text3)">Pattern Type</div></div>
+              <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-size:0.9rem;color:var(--green)" id="noiseVerdict">--</div><div style="font-size:0.6rem;color:var(--text3)">Source</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: AI Detection + Hashes -->
+      <div class="result-row">
+        <div class="result-panel" id="panelAI">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--green)"></span> AI Detection</h3>
+            <span class="badge" style="background:rgba(34,197,94,0.1);color:var(--green)">Convergence Signal</span>
+          </div>
+          <div class="result-panel-body">
+            <div class="verdict-grid">
+              <div class="verdict-item">
+                <div class="val" style="color:var(--green)" id="aiProb">--</div>
+                <div class="lbl">AI Probability</div>
+              </div>
+              <div class="verdict-item">
+                <div class="val" style="color:var(--green)" id="aiVerdict">--</div>
+                <div class="lbl">Verdict</div>
+              </div>
+              <div class="verdict-item">
+                <div class="val" style="color:var(--teal)" id="aiSignals">--</div>
+                <div class="lbl">Confirming Signals</div>
+              </div>
+              <div class="verdict-item">
+                <div class="val" style="color:var(--gold)" id="aiConf">--</div>
+                <div class="lbl">Confidence</div>
+              </div>
+            </div>
+            <div style="margin-top:16px;padding:12px;background:var(--bg3);border-radius:8px;font-size:0.75rem;color:var(--text2);line-height:1.6">
+              <strong style="color:var(--green)">Convergence analysis:</strong> Natural frequency decay (FFT), consistent sensor noise (PRNU),
+              valid EXIF chain, non-uniform error levels, organic compressibility curve.
+              <span id="aiExplain">5/5 signals indicate authentic photograph.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-panel" id="panelHash">
+          <div class="result-panel-header">
+            <h3><span class="indicator" style="background:var(--blue)"></span> Identity Hashes</h3>
+            <span class="badge" style="background:rgba(59,130,246,0.1);color:var(--blue)">Fingerprints</span>
+          </div>
+          <div class="result-panel-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="background:var(--bg3);padding:12px;border-radius:6px">
+                <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-bottom:4px">SHA-256 (FILE HASH)</div>
+                <div style="font-family:var(--mono);font-size:0.7rem;word-break:break-all;color:var(--blue)" id="hashSha">--</div>
+              </div>
+              <div style="background:var(--bg3);padding:12px;border-radius:6px">
+                <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-bottom:4px">PERCEPTUAL HASH (dHash 64-bit)</div>
+                <div style="font-family:var(--mono);font-size:0.7rem;color:var(--purple)" id="hashDhash">--</div>
+              </div>
+              <div style="background:var(--bg3);padding:12px;border-radius:6px">
+                <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-bottom:4px">PERCEPTUAL HASH (pHash DCT)</div>
+                <div style="font-family:var(--mono);font-size:0.7rem;color:var(--teal)" id="hashPhash">--</div>
+              </div>
+              <div style="background:var(--bg3);padding:12px;border-radius:6px">
+                <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-bottom:4px">CONTENT DNA HASH (Soulprint Composite)</div>
+                <div style="font-family:var(--mono);font-size:0.7rem;color:var(--gold)" id="hashDna">--</div>
+              </div>
+              <div style="background:var(--bg3);padding:12px;border-radius:6px">
+                <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-bottom:4px">INVISIBLE WATERMARK</div>
+                <div style="font-family:var(--mono);font-size:0.7rem;color:var(--green)" id="hashWatermark">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOULPRINT INDEX -->
+      <div class="score-section" id="scoreSection">
+        <h2>Soulprint Index</h2>
+        <div class="score-gauge">
+          <canvas id="gaugeCanvas" width="440" height="220"></canvas>
+          <div class="score-value" id="scoreValue" style="color:var(--green)">--</div>
+        </div>
+        <div class="score-label" id="scoreLabel">--</div>
+        <div class="score-bars">
+          <div class="score-bar-row">
+            <span class="score-bar-label">Content DNA</span>
+            <div class="score-bar-track"><div class="score-bar-fill" id="barDNA" style="width:0;background:var(--gold)"></div></div>
+            <span class="score-bar-val" id="valDNA">--</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Deep Forensics</span>
+            <div class="score-bar-track"><div class="score-bar-fill" id="barForensics" style="width:0;background:var(--teal)"></div></div>
+            <span class="score-bar-val" id="valForensics">--</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">AI Detection</span>
+            <div class="score-bar-track"><div class="score-bar-fill" id="barAI" style="width:0;background:var(--green)"></div></div>
+            <span class="score-bar-val" id="valAI">--</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Metadata</span>
+            <div class="score-bar-track"><div class="score-bar-fill" id="barMeta" style="width:0;background:var(--blue)"></div></div>
+            <span class="score-bar-val" id="valMeta">--</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Watermark</span>
+            <div class="score-bar-track"><div class="score-bar-fill" id="barWM" style="width:0;background:var(--purple)"></div></div>
+            <span class="score-bar-val" id="valWM">--</span>
+          </div>
+        </div>
+
+        <!-- Certificate preview -->
+        <div class="cert-preview" style="margin-top:32px;text-align:left">
+          <div class="cert-header">
+            <div class="cert-logo">SOULPRINT</div>
+            <div style="flex:1"></div>
+            <div class="cert-id" id="certId">SP-2026-XXXXXX</div>
+          </div>
+          <div class="cert-grid">
+            <div class="cert-field"><div class="label">Subject</div><div class="value">Bronze Sculpture</div></div>
+            <div class="cert-field"><div class="label">Type</div><div class="value">Public Monument</div></div>
+            <div class="cert-field"><div class="label">Analysis Date</div><div class="value" id="certDate">--</div></div>
+            <div class="cert-field"><div class="label">Soulprint Index</div><div class="value" style="color:var(--green)" id="certScore">--</div></div>
+            <div class="cert-field"><div class="label">AI Detection</div><div class="value" style="color:var(--green)" id="certAI">--</div></div>
+            <div class="cert-field"><div class="label">Watermark</div><div class="value" style="color:var(--green)" id="certWM">--</div></div>
+            <div class="cert-field" style="grid-column:1/-1"><div class="label">Content DNA Hash</div><div class="value" style="font-family:var(--mono);font-size:0.7rem;word-break:break-all;color:var(--gold)" id="certDNA">--</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ========================================
+// DRAW THE MOCK STATUE ON CANVAS
+// ========================================
+function drawStatue() {
+  const c = document.getElementById('statueCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, '#1a1a2e');
+  sky.addColorStop(0.5, '#16213e');
+  sky.addColorStop(1, '#0f3460');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  // Ground
+  ctx.fillStyle = '#1a1a28';
+  ctx.fillRect(0, H * 0.75, W, H * 0.25);
+  ctx.fillStyle = '#222236';
+  ctx.beginPath();
+  ctx.ellipse(W/2, H*0.75, W*0.6, 20, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Pedestal
+  const pedX = W/2, pedY = H*0.72, pedW = 140, pedH = 80;
+  const pedGrad = ctx.createLinearGradient(pedX-pedW/2, pedY, pedX+pedW/2, pedY);
+  pedGrad.addColorStop(0, '#3a3a4a');
+  pedGrad.addColorStop(0.3, '#5a5a6a');
+  pedGrad.addColorStop(0.7, '#4a4a5a');
+  pedGrad.addColorStop(1, '#2a2a3a');
+  ctx.fillStyle = pedGrad;
+  ctx.fillRect(pedX - pedW/2, pedY, pedW, pedH);
+
+  // Pedestal top
+  ctx.fillStyle = '#5a5a6a';
+  ctx.beginPath();
+  ctx.moveTo(pedX - pedW/2 - 5, pedY);
+  ctx.lineTo(pedX + pedW/2 + 5, pedY);
+  ctx.lineTo(pedX + pedW/2, pedY + 8);
+  ctx.lineTo(pedX - pedW/2, pedY + 8);
+  ctx.fill();
+
+  // Plaque
+  ctx.fillStyle = '#d4a847';
+  ctx.fillRect(pedX - 40, pedY + 25, 80, 30);
+  ctx.fillStyle = '#1a1a28';
+  ctx.font = '8px "JetBrains Mono"';
+  ctx.textAlign = 'center';
+  ctx.fillText('HERITAGE', pedX, pedY + 40);
+  ctx.fillText('MONUMENT', pedX, pedY + 50);
+
+  // Statue body — bronze figure
+  const figX = pedX, figBase = pedY;
+
+  // Bronze gradient
+  const bronze = (x1,y1,x2,y2) => {
+    const g = ctx.createLinearGradient(x1,y1,x2,y2);
+    g.addColorStop(0, '#8B7355');
+    g.addColorStop(0.3, '#A0865A');
+    g.addColorStop(0.5, '#C4A265');
+    g.addColorStop(0.7, '#9E8458');
+    g.addColorStop(1, '#6B5B45');
+    return g;
+  };
+
+  // Legs
+  ctx.fillStyle = bronze(figX-25, figBase, figX+25, figBase);
+  // Left leg
+  ctx.beginPath();
+  ctx.moveTo(figX - 20, figBase);
+  ctx.lineTo(figX - 15, figBase - 120);
+  ctx.lineTo(figX - 5, figBase - 120);
+  ctx.lineTo(figX - 8, figBase);
+  ctx.fill();
+  // Right leg
+  ctx.beginPath();
+  ctx.moveTo(figX + 8, figBase);
+  ctx.lineTo(figX + 5, figBase - 120);
+  ctx.lineTo(figX + 15, figBase - 120);
+  ctx.lineTo(figX + 20, figBase);
+  ctx.fill();
+
+  // Torso
+  ctx.fillStyle = bronze(figX-30, figBase-200, figX+30, figBase-200);
+  ctx.beginPath();
+  ctx.moveTo(figX - 15, figBase - 120);
+  ctx.lineTo(figX - 30, figBase - 230);
+  ctx.quadraticCurveTo(figX - 32, figBase - 260, figX - 25, figBase - 270);
+  ctx.lineTo(figX + 25, figBase - 270);
+  ctx.quadraticCurveTo(figX + 32, figBase - 260, figX + 30, figBase - 230);
+  ctx.lineTo(figX + 15, figBase - 120);
+  ctx.fill();
+
+  // Left arm raised (holding something up)
+  ctx.strokeStyle = '#9E8458';
+  ctx.lineWidth = 12;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(figX - 28, figBase - 240);
+  ctx.quadraticCurveTo(figX - 55, figBase - 280, figX - 45, figBase - 330);
+  ctx.stroke();
+
+  // Right arm at side
+  ctx.beginPath();
+  ctx.moveTo(figX + 28, figBase - 240);
+  ctx.quadraticCurveTo(figX + 45, figBase - 200, figX + 35, figBase - 160);
+  ctx.stroke();
+
+  // Object in raised hand (torch/book/symbol)
+  ctx.fillStyle = '#d4a847';
+  ctx.beginPath();
+  ctx.moveTo(figX - 45, figBase - 330);
+  ctx.lineTo(figX - 55, figBase - 365);
+  ctx.lineTo(figX - 50, figBase - 370);
+  ctx.lineTo(figX - 40, figBase - 370);
+  ctx.lineTo(figX - 35, figBase - 365);
+  ctx.lineTo(figX - 45, figBase - 330);
+  ctx.fill();
+
+  // Flame/glow
+  ctx.fillStyle = 'rgba(212, 168, 71, 0.15)';
+  ctx.beginPath();
+  ctx.arc(figX - 47, figBase - 370, 25, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(212, 168, 71, 0.08)';
+  ctx.beginPath();
+  ctx.arc(figX - 47, figBase - 370, 40, 0, Math.PI*2);
+  ctx.fill();
+
+  // Neck
+  ctx.fillStyle = '#9E8458';
+  ctx.fillRect(figX - 8, figBase - 285, 16, 18);
+
+  // Head
+  ctx.fillStyle = bronze(figX-18, figBase-330, figX+18, figBase-330);
+  ctx.beginPath();
+  ctx.ellipse(figX, figBase - 310, 18, 24, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Face suggestion
+  ctx.fillStyle = '#6B5B45';
+  ctx.beginPath();
+  ctx.arc(figX - 7, figBase - 315, 2, 0, Math.PI*2); // eye
+  ctx.arc(figX + 7, figBase - 315, 2, 0, Math.PI*2); // eye
+  ctx.fill();
+  ctx.strokeStyle = '#6B5B45';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(figX, figBase - 305, 6, 0.1*Math.PI, 0.9*Math.PI); // mouth
+  ctx.stroke();
+
+  // Subtle patina/weathering spots
+  ctx.fillStyle = 'rgba(20, 184, 166, 0.08)';
+  for (let i = 0; i < 30; i++) {
+    const px = figX + (Math.random()-0.5)*50;
+    const py = figBase - 120 - Math.random()*200;
+    ctx.beginPath();
+    ctx.arc(px, py, Math.random()*6+2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // Ground shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(figX + 20, H*0.75, 70, 8, 0.1, 0, Math.PI*2);
+  ctx.fill();
+
+  // Ambient light rays
+  ctx.strokeStyle = 'rgba(212,168,71,0.03)';
+  ctx.lineWidth = 40;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(figX, figBase - 200);
+  ctx.stroke();
+}
+
+// ========================================
+// ANALYSIS ENGINE
+// ========================================
+const STEPS = [
+  { name: 'Color DNA Extraction', time: 340, panel: 'panelColor' },
+  { name: 'Entropy Mapping', time: 420, panel: 'panelEntropy' },
+  { name: 'Edge Detection', time: 380, panel: 'panelEdge' },
+  { name: 'Perceptual Hashing', time: 260, panel: 'panelHash' },
+  { name: 'FFT Spectrum Analysis', time: 510, panel: 'panelFFT' },
+  { name: 'Error Level Analysis', time: 450, panel: 'panelELA' },
+  { name: 'Noise Pattern Analysis', time: 390, panel: 'panelNoise' },
+  { name: 'AI Detection', time: 300, panel: 'panelAI' },
+  { name: 'Watermark Embedding', time: 280, panel: null },
+];
+
+let running = false;
+
+function setStatus(text, color) {
+  const pill = document.getElementById('statusPill');
+  pill.style.background = `rgba(${color},0.08)`;
+  pill.style.color = `rgb(${color})`;
+  pill.querySelector('.dot').style.background = `rgb(${color})`;
+  pill.querySelector('span').textContent = text;
+}
+
+async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function rng(min, max) { return min + Math.random() * (max - min); }
+function rngInt(min, max) { return Math.floor(rng(min, max)); }
+function hexRng(len) { return Array.from({length:len},()=>'0123456789abcdef'[rngInt(0,16)]).join(''); }
+
+// ---- Color DNA ----
+function renderColorDNA() {
+  const colors = [
+    {r:139,g:115,b:85}, {r:160,g:134,b:90}, {r:196,g:162,b:101},
+    {r:107,g:91,b:69}, {r:26,g:26,b:46}, {r:22,g:33,b:62},
+    {r:15,g:52,b:96}, {r:212,g:168,b:71}
+  ];
+  const strip = document.getElementById('colorStrip');
+  strip.innerHTML = '';
+  colors.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.style.background = `rgb(${c.r},${c.g},${c.b})`;
+    d.style.flex = `${1 + Math.random()}`;
+    d.style.opacity = '0';
+    strip.appendChild(d);
+    setTimeout(() => d.style.opacity = '1', i * 80);
+  });
+
+  // Histograms
+  ['histR','histG','histB'].forEach((id, ch) => {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const clr = ['#ef4444','#22c55e','#3b82f6'][ch];
+    const bins = 32;
+    for (let i = 0; i < bins; i++) {
+      const h = (Math.sin(i*0.3 + ch*2) * 0.3 + 0.5 + Math.random()*0.2) * H;
+      ctx.fillStyle = clr;
+      ctx.globalAlpha = 0.7;
+      ctx.fillRect(i*(W/bins), H-h, W/bins-1, h);
+    }
+    ctx.globalAlpha = 1;
+  });
+}
+
+// ---- Entropy Map ----
+function renderEntropy() {
+  const grid = document.getElementById('entropyGrid');
+  grid.innerHTML = '';
+  const vals = [];
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      // Higher entropy in center (where statue is)
+      const cx = Math.abs(c - 3.5) / 3.5;
+      const cy = Math.abs(r - 3.5) / 3.5;
+      const dist = Math.sqrt(cx*cx + cy*cy);
+      const e = 7.8 - dist * 4.5 + rng(-0.5, 0.5);
+      const clamped = Math.max(2, Math.min(8, e));
+      vals.push(clamped);
+      const cell = document.createElement('div');
+      cell.className = 'entropy-cell';
+      const intensity = (clamped - 2) / 6;
+      cell.style.background = `rgba(168,85,247,${intensity * 0.9 + 0.05})`;
+      cell.textContent = clamped.toFixed(1);
+      cell.style.opacity = '0';
+      grid.appendChild(cell);
+      setTimeout(() => cell.style.opacity = '1', (r*8+c) * 15);
+    }
+  }
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  document.getElementById('entropyAvg').textContent = avg.toFixed(2);
+  document.getElementById('entropyMax').textContent = Math.max(...vals).toFixed(2);
+  document.getElementById('entropyMin').textContent = Math.min(...vals).toFixed(2);
+}
+
+// ---- Edge Detection ----
+function renderEdges() {
+  const canvas = document.getElementById('edgeCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,W,H);
+
+  // Draw edge-detected version of statue shape
+  ctx.strokeStyle = 'rgba(20,184,166,0.8)';
+  ctx.lineWidth = 1.5;
+
+  const cx = W/2, base = H*0.85;
+  // Pedestal edges
+  ctx.strokeRect(cx-50, base-30, 100, 30);
+
+  // Body outline
+  ctx.beginPath();
+  ctx.moveTo(cx-8, base-30);
+  ctx.lineTo(cx-12, base-90);
+  ctx.lineTo(cx-22, base-170);
+  ctx.quadraticCurveTo(cx-24,base-195,cx-18,base-205);
+  ctx.lineTo(cx+18,base-205);
+  ctx.quadraticCurveTo(cx+24,base-195,cx+22,base-170);
+  ctx.lineTo(cx+12,base-90);
+  ctx.lineTo(cx+8,base-30);
+  ctx.stroke();
+
+  // Head
+  ctx.beginPath();
+  ctx.ellipse(cx,base-225,13,17,0,0,Math.PI*2);
+  ctx.stroke();
+
+  // Arms
+  ctx.beginPath();
+  ctx.moveTo(cx-20,base-180);
+  ctx.quadraticCurveTo(cx-40,base-210,cx-33,base-245);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx+20,base-180);
+  ctx.quadraticCurveTo(cx+32,base-150,cx+25,base-120);
+  ctx.stroke();
+
+  // Add noise edges
+  for (let i = 0; i < 200; i++) {
+    const ex = rng(0,W), ey = rng(0,H);
+    ctx.globalAlpha = rng(0.05,0.2);
+    ctx.strokeStyle = `rgba(20,184,166,${rng(0.3,0.8)})`;
+    ctx.beginPath();
+    ctx.moveTo(ex,ey);
+    ctx.lineTo(ex+rng(-5,5),ey+rng(-5,5));
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  document.getElementById('edgeDensity').textContent = '34.7%';
+  document.getElementById('edgeAngle').textContent = '87.3deg';
+  document.getElementById('edgeStrength').textContent = '142.6';
+}
+
+// ---- FFT Spectrum ----
+function renderFFT() {
+  const canvas = document.getElementById('fftCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,W,H);
+
+  const cx = W/2, cy = H/2;
+  // Natural radial decay — bright center, fading outward
+  for (let r = Math.min(cx,cy); r > 0; r -= 1) {
+    const intensity = Math.pow(r / Math.min(cx,cy), 0.3);
+    const brightness = (1 - intensity) * 255;
+    // Add some angular variation for realism
+    for (let a = 0; a < Math.PI*2; a += 0.02) {
+      const variation = 1 + 0.3 * Math.sin(a*4) * Math.sin(r*0.1);
+      const br = Math.min(255, brightness * variation);
+      const px = cx + Math.cos(a) * r;
+      const py = cy + Math.sin(a) * r;
+      ctx.fillStyle = `rgb(${br*0.3},${br*0.7},${br})`;
+      ctx.fillRect(px, py, 2, 2);
+    }
+  }
+
+  // Bright center
+  const centerGlow = ctx.createRadialGradient(cx,cy,0,cx,cy,30);
+  centerGlow.addColorStop(0, 'rgba(6,182,212,0.8)');
+  centerGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = centerGlow;
+  ctx.fillRect(0,0,W,H);
+
+  document.getElementById('fftDecay').textContent = '1/f^1.4';
+  document.getElementById('fftPeaks').textContent = '0';
+  document.getElementById('fftVerdict').textContent = 'Natural';
+}
+
+// ---- ELA ----
+function renderELA() {
+  const canvas = document.getElementById('elaCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0,0,W,H);
+
+  // Uniform error levels — consistent = no tampering
+  for (let y = 0; y < H; y += 3) {
+    for (let x = 0; x < W; x += 3) {
+      const base = 25 + rng(-8, 8);
+      // Slightly higher at edges (normal for JPEG)
+      const edgeFactor = (Math.abs(x-W/2)/(W/2)) * 10;
+      const v = base + edgeFactor;
+      ctx.fillStyle = `rgb(${v*2},${v*0.8},${v*0.3})`;
+      ctx.fillRect(x, y, 3, 3);
+    }
+  }
+
+  // Statue region slightly different error level (normal — different texture)
+  const cx = W/2, base = H*0.85;
+  ctx.globalAlpha = 0.15;
+  ctx.fillStyle = '#f97316';
+  ctx.beginPath();
+  ctx.moveTo(cx-25, base-30);
+  ctx.lineTo(cx-30, base-200);
+  ctx.lineTo(cx+30, base-200);
+  ctx.lineTo(cx+25, base-30);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  document.getElementById('elaUniform').textContent = '94.2%';
+  document.getElementById('elaVerdict').textContent = 'None';
+}
+
+// ---- Noise ----
+function renderNoise() {
+  const canvas = document.getElementById('noiseCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0,0,W,H);
+
+  // Camera sensor noise pattern — Gaussian with slight spatial correlation
+  const imgData = ctx.createImageData(W, H);
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const px = (i/4) % W;
+    const py = Math.floor((i/4) / W);
+    // Gaussian noise
+    const u1 = Math.random(), u2 = Math.random();
+    const gauss = Math.sqrt(-2*Math.log(u1)) * Math.cos(2*Math.PI*u2);
+    const v = 128 + gauss * 20;
+    // Add subtle fixed pattern (PRNU simulation)
+    const prnu = Math.sin(px * 0.1) * Math.cos(py * 0.1) * 8;
+    const final = Math.max(0, Math.min(255, v + prnu));
+    imgData.data[i] = final * 0.8;     // R (pink tint)
+    imgData.data[i+1] = final * 0.4;   // G
+    imgData.data[i+2] = final * 0.6;   // B
+    imgData.data[i+3] = 255;
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  document.getElementById('noiseStd').textContent = '4.73';
+  document.getElementById('noisePattern').textContent = 'Gaussian';
+  document.getElementById('noiseVerdict').textContent = 'Camera';
+}
+
+// ---- Hashes ----
+function renderHashes() {
+  document.getElementById('hashSha').textContent = hexRng(64);
+  document.getElementById('hashDhash').textContent = hexRng(16);
+  document.getElementById('hashPhash').textContent = hexRng(16);
+  document.getElementById('hashDna').textContent = 'SP:' + hexRng(12) + ':' + hexRng(12) + ':' + hexRng(8);
+  document.getElementById('hashWatermark').textContent = 'WM-' + hexRng(8).toUpperCase() + ' (embedded, 256-bit spread spectrum)';
+}
+
+// ---- AI Detection ----
+function renderAIDetection() {
+  document.getElementById('aiProb').textContent = '3.2%';
+  document.getElementById('aiVerdict').textContent = 'AUTHENTIC';
+  document.getElementById('aiSignals').textContent = '5 / 5';
+  document.getElementById('aiConf').textContent = '96.8%';
+}
+
+// ---- Score ----
+function renderScore() {
+  const canvas = document.getElementById('gaugeCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const cx = W/2, cy = H - 10, radius = 100;
+
+  // Background arc
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, Math.PI, 0);
+  ctx.lineWidth = 20;
+  ctx.strokeStyle = '#1c1c2a';
+  ctx.stroke();
+
+  // Score arc (animated feel via gradient)
+  const score = 92;
+  const angle = Math.PI + (score/100) * Math.PI;
+  const grad = ctx.createLinearGradient(cx-radius,cy,cx+radius,cy);
+  grad.addColorStop(0, '#ef4444');
+  grad.addColorStop(0.3, '#f97316');
+  grad.addColorStop(0.5, '#d4a847');
+  grad.addColorStop(0.8, '#22c55e');
+  grad.addColorStop(1, '#14b8a6');
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, Math.PI, angle);
+  ctx.lineWidth = 20;
+  ctx.strokeStyle = grad;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Tick marks
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  for (let i = 0; i <= 10; i++) {
+    const a = Math.PI + (i/10) * Math.PI;
+    const x1 = cx + Math.cos(a) * (radius - 15);
+    const y1 = cy + Math.sin(a) * (radius - 15);
+    const x2 = cx + Math.cos(a) * (radius + 15);
+    const y2 = cy + Math.sin(a) * (radius + 15);
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+  }
+
+  document.getElementById('scoreValue').textContent = '92';
+  document.getElementById('scoreLabel').textContent = 'HIGH CONFIDENCE \u2022 AUTHENTIC PHOTOGRAPH';
+
+  // Layer bars
+  const layers = [
+    {bar:'barDNA',val:'valDNA',score:95},
+    {bar:'barForensics',val:'valForensics',score:91},
+    {bar:'barAI',val:'valAI',score:97},
+    {bar:'barMeta',val:'valMeta',score:88},
+    {bar:'barWM',val:'valWM',score:100},
+  ];
+  layers.forEach((l,i) => {
+    setTimeout(() => {
+      document.getElementById(l.bar).style.width = l.score + '%';
+      document.getElementById(l.val).textContent = l.score;
+    }, i * 200);
+  });
+
+  // Certificate
+  const certNum = 'SP-2026-' + hexRng(6).toUpperCase();
+  document.getElementById('certId').textContent = certNum;
+  document.getElementById('certDate').textContent = '2026-03-01 14:32:47 UTC';
+  document.getElementById('certScore').textContent = '92 / 100';
+  document.getElementById('certAI').textContent = 'Authentic (96.8%)';
+  document.getElementById('certWM').textContent = 'Embedded';
+  document.getElementById('certDNA').textContent = document.getElementById('hashDna').textContent;
+}
+
+// ========================================
+// MAIN ANALYSIS FLOW
+// ========================================
+async function startAnalysis() {
+  if (running) return;
+  running = true;
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.className = 'analyze-btn running';
+  btn.textContent = 'Analyzing...';
+
+  setStatus('Forensic Analysis Running', '212,168,71');
+
+  // Show results container
+  document.getElementById('waitingMsg').style.display = 'none';
+  document.getElementById('rightPanel').classList.remove('waiting');
+  document.getElementById('resultsContainer').style.display = 'flex';
+  document.getElementById('resultsContainer').style.flexDirection = 'column';
+  document.getElementById('resultsContainer').style.gap = '16px';
+
+  // Add scan line to statue
+  const scanLine = document.createElement('div');
+  scanLine.className = 'scan-line';
+  document.getElementById('statueViewport').appendChild(scanLine);
+
+  const pipeSteps = document.querySelectorAll('.pipe-step');
+  const renderers = [
+    renderColorDNA,   // 0
+    renderEntropy,    // 1
+    renderEdges,      // 2
+    renderHashes,     // 3
+    renderFFT,        // 4
+    renderELA,        // 5
+    renderNoise,      // 6
+    renderAIDetection,// 7
+    () => {},         // 8 watermark (no separate panel)
+  ];
+
+  for (let i = 0; i < STEPS.length; i++) {
+    // Activate step
+    pipeSteps[i].classList.add('active');
+
+    // Scroll pipeline into view
+    pipeSteps[i].scrollIntoView({behavior:'smooth',block:'nearest'});
+
+    // Run analysis
+    await sleep(STEPS[i].time);
+
+    // Render results
+    renderers[i]();
+
+    // Show panel
+    if (STEPS[i].panel) {
+      const panel = document.getElementById(STEPS[i].panel);
+      panel.classList.add('visible');
+      panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+
+    // Mark done
+    pipeSteps[i].classList.remove('active');
+    pipeSteps[i].classList.add('done');
+    pipeSteps[i].querySelector('.time').textContent = STEPS[i].time + 'ms';
+  }
+
+  // Remove scan line
+  scanLine.remove();
+
+  // Show score section
+  await sleep(300);
+  const scoreSection = document.getElementById('scoreSection');
+  scoreSection.classList.add('visible');
+  scoreSection.scrollIntoView({behavior:'smooth',block:'center'});
+  renderScore();
+
+  // Done
+  btn.className = 'analyze-btn done';
+  btn.textContent = 'Analysis Complete \u2014 9/9 Layers';
+  setStatus('Analysis Complete', '34,197,94');
+
+  running = false;
+}
+
+// ========================================
+// INIT
+// ========================================
+drawStatue();
+</script>
+</body>
+</html>

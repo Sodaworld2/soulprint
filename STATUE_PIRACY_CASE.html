@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOULPRINT — How We Catch a Statue Pirate</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08080d;--bg2:#0e0e16;--bg3:#15151f;--bg4:#1c1c2a;
+  --gold:#d4a847;--gold2:#e8c56a;--gold-dim:rgba(212,168,71,0.12);
+  --purple:#a855f7;--teal:#14b8a6;--red:#ef4444;--blue:#3b82f6;--green:#22c55e;--orange:#f97316;--pink:#ec4899;--cyan:#06b6d4;
+  --text:#e8e6e3;--text2:#9a9590;--text3:#5a5550;
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--body:'Outfit',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* HEADER */
+.header{padding:60px 0 40px;text-align:center;position:relative}
+.header::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(239,68,68,0.06) 0%,transparent 70%);pointer-events:none}
+.badge{display:inline-block;padding:5px 16px;border:1px solid rgba(239,68,68,0.2);border-radius:20px;font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--red);margin-bottom:16px}
+.header h1{font-family:var(--sans);font-size:clamp(2rem,5vw,3rem);font-weight:700;line-height:1.2;margin-bottom:12px}
+.header h1 .red{color:var(--red)}
+.header h1 .gold{color:var(--gold)}
+.header p{color:var(--text2);font-size:1.05rem;max-width:650px;margin:0 auto}
+
+/* TIMELINE */
+.timeline{position:relative;padding:40px 0}
+.timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--green),var(--gold),var(--red),var(--red),var(--gold),var(--green));transform:translateX(-50%)}
+@media(max-width:768px){.timeline::before{left:24px}}
+
+.event{position:relative;margin-bottom:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+@media(max-width:768px){.event{grid-template-columns:1fr;gap:20px;padding-left:50px}}
+.event:nth-child(odd) .event-content{grid-column:1}
+.event:nth-child(odd) .event-visual{grid-column:2}
+.event:nth-child(even) .event-content{grid-column:2}
+.event:nth-child(even) .event-visual{grid-column:1;grid-row:1}
+@media(max-width:768px){
+  .event .event-content,.event .event-visual{grid-column:1!important;grid-row:auto!important}
+}
+
+.event-dot{position:absolute;left:50%;top:20px;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;border:3px solid;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.6rem;font-weight:700;background:var(--bg);z-index:2}
+@media(max-width:768px){.event-dot{left:24px}}
+
+.event-content{padding:0 20px}
+.event-tag{font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.event-content h2{font-family:var(--sans);font-size:1.3rem;margin-bottom:8px}
+.event-content p{color:var(--text2);font-size:0.9rem;margin-bottom:12px}
+
+.event-visual{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden}
+.visual-header{padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.04);font-family:var(--mono);font-size:0.6rem;color:var(--text3)}
+.visual-dots{display:flex;gap:4px}
+.visual-dots span{width:8px;height:8px;border-radius:50%}
+.visual-body{padding:20px}
+.visual-body canvas{width:100%;display:block;border-radius:6px}
+
+/* DETAIL BOXES */
+.detail-box{background:var(--bg3);border-radius:8px;padding:14px 16px;margin-top:12px;font-size:0.82rem}
+.detail-box h4{font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.detail-box ul{list-style:none;padding:0}
+.detail-box li{padding:3px 0;padding-left:16px;position:relative;color:var(--text2)}
+.detail-box li::before{content:'';position:absolute;left:0;top:10px;width:6px;height:6px;border-radius:50%}
+
+/* TECH PILLS */
+.tech-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tech-pill{font-family:var(--mono);font-size:0.6rem;padding:3px 10px;border-radius:4px;background:rgba(255,255,255,0.04);color:var(--text3)}
+
+/* ALERT PANEL */
+.alert-panel{background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:24px;margin:20px 0}
+.alert-panel h3{font-family:var(--sans);font-size:1.1rem;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.alert-panel p{color:var(--text2);font-size:0.9rem}
+
+/* MATCH COMPARISON */
+.match-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin:16px 0}
+@media(max-width:768px){.match-grid{grid-template-columns:1fr}}
+.match-card{background:var(--bg3);border-radius:10px;overflow:hidden}
+.match-card canvas{width:100%;display:block}
+.match-card-footer{padding:10px 14px;font-family:var(--mono);font-size:0.65rem;display:flex;justify-content:space-between;color:var(--text3)}
+.match-arrow{text-align:center}
+.match-arrow .pct{font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--red)}
+.match-arrow .lbl{font-family:var(--mono);font-size:0.6rem;color:var(--text3);display:block}
+@media(max-width:768px){.match-arrow{transform:rotate(90deg)}}
+
+/* OUTCOME */
+.outcome-section{background:var(--bg2);border-radius:16px;padding:40px;margin:40px 0;border:1px solid rgba(34,197,94,0.1)}
+.outcome-section h2{font-family:var(--sans);font-size:1.5rem;color:var(--green);margin-bottom:20px;text-align:center}
+.outcome-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:768px){.outcome-grid{grid-template-columns:1fr}}
+.outcome-card{background:var(--bg3);border-radius:10px;padding:20px;text-align:center}
+.outcome-card .icon{font-size:2rem;margin-bottom:8px}
+.outcome-card h4{font-family:var(--sans);font-size:0.95rem;margin-bottom:6px}
+.outcome-card p{font-size:0.8rem;color:var(--text2)}
+
+/* FOOTER */
+.footer{padding:40px 0;text-align:center;border-top:1px solid rgba(255,255,255,0.03)}
+.footer p{font-size:0.75rem;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="container">
+    <div class="badge">Real World Case Study</div>
+    <h1>A Statue Gets <span class="red">Stolen</span>.<br>Soulprint <span class="gold">Catches It</span>.</h1>
+    <p style="font-size:1.3rem; font-weight:600; color:rgba(255,255,255,0.45); margin-bottom:0.5rem; letter-spacing:2px;">IT PROVES YOU WERE HERE</p>
+    <p>
+      Follow the full chain: a sculptor registers their public monument with Soulprint.
+      Someone 3D-scans it and sells it as a game asset. Here's exactly how the system detects,
+      matches, and proves the theft &mdash; layer by layer.
+    </p>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div class="container">
+  <div class="timeline">
+
+    <!-- EVENT 1: CREATION -->
+    <div class="event">
+      <div class="event-dot" style="border-color:var(--green);color:var(--green)">1</div>
+      <div class="event-content">
+        <div class="event-tag" style="color:var(--green)">Day 0 &mdash; Registration</div>
+        <h2>Sculptor Registers the Work</h2>
+        <p>
+          Thandiwe Mabaso, a sculptor in Johannesburg, has just completed a 2.4m bronze figure
+          commissioned for a public park. Before unveiling, she photographs it from 8 angles
+          and uploads to Soulprint.
+        </p>
+        <div class="detail-box">
+          <h4 style="color:var(--green)">Step 1: Wide Shots (8 angles)</h4>
+          <ul>
+            <li style="color:var(--text2)"><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> 8 full-body photographs from 45-degree intervals around the sculpture</li>
+            <li style="color:var(--text2)"><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> Cross-image correlation confirms same physical object from every angle</li>
+            <li style="color:var(--text2)"><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> Geometric silhouette extracted per angle &mdash; the shape DNA of the form</li>
+            <li style="color:var(--text2)"><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> GPS metadata locked: Johannesburg (-26.2041, 28.0473)</li>
+          </ul>
+        </div>
+
+        <div class="detail-box" style="border-left:3px solid var(--gold)">
+          <h4 style="color:var(--gold)">Step 2: Close-Up Material Analysis (12-16 detail shots)</h4>
+          <ul>
+            <li style="color:var(--text2)"><span style="color:var(--gold);position:absolute;left:0;font-size:0.7rem">&#x25C6;</span> <strong>Hands &amp; fingers:</strong> Tool marks in the bronze casting, unique hammer textures, chisel patterns. These are the sculptor's "handwriting" &mdash; forensically unique like a fingerprint.</li>
+            <li style="color:var(--text2)"><span style="color:var(--gold);position:absolute;left:0;font-size:0.7rem">&#x25C6;</span> <strong>Surface patina:</strong> Color channel analysis (LAB colour space) maps the exact distribution of green oxidation, brown patina, and polished bronze. No two statues weather identically.</li>
+            <li style="color:var(--text2)"><span style="color:var(--gold);position:absolute;left:0;font-size:0.7rem">&#x25C6;</span> <strong>Facial features:</strong> Edge detection maps the precise contours of eyes, nose, mouth. Entropy mapping captures complexity gradients across the face. Micro-geometry that defines the artist's hand.</li>
+            <li style="color:var(--text2)"><span style="color:var(--gold);position:absolute;left:0;font-size:0.7rem">&#x25C6;</span> <strong>Texture close-ups:</strong> Bronze grain, weld seams, casting marks, polishing patterns. Regional entropy at macro zoom reveals material signatures invisible to the naked eye.</li>
+            <li style="color:var(--text2)"><span style="color:var(--gold);position:absolute;left:0;font-size:0.7rem">&#x25C6;</span> <strong>Base/pedestal inscription:</strong> OCR extraction + perceptual hash of the plaque. Text content indexed for search.</li>
+            <li style="color:var(--text2)"><span style="color:var(--gold);position:absolute;left:0;font-size:0.7rem">&#x25C6;</span> <strong>Material colour signature:</strong> HSV histogram extracts the exact bronze alloy colour profile. Different foundries, different alloys, different oxidation = unique colour fingerprint.</li>
+          </ul>
+        </div>
+
+        <div class="detail-box" style="border-left:3px solid var(--teal)">
+          <h4 style="color:var(--teal)">Step 3: Forensic Processing</h4>
+          <ul>
+            <li style="color:var(--text2)"><span style="color:var(--teal);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> FFT spectrum analysis on every photo &mdash; confirms authentic photography, no AI generation</li>
+            <li style="color:var(--text2)"><span style="color:var(--teal);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> Error Level Analysis verifies no digital manipulation or compositing</li>
+            <li style="color:var(--text2)"><span style="color:var(--teal);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> Noise pattern analysis extracts camera sensor fingerprint (PRNU) across all shots</li>
+            <li style="color:var(--text2)"><span style="color:var(--teal);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> Perceptual hashes (pHash + dHash) computed per shot &mdash; both wide and close-up</li>
+            <li style="color:var(--text2)"><span style="color:var(--teal);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> Invisible watermark embedded in every image</li>
+            <li style="color:var(--text2)"><span style="color:var(--teal);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> RFC 3161 trusted timestamp: 2026-03-01 09:14:32 UTC</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(212,168,71,0.04);border:1px solid rgba(212,168,71,0.1);border-radius:8px;padding:16px;margin-top:12px">
+          <h4 style="font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px">Why Close-Ups Matter</h4>
+          <p style="font-size:0.82rem;color:var(--text2);line-height:1.6">
+            A 3D scanner captures <strong>geometry</strong> but loses <strong>material</strong>.
+            The pirate gets the shape, but not the patina, not the tool marks, not the bronze grain,
+            not the oxidation patterns. Soulprint's close-up analysis creates a material signature
+            that a 3D scan can never reproduce &mdash; because the information lives in the
+            <em>surface</em>, not the <em>form</em>. Even if someone recreates the exact shape,
+            the material DNA won't match.
+          </p>
+        </div>
+
+        <div class="tech-pills">
+          <span class="tech-pill">Content DNA</span>
+          <span class="tech-pill">pHash</span>
+          <span class="tech-pill">FFT</span>
+          <span class="tech-pill">ELA</span>
+          <span class="tech-pill">Watermark</span>
+          <span class="tech-pill">EXIF/GPS</span>
+          <span class="tech-pill">Timestamp</span>
+          <span class="tech-pill">LAB Color</span>
+          <span class="tech-pill">Material Signature</span>
+          <span class="tech-pill">Tool Mark Analysis</span>
+          <span class="tech-pill">Patina Mapping</span>
+          <span class="tech-pill">Texture Forensics</span>
+        </div>
+      </div>
+      <div class="event-visual">
+        <div class="visual-header">
+          <div class="visual-dots">
+            <span style="background:#ef4444"></span>
+            <span style="background:#f59e0b"></span>
+            <span style="background:#22c55e"></span>
+          </div>
+          <span>soulprint.app/lab &mdash; Registration Complete</span>
+        </div>
+        <div class="visual-body">
+          <canvas id="regCanvas" width="500" height="320"></canvas>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+            <div style="background:var(--bg3);border-radius:6px;padding:8px;text-align:center">
+              <div style="font-family:var(--mono);font-size:1.1rem;color:var(--green)">92</div>
+              <div style="font-size:0.6rem;color:var(--text3)">Soulprint Index</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:6px;padding:8px;text-align:center">
+              <div style="font-family:var(--mono);font-size:1.1rem;color:var(--green)">3.2%</div>
+              <div style="font-size:0.6rem;color:var(--text3)">AI Probability</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:6px;padding:8px;text-align:center">
+              <div style="font-family:var(--mono);font-size:1.1rem;color:var(--gold)">8</div>
+              <div style="font-size:0.6rem;color:var(--text3)">Photos Linked</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENT 2: THE THEFT -->
+    <div class="event">
+      <div class="event-dot" style="border-color:var(--red);color:var(--red)">2</div>
+      <div class="event-content" style="grid-column:2">
+        <div class="event-tag" style="color:var(--red)">3 Months Later &mdash; The Theft</div>
+        <h2>Someone 3D-Scans the Statue</h2>
+        <p>
+          A game developer visits the park. Using a phone with LiDAR (iPhone Pro) and photogrammetry
+          software (Polycam), they capture a detailed 3D scan of Thandiwe's sculpture. They
+          clean it up in Blender, re-texture it, and list it on a game asset marketplace as
+          "African Warrior Statue &mdash; Game Ready" for $29.99.
+        </p>
+        <div class="detail-box">
+          <h4 style="color:var(--red)">What the Pirate Does</h4>
+          <ul>
+            <li><span style="color:var(--red);position:absolute;left:0;font-size:0.7rem">&#x2717;</span> 3D scans the sculpture with LiDAR photogrammetry</li>
+            <li><span style="color:var(--red);position:absolute;left:0;font-size:0.7rem">&#x2717;</span> Cleans mesh in Blender, re-UVs, adds game-ready textures</li>
+            <li><span style="color:var(--red);position:absolute;left:0;font-size:0.7rem">&#x2717;</span> Renders marketing images from 4 angles</li>
+            <li><span style="color:var(--red);position:absolute;left:0;font-size:0.7rem">&#x2717;</span> Lists on TurboSquid / Sketchfab / Unity Asset Store</li>
+            <li><span style="color:var(--red);position:absolute;left:0;font-size:0.7rem">&#x2717;</span> Claims "Original 3D model, inspired by African art"</li>
+            <li><span style="color:var(--red);position:absolute;left:0;font-size:0.7rem">&#x2717;</span> No credit to Thandiwe. No license. No permission.</li>
+          </ul>
+        </div>
+        <div class="tech-pills">
+          <span class="tech-pill" style="border:1px solid rgba(239,68,68,0.2);color:var(--red)">LiDAR Scan</span>
+          <span class="tech-pill" style="border:1px solid rgba(239,68,68,0.2);color:var(--red)">Photogrammetry</span>
+          <span class="tech-pill" style="border:1px solid rgba(239,68,68,0.2);color:var(--red)">Blender</span>
+          <span class="tech-pill" style="border:1px solid rgba(239,68,68,0.2);color:var(--red)">Asset Store</span>
+        </div>
+      </div>
+      <div class="event-visual" style="grid-column:1;grid-row:1">
+        <div class="visual-header">
+          <div class="visual-dots">
+            <span style="background:#ef4444"></span>
+            <span style="background:#f59e0b"></span>
+            <span style="background:#22c55e"></span>
+          </div>
+          <span>turbosquid.com &mdash; "African Warrior Statue"</span>
+        </div>
+        <div class="visual-body">
+          <canvas id="piracyCanvas" width="500" height="320"></canvas>
+          <div style="display:flex;gap:8px;margin-top:12px;font-family:var(--mono);font-size:0.65rem">
+            <span style="background:rgba(239,68,68,0.1);color:var(--red);padding:4px 10px;border-radius:4px">No License</span>
+            <span style="background:rgba(239,68,68,0.1);color:var(--red);padding:4px 10px;border-radius:4px">No Credit</span>
+            <span style="background:rgba(239,68,68,0.1);color:var(--red);padding:4px 10px;border-radius:4px">$29.99</span>
+            <span style="background:rgba(239,68,68,0.1);color:var(--red);padding:4px 10px;border-radius:4px">47 Sales</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENT 3: DETECTION -->
+    <div class="event">
+      <div class="event-dot" style="border-color:var(--orange);color:var(--orange)">3</div>
+      <div class="event-content">
+        <div class="event-tag" style="color:var(--orange)">Detection &mdash; How Soulprint Catches It</div>
+        <h2>The System Finds the Match</h2>
+        <p>
+          The pirate's marketing renders of the 3D model are photographs of the SAME physical form.
+          Even though they've been re-textured and rendered from a 3D scan, the underlying geometry
+          &mdash; the proportions, the pose, the contours &mdash; is identical. Soulprint detects this
+          through multiple independent signals.
+        </p>
+
+        <div class="alert-panel">
+          <h3>&#x1F6A8; SIMILARITY ALERT TRIGGERED</h3>
+          <p>
+            Soulprint's monitoring system (Phase 2) crawls asset marketplaces and runs perceptual
+            hash comparison against all registered works. The pirate's marketing images trigger
+            a similarity match against Thandiwe's registered photos.
+          </p>
+        </div>
+
+        <div class="detail-box">
+          <h4 style="color:var(--orange)">Forensic Evidence Chain (5 Independent Signals)</h4>
+          <ul>
+            <li><span style="color:var(--orange);position:absolute;left:0;font-size:0.7rem">1</span> <strong>Perceptual Hash Match:</strong> pHash Hamming distance = 4 bits (threshold: &lt;10). The geometric silhouette is identical despite different textures and lighting.</li>
+            <li><span style="color:var(--orange);position:absolute;left:0;font-size:0.7rem">2</span> <strong>Edge Orientation Match:</strong> Sobel edge histograms from registered photos align with the 3D render's edges. Same contours = same form.</li>
+            <li><span style="color:var(--orange);position:absolute;left:0;font-size:0.7rem">3</span> <strong>Entropy Pattern Correlation:</strong> The complexity distribution across the image regions matches &mdash; where the statue is detailed vs smooth is identical.</li>
+            <li><span style="color:var(--orange);position:absolute;left:0;font-size:0.7rem">4</span> <strong>FFT Spectrum Anomaly:</strong> The render's frequency spectrum shows rendering artifacts (unnaturally clean high frequencies) inconsistent with a photograph of an original sculpture.</li>
+            <li><span style="color:var(--orange);position:absolute;left:0;font-size:0.7rem">5</span> <strong>Metadata Absence:</strong> No camera EXIF, no GPS, no sensor data. Rendering software metadata only. Inconsistent with "original" claim.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="event-visual">
+        <div class="visual-header">
+          <div class="visual-dots">
+            <span style="background:#ef4444"></span>
+            <span style="background:#f59e0b"></span>
+            <span style="background:#22c55e"></span>
+          </div>
+          <span>soulprint.app/alert &mdash; Match Found</span>
+        </div>
+        <div class="visual-body">
+          <!-- Match comparison -->
+          <div class="match-grid">
+            <div class="match-card">
+              <canvas id="matchOriginal" width="200" height="200"></canvas>
+              <div class="match-card-footer">
+                <span style="color:var(--green)">REGISTERED</span>
+                <span>SP-2026-A7F3B2</span>
+              </div>
+            </div>
+            <div class="match-arrow">
+              <div class="pct">94.7%</div>
+              <span class="lbl">pHash Match</span>
+            </div>
+            <div class="match-card">
+              <canvas id="matchPirate" width="200" height="200"></canvas>
+              <div class="match-card-footer">
+                <span style="color:var(--red)">FLAGGED</span>
+                <span>Asset Store</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:grid;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);min-width:100px">pHash Dist</span>
+              <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
+                <div style="width:94.7%;height:100%;background:var(--red);border-radius:2px"></div>
+              </div>
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--red)">4 bits</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);min-width:100px">Edge Corr</span>
+              <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
+                <div style="width:91.3%;height:100%;background:var(--orange);border-radius:2px"></div>
+              </div>
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--orange)">91.3%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);min-width:100px">Entropy Corr</span>
+              <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
+                <div style="width:87.6%;height:100%;background:var(--gold);border-radius:2px"></div>
+              </div>
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--gold)">87.6%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);min-width:100px">Geometric</span>
+              <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
+                <div style="width:96.1%;height:100%;background:var(--red);border-radius:2px"></div>
+              </div>
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--red)">96.1%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENT 4: PROOF -->
+    <div class="event">
+      <div class="event-dot" style="border-color:var(--gold);color:var(--gold)">4</div>
+      <div class="event-content" style="grid-column:2">
+        <div class="event-tag" style="color:var(--gold)">Evidence Package &mdash; Legal Proof</div>
+        <h2>Soulprint Builds the Case</h2>
+        <p>
+          The system generates a forensic evidence package that would hold up in any IP dispute.
+          Not just "we think this matches" &mdash; quantified, timestamped, multi-signal proof.
+        </p>
+        <div class="detail-box">
+          <h4 style="color:var(--gold)">Evidence Package Contains</h4>
+          <ul>
+            <li><span style="color:var(--gold);position:absolute;left:0;font-size:0.6rem">&#x25C6;</span> <strong>Priority timestamp:</strong> Thandiwe registered March 1, 2026. Asset listed June 15, 2026. She was first by 3.5 months.</li>
+            <li><span style="color:var(--gold);position:absolute;left:0;font-size:0.6rem">&#x25C6;</span> <strong>Multi-signal match report:</strong> 4 independent forensic signals all confirming &gt;87% correlation.</li>
+            <li><span style="color:var(--gold);position:absolute;left:0;font-size:0.6rem">&#x25C6;</span> <strong>Content DNA comparison:</strong> Side-by-side visualization of entropy maps, edge profiles, and color signatures.</li>
+            <li><span style="color:var(--gold);position:absolute;left:0;font-size:0.6rem">&#x25C6;</span> <strong>Metadata forensics:</strong> Original photos have full camera chain (iPhone 15, GPS:JHB). Pirate renders have Blender metadata only.</li>
+            <li><span style="color:var(--gold);position:absolute;left:0;font-size:0.6rem">&#x25C6;</span> <strong>Watermark extraction:</strong> If any of Thandiwe's watermarked photos were used as reference, the watermark can be extracted from derivative works.</li>
+            <li><span style="color:var(--gold);position:absolute;left:0;font-size:0.6rem">&#x25C6;</span> <strong>ISO 27037 compliant:</strong> Full chain of custody documented for legal proceedings.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="event-visual" style="grid-column:1;grid-row:1">
+        <div class="visual-header">
+          <div class="visual-dots">
+            <span style="background:#ef4444"></span>
+            <span style="background:#f59e0b"></span>
+            <span style="background:#22c55e"></span>
+          </div>
+          <span>soulprint.app/evidence &mdash; Case SP-2026-A7F3B2</span>
+        </div>
+        <div class="visual-body">
+          <div style="background:var(--bg3);border-radius:8px;padding:16px;margin-bottom:12px">
+            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--gold);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Forensic Evidence Summary</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="background:var(--bg);border-radius:6px;padding:12px;text-align:center">
+                <div style="font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--red)">94.7%</div>
+                <div style="font-size:0.6rem;color:var(--text3)">Overall Match</div>
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:12px;text-align:center">
+                <div style="font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--gold)">5/5</div>
+                <div style="font-size:0.6rem;color:var(--text3)">Confirming Signals</div>
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:12px;text-align:center">
+                <div style="font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--green)">106 days</div>
+                <div style="font-size:0.6rem;color:var(--text3)">Priority Lead</div>
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:12px;text-align:center">
+                <div style="font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--green)">ISO 27037</div>
+                <div style="font-size:0.6rem;color:var(--text3)">Compliance</div>
+              </div>
+            </div>
+          </div>
+          <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:8px;background:var(--bg3);border-radius:6px;line-height:1.8">
+            <span style="color:var(--gold)">REGISTERED:</span> SP-2026-A7F3B2 | Thandiwe Mabaso<br>
+            <span style="color:var(--gold)">TIMESTAMP:</span> 2026-03-01 09:14:32 UTC (RFC 3161)<br>
+            <span style="color:var(--red)">INFRINGEMENT:</span> turbosquid.com/3d-models/african-warrior<br>
+            <span style="color:var(--red)">FIRST SEEN:</span> 2026-06-15 (web crawl)<br>
+            <span style="color:var(--red)">SALES:</span> 47 units @ $29.99 = $1,409.53 revenue
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENT 5: ENFORCEMENT -->
+    <div class="event">
+      <div class="event-dot" style="border-color:var(--green);color:var(--green)">5</div>
+      <div class="event-content">
+        <div class="event-tag" style="color:var(--green)">Resolution &mdash; Justice</div>
+        <h2>Takedown &amp; Compensation</h2>
+        <p>
+          With Soulprint's evidence package, Thandiwe has everything she needs.
+          The evidence is forensic-grade &mdash; not "I think that's my statue" but quantified,
+          timestamped, multi-signal proof that the asset is derived from her registered work.
+        </p>
+        <div class="detail-box">
+          <h4 style="color:var(--green)">What Happens Next</h4>
+          <ul>
+            <li><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> <strong>DMCA takedown</strong> filed with TurboSquid using Soulprint evidence package. Listing removed within 48 hours.</li>
+            <li><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> <strong>Revenue recovery:</strong> Pixsy-style enforcement &mdash; Soulprint assists with compensation claim ($1,409 sales + statutory damages).</li>
+            <li><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> <strong>Monitoring continues:</strong> Soulprint flags any re-listing under different names/accounts. Perceptual hash doesn't care about filenames.</li>
+            <li><span style="color:var(--green);position:absolute;left:0;font-size:0.7rem">&#x2713;</span> <strong>Licensing option:</strong> If the game developer wants to use the sculpture legitimately, Soulprint facilitates a licensing agreement through Thandiwe.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="event-visual">
+        <div class="visual-header">
+          <div class="visual-dots">
+            <span style="background:#ef4444"></span>
+            <span style="background:#f59e0b"></span>
+            <span style="background:#22c55e"></span>
+          </div>
+          <span>Resolution Dashboard</span>
+        </div>
+        <div class="visual-body" style="text-align:center">
+          <div style="font-size:3rem;margin-bottom:12px">&#x2705;</div>
+          <div style="font-family:var(--sans);font-size:1.3rem;color:var(--green);margin-bottom:8px">Case Resolved</div>
+          <div style="font-size:0.85rem;color:var(--text2);margin-bottom:20px">
+            Infringing listing removed. Compensation secured.
+            Work continues to be monitored.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:var(--bg3);border-radius:8px;padding:14px">
+              <div style="font-family:var(--mono);font-size:1.1rem;color:var(--green)">$3,200</div>
+              <div style="font-size:0.6rem;color:var(--text3)">Compensation Won</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:8px;padding:14px">
+              <div style="font-family:var(--mono);font-size:1.1rem;color:var(--green)">48hrs</div>
+              <div style="font-size:0.6rem;color:var(--text3)">Time to Takedown</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:8px;padding:14px">
+              <div style="font-family:var(--mono);font-size:1.1rem;color:var(--gold)">Active</div>
+              <div style="font-size:0.6rem;color:var(--text3)">Monitoring Status</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:8px;padding:14px">
+              <div style="font-family:var(--mono);font-size:1.1rem;color:var(--blue)">2</div>
+              <div style="font-size:0.6rem;color:var(--text3)">License Requests</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+
+  <!-- WHY THIS WORKS -->
+  <div class="outcome-section">
+    <h2>Why This Is Unbeatable</h2>
+    <div class="outcome-grid">
+      <div class="outcome-card">
+        <div class="icon">&#x1F9EC;</div>
+        <h4 style="color:var(--gold)">Geometry is Identity</h4>
+        <p>A 3D scan preserves the EXACT proportions, curves, and form of the original. Re-texturing and re-lighting change the surface but NOT the shape. Soulprint reads shape through edge detection, entropy patterns, and perceptual hashing. You can't disguise the DNA.</p>
+      </div>
+      <div class="outcome-card">
+        <div class="icon">&#x23F1;</div>
+        <h4 style="color:var(--green)">Timestamp Proves Priority</h4>
+        <p>RFC 3161 trusted timestamps are cryptographically verifiable and court-admissible. Thandiwe's registration is 106 days before the pirate's listing. There is no argument about who was first.</p>
+      </div>
+      <div class="outcome-card">
+        <div class="icon">&#x1F50D;</div>
+        <h4 style="color:var(--purple)">Convergence Kills Doubt</h4>
+        <p>Not one signal &mdash; five independent forensic signals all pointing to the same conclusion. Like the FBI Art Crime Team: any single technique could be challenged. Five converging signals cannot.</p>
+      </div>
+      <div class="outcome-card">
+        <div class="icon">&#x1F3AD;</div>
+        <h4 style="color:var(--teal)">Renders Betray Themselves</h4>
+        <p>3D renders have distinct FFT signatures &mdash; unnaturally clean high frequencies, no camera sensor noise, no JPEG compression chain. The system knows a render from a photo even before checking similarity.</p>
+      </div>
+      <div class="outcome-card">
+        <div class="icon">&#x1F30D;</div>
+        <h4 style="color:var(--blue)">Monitoring Never Sleeps</h4>
+        <p>Re-listing under a different name, on a different platform, with modified textures? The perceptual hash doesn't care about filenames, colours, or stores. It sees the SHAPE. And it's always watching.</p>
+      </div>
+      <div class="outcome-card">
+        <div class="icon">&#x2696;&#xFE0F;</div>
+        <h4 style="color:var(--orange)">Legal-Grade Evidence</h4>
+        <p>ISO 27037 compliant digital evidence. Full chain of custody. Exportable report with every forensic comparison visualised. Ready for DMCA, court filing, or licensing negotiation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WITHOUT SOULPRINT -->
+  <div style="background:var(--bg2);border:1px solid rgba(239,68,68,0.1);border-radius:16px;padding:40px;margin:40px 0">
+    <h2 style="font-family:var(--sans);font-size:1.3rem;color:var(--red);margin-bottom:16px;text-align:center">Without Soulprint</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:800px;margin:0 auto">
+      <div>
+        <h4 style="font-size:0.9rem;color:var(--red);margin-bottom:8px">Thandiwe's reality today:</h4>
+        <ul style="list-style:none;padding:0;font-size:0.85rem;color:var(--text2)">
+          <li style="padding:4px 0">&#x274C; Discovers the theft by accident months later</li>
+          <li style="padding:4px 0">&#x274C; Has no proof she created it first</li>
+          <li style="padding:4px 0">&#x274C; "I made that statue" = her word against his</li>
+          <li style="padding:4px 0">&#x274C; DMCA without forensic evidence = contested</li>
+          <li style="padding:4px 0">&#x274C; Legal fees exceed the $1,400 in dispute</li>
+          <li style="padding:4px 0">&#x274C; Pirate re-lists under a new name next week</li>
+          <li style="padding:4px 0">&#x274C; She gives up. The theft stands.</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="font-size:0.9rem;color:var(--green);margin-bottom:8px">With Soulprint ($49 one-time):</h4>
+        <ul style="list-style:none;padding:0;font-size:0.85rem;color:var(--text2)">
+          <li style="padding:4px 0">&#x2705; Automated monitoring finds it</li>
+          <li style="padding:4px 0">&#x2705; Cryptographic timestamp proves priority</li>
+          <li style="padding:4px 0">&#x2705; 5 forensic signals quantify the match</li>
+          <li style="padding:4px 0">&#x2705; Evidence package = instant DMCA</li>
+          <li style="padding:4px 0">&#x2705; Compensation recovery (Pixsy model)</li>
+          <li style="padding:4px 0">&#x2705; Re-listing caught automatically</li>
+          <li style="padding:4px 0">&#x2705; OR &mdash; licensing agreement generates revenue</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p style="color:var(--gold);font-family:var(--sans);font-weight:600;margin-bottom:6px">SOULPRINT</p>
+    <p>The digital twin knows it's the original. If anyone uses it without a certificate, they're caught.</p>
+  </div>
+</footer>
+
+<script>
+// ========================================
+// DRAW CANVASES
+// ========================================
+function rng(a,b){return a+Math.random()*(b-a)}
+
+// Registration canvas — statue with scan overlay
+function drawReg(){
+  const c=document.getElementById('regCanvas'),ctx=c.getContext('2d'),W=c.width,H=c.height;
+  // Dark bg
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#1a1a2e');sky.addColorStop(1,'#0f3460');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+
+  // Ground
+  ctx.fillStyle='#1a1a28';ctx.fillRect(0,H*0.78,W,H*0.22);
+
+  const cx=W/2,base=H*0.76;
+
+  // Pedestal
+  ctx.fillStyle='#4a4a5a';ctx.fillRect(cx-55,base,110,35);
+  ctx.fillStyle='#d4a847';ctx.fillRect(cx-30,base+10,60,16);
+
+  // Figure — simplified bronze
+  const bronze=ctx.createLinearGradient(cx-25,base-200,cx+25,base-200);
+  bronze.addColorStop(0,'#8B7355');bronze.addColorStop(0.5,'#C4A265');bronze.addColorStop(1,'#6B5B45');
+
+  // Legs
+  ctx.fillStyle=bronze;
+  ctx.beginPath();ctx.moveTo(cx-16,base);ctx.lineTo(cx-10,base-100);ctx.lineTo(cx-3,base-100);ctx.lineTo(cx-6,base);ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+6,base);ctx.lineTo(cx+3,base-100);ctx.lineTo(cx+10,base-100);ctx.lineTo(cx+16,base);ctx.fill();
+  // Torso
+  ctx.beginPath();ctx.moveTo(cx-10,base-100);ctx.lineTo(cx-22,base-190);ctx.quadraticCurveTo(cx-24,base-215,cx-18,base-220);ctx.lineTo(cx+18,base-220);ctx.quadraticCurveTo(cx+24,base-215,cx+22,base-190);ctx.lineTo(cx+10,base-100);ctx.fill();
+  // Head
+  ctx.beginPath();ctx.ellipse(cx,base-240,14,18,0,0,Math.PI*2);ctx.fill();
+  // Arms
+  ctx.strokeStyle='#9E8458';ctx.lineWidth=9;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx-20,base-195);ctx.quadraticCurveTo(cx-42,base-230,cx-35,base-270);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+20,base-195);ctx.quadraticCurveTo(cx+35,base-165,cx+28,base-130);ctx.stroke();
+
+  // Scan overlay — green grid
+  ctx.strokeStyle='rgba(34,197,94,0.15)';ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+
+  // Green registration border
+  ctx.strokeStyle='rgba(34,197,94,0.5)';ctx.lineWidth=2;ctx.setLineDash([5,5]);
+  ctx.strokeRect(cx-60,base-270,120,270);ctx.setLineDash([]);
+
+  // Label
+  ctx.fillStyle='rgba(34,197,94,0.8)';ctx.font='bold 10px "JetBrains Mono"';ctx.fillText('SOULPRINT REGISTERED',cx-75,base-275);
+}
+
+// Piracy canvas — game-style render
+function drawPiracy(){
+  const c=document.getElementById('piracyCanvas'),ctx=c.getContext('2d'),W=c.width,H=c.height;
+  // Game environment bg
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#2a1a3e');bg.addColorStop(1,'#1a0a2e');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  // Grid floor (game look)
+  ctx.strokeStyle='rgba(168,85,247,0.1)';ctx.lineWidth=0.5;
+  for(let i=0;i<20;i++){
+    const y=H*0.6+i*8;const spread=i*8;
+    ctx.beginPath();ctx.moveTo(W/2-spread,y);ctx.lineTo(W/2+spread,y);ctx.stroke();
+  }
+  for(let i=-10;i<10;i++){
+    ctx.beginPath();ctx.moveTo(W/2+i*20,H*0.6);ctx.lineTo(W/2+i*40,H);ctx.stroke();
+  }
+
+  const cx=W/2,base=H*0.76;
+
+  // Re-textured figure — purple/game style
+  const gameTex=ctx.createLinearGradient(cx-25,base-200,cx+25,base-200);
+  gameTex.addColorStop(0,'#5B3A8A');gameTex.addColorStop(0.5,'#7B4AB2');gameTex.addColorStop(1,'#4A2A6A');
+
+  ctx.fillStyle=gameTex;
+  // Same geometry — legs
+  ctx.beginPath();ctx.moveTo(cx-16,base);ctx.lineTo(cx-10,base-100);ctx.lineTo(cx-3,base-100);ctx.lineTo(cx-6,base);ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+6,base);ctx.lineTo(cx+3,base-100);ctx.lineTo(cx+10,base-100);ctx.lineTo(cx+16,base);ctx.fill();
+  // Same geometry — torso
+  ctx.beginPath();ctx.moveTo(cx-10,base-100);ctx.lineTo(cx-22,base-190);ctx.quadraticCurveTo(cx-24,base-215,cx-18,base-220);ctx.lineTo(cx+18,base-220);ctx.quadraticCurveTo(cx+24,base-215,cx+22,base-190);ctx.lineTo(cx+10,base-100);ctx.fill();
+  // Same geometry — head
+  ctx.beginPath();ctx.ellipse(cx,base-240,14,18,0,0,Math.PI*2);ctx.fill();
+  // Same geometry — arms
+  ctx.strokeStyle='#7B4AB2';ctx.lineWidth=9;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx-20,base-195);ctx.quadraticCurveTo(cx-42,base-230,cx-35,base-270);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+20,base-195);ctx.quadraticCurveTo(cx+35,base-165,cx+28,base-130);ctx.stroke();
+
+  // Game UI overlay
+  ctx.fillStyle='rgba(239,68,68,0.8)';ctx.font='bold 10px "JetBrains Mono"';
+  ctx.fillText('$29.99 — "AFRICAN WARRIOR STATUE"',cx-120,25);
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='9px "JetBrains Mono"';
+  ctx.fillText('"Original 3D model, inspired by African art"',cx-130,42);
+
+  // Wireframe overlay to show 3D scan
+  ctx.strokeStyle='rgba(168,85,247,0.2)';ctx.lineWidth=0.5;
+  for(let y=base-260;y<base;y+=12){
+    const w=15+Math.sin((y-base+260)*0.02)*10;
+    ctx.beginPath();ctx.moveTo(cx-w,y);ctx.lineTo(cx+w,y);ctx.stroke();
+  }
+}
+
+// Match cards — small versions
+function drawMatch(id,isOriginal){
+  const c=document.getElementById(id),ctx=c.getContext('2d'),W=c.width,H=c.height;
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  if(isOriginal){bg.addColorStop(0,'#1a1a2e');bg.addColorStop(1,'#0f3460')}
+  else{bg.addColorStop(0,'#2a1a3e');bg.addColorStop(1,'#1a0a2e')}
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  const cx=W/2,base=H*0.82;
+  const color=isOriginal?'#C4A265':'#7B4AB2';
+  const stroke=isOriginal?'#9E8458':'#7B4AB2';
+
+  ctx.fillStyle=color;
+  ctx.beginPath();ctx.moveTo(cx-10,base);ctx.lineTo(cx-6,base-60);ctx.lineTo(cx-1,base-60);ctx.lineTo(cx-4,base);ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+4,base);ctx.lineTo(cx+1,base-60);ctx.lineTo(cx+6,base-60);ctx.lineTo(cx+10,base);ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx-6,base-60);ctx.lineTo(cx-14,base-120);ctx.quadraticCurveTo(cx-16,base-138,cx-12,base-142);ctx.lineTo(cx+12,base-142);ctx.quadraticCurveTo(cx+16,base-138,cx+14,base-120);ctx.lineTo(cx+6,base-60);ctx.fill();
+  ctx.beginPath();ctx.ellipse(cx,base-155,9,12,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=stroke;ctx.lineWidth=6;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx-13,base-125);ctx.quadraticCurveTo(cx-28,base-148,cx-22,base-175);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+13,base-125);ctx.quadraticCurveTo(cx+22,base-108,cx+18,base-85);ctx.stroke();
+
+  // Border
+  if(!isOriginal){
+    ctx.strokeStyle='rgba(239,68,68,0.5)';ctx.lineWidth=2;ctx.setLineDash([4,4]);
+    ctx.strokeRect(2,2,W-4,H-4);ctx.setLineDash([]);
+  }else{
+    ctx.strokeStyle='rgba(34,197,94,0.5)';ctx.lineWidth=2;
+    ctx.strokeRect(2,2,W-4,H-4);
+  }
+}
+
+drawReg();
+drawPiracy();
+drawMatch('matchOriginal',true);
+drawMatch('matchPirate',false);
+</script>
+</body>
+</html>

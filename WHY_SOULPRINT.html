@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOULPRINT — Why We're Building This</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08080d;--bg2:#0e0e16;--bg3:#15151f;--bg4:#1c1c2a;
+  --gold:#d4a847;--gold2:#e8c56a;--gold-dim:rgba(212,168,71,0.12);
+  --purple:#a855f7;--teal:#14b8a6;--red:#ef4444;--blue:#3b82f6;--green:#22c55e;--orange:#f97316;--pink:#ec4899;--cyan:#06b6d4;
+  --text:#e8e6e3;--text2:#9a9590;--text3:#5a5550;
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--body:'Outfit',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* SECTIONS */
+.section{padding:60px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.section-tag{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.section h2{font-family:var(--sans);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;margin-bottom:12px;line-height:1.3}
+.section-intro{color:var(--text2);font-size:1rem;max-width:700px;margin-bottom:32px}
+
+/* HERO */
+.hero{padding:80px 0 60px;text-align:center;position:relative}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(212,168,71,0.06) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-block;padding:5px 16px;border:1px solid var(--gold-dim);border-radius:20px;font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:16px}
+.hero h1{font-family:var(--sans);font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.2;margin-bottom:16px}
+.hero h1 .gold{color:var(--gold)}
+.hero p{color:var(--text2);font-size:1.1rem;max-width:650px;margin:0 auto}
+
+/* PROBLEM CARDS */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px}
+@media(max-width:768px){.problem-grid{grid-template-columns:1fr}}
+.problem-card{background:var(--bg2);border:1px solid rgba(239,68,68,0.1);border-radius:12px;padding:24px;position:relative;overflow:hidden}
+.problem-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red)}
+.problem-card .stat{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--red);margin-bottom:8px}
+.problem-card h3{font-family:var(--sans);font-size:1rem;margin-bottom:8px}
+.problem-card p{font-size:0.85rem;color:var(--text2)}
+.problem-card .source{font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-top:8px}
+
+/* BENEFIT CARDS */
+.benefit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){.benefit-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.benefit-grid{grid-template-columns:1fr}}
+.benefit-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:border-color 0.3s}
+.benefit-card:hover{border-color:rgba(212,168,71,0.2)}
+.benefit-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.benefit-card .icon{font-size:2rem;margin-bottom:12px}
+.benefit-card h3{font-family:var(--sans);font-size:1rem;margin-bottom:8px}
+.benefit-card p{font-size:0.85rem;color:var(--text2);line-height:1.6}
+.benefit-card .tag{font-family:var(--mono);font-size:0.55rem;text-transform:uppercase;letter-spacing:1.5px;margin-top:12px;display:inline-block;padding:3px 10px;border-radius:4px}
+
+/* WHO IT'S FOR */
+.who-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+@media(max-width:768px){.who-grid{grid-template-columns:1fr}}
+.who-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:28px;text-align:center}
+.who-card .icon{font-size:2.5rem;margin-bottom:12px}
+.who-card h3{font-family:var(--sans);font-size:1.1rem;margin-bottom:8px}
+.who-card p{font-size:0.85rem;color:var(--text2);margin-bottom:12px}
+.who-card .use-cases{text-align:left;font-size:0.8rem;color:var(--text2)}
+.who-card .use-cases li{padding:3px 0;padding-left:16px;position:relative;list-style:none}
+.who-card .use-cases li::before{content:'\2192';position:absolute;left:0;color:var(--gold)}
+
+/* COMPARISON */
+.compare-table{width:100%;border-collapse:collapse;margin:20px 0}
+.compare-table th{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;padding:12px 16px;text-align:left;border-bottom:2px solid rgba(255,255,255,0.08);color:var(--text3)}
+.compare-table th:first-child{width:200px}
+.compare-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.85rem}
+.compare-table td:first-child{font-family:var(--sans);font-weight:500}
+.compare-table .yes{color:var(--green)}
+.compare-table .no{color:var(--red)}
+.compare-table .partial{color:var(--orange)}
+.compare-table .sp{background:rgba(212,168,71,0.03)}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* MARKET */
+.market-cards{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px}
+@media(max-width:900px){.market-cards{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.market-cards{grid-template-columns:1fr}}
+.market-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:20px;text-align:center}
+.market-card .num{font-family:var(--mono);font-size:1.5rem;font-weight:700;margin-bottom:4px}
+.market-card .lbl{font-size:0.75rem;color:var(--text2)}
+.market-card .src{font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-top:8px}
+
+/* QUOTE */
+.quote{background:var(--bg2);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:24px 28px;margin:24px 0;font-style:italic;font-size:1.05rem;color:var(--text2)}
+.quote .attr{font-style:normal;font-family:var(--mono);font-size:0.7rem;color:var(--text3);margin-top:8px}
+
+/* CTA */
+.cta-section{text-align:center;padding:60px 0;background:var(--bg2);border-radius:16px;margin:40px 0}
+.cta-section h2{font-family:var(--sans);font-size:1.8rem;margin-bottom:12px}
+.cta-section p{color:var(--text2);max-width:500px;margin:0 auto 24px}
+
+/* FOOTER */
+.footer{padding:40px 0;text-align:center;border-top:1px solid rgba(255,255,255,0.03)}
+.footer p{font-size:0.75rem;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">The Case for Soulprint</div>
+    <h1>It Proves You Were <span class="gold">Here</span>.</h1>
+    <p style="font-size:1.5rem; font-weight:600; margin-bottom:0.5rem; color:rgba(255,255,255,0.6);">Every creative work deserves a digital twin.</p>
+    <p>
+      A comprehensive guide to why Soulprint exists, what it does differently,
+      who it protects, and the market forces making it inevitable.
+    </p>
+  </div>
+</section>
+
+<!-- THE PROBLEM -->
+<section class="section">
+  <div class="container">
+    <p class="section-tag" style="color:var(--red)">The Problem</p>
+    <h2>Creative Work Is Being Consumed at Scale</h2>
+    <p class="section-intro">
+      AI doesn't just generate content. It was trained ON content &mdash; scraped from every corner
+      of the internet without consent, attribution, or compensation. The creators are invisible.
+    </p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="stat">$0.03</div>
+        <h3>AI Labor vs Human Labor</h3>
+        <p>For every $1 of human creative labor, AI can replicate the output for 3 cents. This isn't hypothetical &mdash; it's real transaction data from Ramp 2025.</p>
+        <div class="source">Source: Ramp 2025 spending data</div>
+      </div>
+      <div class="problem-card">
+        <div class="stat">-33%</div>
+        <h3>Graphic Artist Job Losses</h3>
+        <p>Freelance graphic artist jobs have declined 33% since AI image generation went mainstream. Writers down 28%. The creative middle class is evaporating.</p>
+        <div class="source">Source: DemandSage 2025</div>
+      </div>
+      <div class="problem-card">
+        <div class="stat">-21%</div>
+        <h3>African Freelance Jobs on Upwork</h3>
+        <p>African freelancers are losing work faster than global averages. The most vulnerable creative economies are being hit hardest.</p>
+        <div class="source">Source: Jobtech Alliance</div>
+      </div>
+      <div class="problem-card">
+        <div class="stat">54,836</div>
+        <h3>AI-Attributed Layoffs in 2025</h3>
+        <p>Not hypothetical. Not "might happen." Companies are publicly attributing mass layoffs directly to AI replacement. Klarna cut 700 agents. Salesforce cut 4,000.</p>
+        <div class="source">Source: Challenger, Gray &amp; Christmas</div>
+      </div>
+    </div>
+
+    <div class="quote">
+      "Half of entry-level white-collar jobs will be gone in 1 to 5 years. Stop sugar-coating it."
+      <div class="attr">&mdash; Dario Amodei, CEO of Anthropic (maker of Claude AI), 2025</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY NOW -->
+<section class="section">
+  <div class="container">
+    <p class="section-tag" style="color:var(--orange)">Why Now</p>
+    <h2>Three Converging Forces</h2>
+    <p class="section-intro">
+      This isn't a solution looking for a problem. Three independent forces are creating
+      urgent, accelerating demand for creative work authentication.
+    </p>
+
+    <div class="benefit-grid" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="benefit-card" style="border-color:rgba(239,68,68,0.15)">
+        <div class="benefit-card::before" style="background:var(--red)"></div>
+        <div class="icon">&#x1F30A;</div>
+        <h3 style="color:var(--red)">The AI Content Flood</h3>
+        <p>
+          1 billion+ AI images generated in 2025. Platforms are drowning. Consumer trust in digital
+          content is collapsing. Only 26% of consumers prefer AI content, down from 60%.
+          Authentic work needs a way to prove itself.
+        </p>
+        <div class="tag" style="background:rgba(239,68,68,0.08);color:var(--red)">Demand Signal</div>
+      </div>
+      <div class="benefit-card" style="border-color:rgba(249,115,22,0.15)">
+        <div class="icon">&#x2696;&#xFE0F;</div>
+        <h3 style="color:var(--orange)">The Regulatory Wave</h3>
+        <p>
+          EU AI Act Article 50 mandates AI content labeling by August 2026. China already requires it.
+          WIPO Proof shut down in 2022 leaving a gap. Copyright offices take months.
+          Creators need a fast, affordable, forensic-grade solution NOW.
+        </p>
+        <div class="tag" style="background:rgba(249,115,22,0.08);color:var(--orange)">Legal Mandate</div>
+      </div>
+      <div class="benefit-card" style="border-color:rgba(34,197,94,0.15)">
+        <div class="icon">&#x1F4B0;</div>
+        <h3 style="color:var(--green)">The Authenticity Premium</h3>
+        <p>
+          Authenticated art sells 40-60% higher. The "handmade" premium is now "provably human" premium.
+          Galleries, collectors, and platforms are willing to pay for proof.
+          Authenticity is becoming a market differentiator.
+        </p>
+        <div class="tag" style="background:rgba(34,197,94,0.08);color:var(--green)">Revenue Driver</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE DO -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container">
+    <p class="section-tag" style="color:var(--gold)">What Soulprint Does</p>
+    <h2>Forensic Authentication, Not Filing</h2>
+    <p class="section-intro">
+      Soulprint doesn't just store a hash of your file. It runs 30+ forensic analyses,
+      builds a mathematical DNA of your work, detects AI generation, embeds invisible watermarks,
+      and generates a convergence score from independent evidence streams.
+    </p>
+
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);border-radius:3px 3px 0 0"></div>
+        <div class="icon">&#x1F9EC;</div>
+        <h3>Content DNA Fingerprint</h3>
+        <p>Color channel analysis (RGB/HSV/LAB), regional entropy mapping, edge detection, statistical moments, perceptual hashing. The mathematical identity of your work.</p>
+        <div class="tag" style="background:var(--gold-dim);color:var(--gold)">Identity</div>
+      </div>
+      <div class="benefit-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal);border-radius:3px 3px 0 0"></div>
+        <div class="icon">&#x1F50D;</div>
+        <h3>Deep Forensic Analysis</h3>
+        <p>FFT frequency spectrum, Error Level Analysis, noise pattern detection, EXIF forensics. The same techniques museums and law enforcement use to catch forgeries.</p>
+        <div class="tag" style="background:rgba(20,184,166,0.08);color:var(--teal)">Verification</div>
+      </div>
+      <div class="benefit-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--green);border-radius:3px 3px 0 0"></div>
+        <div class="icon">&#x1F916;</div>
+        <h3>AI Detection</h3>
+        <p>Convergence of 5+ signals: frequency spectrum analysis, compressibility curves, noise pattern uniformity, metadata chain, ELA consistency. Not one heuristic &mdash; convergence.</p>
+        <div class="tag" style="background:rgba(34,197,94,0.08);color:var(--green)">Protection</div>
+      </div>
+      <div class="benefit-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--purple);border-radius:3px 3px 0 0"></div>
+        <div class="icon">&#x1F3A8;</div>
+        <h3>Creation Biometrics</h3>
+        <p>Record the process of creation: stroke velocity, pressure curves, hesitation patterns, undo/redo sequences. AI cannot produce this data. This is Proof of Process.</p>
+        <div class="tag" style="background:rgba(168,85,247,0.08);color:var(--purple)">Killer Feature</div>
+      </div>
+      <div class="benefit-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan);border-radius:3px 3px 0 0"></div>
+        <div class="icon">&#x1F4A7;</div>
+        <h3>Invisible Watermark</h3>
+        <p>Spread-spectrum watermark embedded in image pixels. Survives JPEG compression, scaling, cropping. Certificate ID recoverable from any copy of the image.</p>
+        <div class="tag" style="background:rgba(6,182,212,0.08);color:var(--cyan)">Tracing</div>
+      </div>
+      <div class="benefit-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);border-radius:3px 3px 0 0"></div>
+        <div class="icon">&#x1F4DC;</div>
+        <h3>Forensic Certificate</h3>
+        <p>Soulprint Index (0-100) from weighted convergence of all layers. Shareable, verifiable, legally meaningful. Not a badge &mdash; a forensic report card.</p>
+        <div class="tag" style="background:rgba(59,130,246,0.08);color:var(--blue)">Output</div>
+      </div>
+    </div>
+
+    <div class="quote" style="margin-top:32px">
+      "Like the FBI Art Crime Team: any single technique can be challenged. But six independent signals
+      all pointing to the same conclusion? That's convergence. That's how you authenticate."
+      <div class="attr">&mdash; Soulprint Design Philosophy</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="section">
+  <div class="container">
+    <p class="section-tag" style="color:var(--purple)">Who It's For</p>
+    <h2>Every Creator Who Makes Something Real</h2>
+
+    <div class="who-grid">
+      <div class="who-card">
+        <div class="icon">&#x1F3A8;</div>
+        <h3>Visual Artists &amp; Sculptors</h3>
+        <p>Painters, illustrators, photographers, sculptors. Anyone whose physical or digital art is being scraped, copied, or AI-replicated.</p>
+        <ul class="use-cases">
+          <li>Register paintings with Content DNA before gallery shows</li>
+          <li>Protect sculptures from unauthorized 3D scanning</li>
+          <li>Prove human creation with biometric stroke data</li>
+          <li>Detect when AI models replicate your style</li>
+        </ul>
+      </div>
+      <div class="who-card">
+        <div class="icon">&#x1F3AE;</div>
+        <h3>3D Artists &amp; Game Devs</h3>
+        <p>Modelers, environment artists, character designers. Protecting original assets from unauthorized marketplace listings.</p>
+        <ul class="use-cases">
+          <li>Register original models before publication</li>
+          <li>Detect re-textured copies on asset stores</li>
+          <li>Prove authorship with creation process recording</li>
+          <li>License tracking for authorized buyers</li>
+        </ul>
+      </div>
+      <div class="who-card">
+        <div class="icon">&#x1F3DB;&#xFE0F;</div>
+        <h3>Institutions &amp; Galleries</h3>
+        <p>Museums, galleries, cultural institutions, archives. Bulk registration, provenance tracking, authentication for collections.</p>
+        <ul class="use-cases">
+          <li>Register entire collections with forensic DNA</li>
+          <li>Authenticate works during acquisition</li>
+          <li>Detect unauthorized reproductions online</li>
+          <li>Inter-institutional loan verification</li>
+        </ul>
+      </div>
+      <div class="who-card">
+        <div class="icon">&#x1F4F1;</div>
+        <h3>Digital Creators</h3>
+        <p>Designers, photographers, illustrators, content creators. Anyone whose digital work is at risk of AI scraping or unauthorized use.</p>
+        <ul class="use-cases">
+          <li>Embed invisible watermarks before publishing</li>
+          <li>Track unauthorized usage across platforms</li>
+          <li>Prove human authorship for client confidence</li>
+          <li>EU AI Act compliance documentation</li>
+        </ul>
+      </div>
+      <div class="who-card">
+        <div class="icon">&#x1F3E2;</div>
+        <h3>Brands &amp; Agencies</h3>
+        <p>Creative agencies, brands, marketing teams. Ensure creative supply chain authenticity and regulatory compliance.</p>
+        <ul class="use-cases">
+          <li>Verify human origin of commissioned work</li>
+          <li>EU AI Act Article 50 compliance</li>
+          <li>Protect brand IP from AI replication</li>
+          <li>Certify creative supply chain</li>
+        </ul>
+      </div>
+      <div class="who-card">
+        <div class="icon">&#x1F30D;</div>
+        <h3>Indigenous &amp; Cultural Communities</h3>
+        <p>Traditional artisans, cultural custodians, community collectives. Protecting cultural heritage from AI extraction.</p>
+        <ul class="use-cases">
+          <li>Register traditional patterns and designs</li>
+          <li>Detect unauthorized cultural appropriation</li>
+          <li>Community-level collective registration</li>
+          <li>Free tier for indigenous creators</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETITIVE COMPARISON -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container">
+    <p class="section-tag" style="color:var(--teal)">Competitive Landscape</p>
+    <h2>Nothing Else Does This</h2>
+    <p class="section-intro">
+      Each existing solution covers one piece. None combines forensic analysis + AI detection +
+      creation biometrics + invisible watermarking + convergence scoring in one platform.
+    </p>
+
+    <div style="overflow-x:auto">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th class="sp" style="color:var(--gold)">Soulprint</th>
+          <th>Copyright Office</th>
+          <th>C2PA</th>
+          <th>Not By AI</th>
+          <th>Pixsy</th>
+          <th>HumanMade.art</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Forensic content analysis</td>
+          <td class="sp yes">30+ techniques</td>
+          <td class="no">None</td>
+          <td class="no">None</td>
+          <td class="no">None</td>
+          <td class="partial">Image matching only</td>
+          <td class="no">Manual review</td>
+        </tr>
+        <tr>
+          <td>AI detection</td>
+          <td class="sp yes">5-signal convergence</td>
+          <td class="no">No</td>
+          <td class="partial">Metadata only</td>
+          <td class="no">Honor system</td>
+          <td class="no">No</td>
+          <td class="partial">Manual timelapse</td>
+        </tr>
+        <tr>
+          <td>Creation biometrics</td>
+          <td class="sp yes">Stroke-level data</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="partial">Video only</td>
+        </tr>
+        <tr>
+          <td>Invisible watermark</td>
+          <td class="sp yes">Spread-spectrum</td>
+          <td class="no">No</td>
+          <td class="partial">Metadata</td>
+          <td class="no">Visible badge</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Cost per work</td>
+          <td class="sp yes" style="color:var(--gold)">$9 &mdash; $149</td>
+          <td class="partial">$45 &mdash; $125</td>
+          <td class="yes">Free (enterprise)</td>
+          <td class="yes">Free</td>
+          <td class="partial">$$$</td>
+          <td class="partial">$50 &mdash; $200</td>
+        </tr>
+        <tr>
+          <td>Time to certificate</td>
+          <td class="sp yes">~30 seconds</td>
+          <td class="no">3 &mdash; 6 months</td>
+          <td class="yes">Instant</td>
+          <td class="yes">Instant</td>
+          <td class="no">N/A</td>
+          <td class="no">24 &mdash; 72 hours</td>
+        </tr>
+        <tr>
+          <td>Convergence scoring</td>
+          <td class="sp yes">0-100 index</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Legally meaningful</td>
+          <td class="sp yes">ISO 27037</td>
+          <td class="yes">Yes</td>
+          <td class="partial">Emerging</td>
+          <td class="no">No</td>
+          <td class="yes">Yes</td>
+          <td class="partial">Evidence</td>
+        </tr>
+        <tr>
+          <td>3D / sculpture support</td>
+          <td class="sp yes">Multi-angle</td>
+          <td class="partial">Photos only</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- MARKET SIZE -->
+<section class="section">
+  <div class="container">
+    <p class="section-tag" style="color:var(--blue)">Market</p>
+    <h2>The Numbers Behind the Opportunity</h2>
+    <p class="section-intro">
+      Digital content authentication is being pulled into existence by regulatory mandates,
+      market demand, and the sheer volume of AI-generated content flooding every platform.
+    </p>
+
+    <div class="market-cards">
+      <div class="market-card">
+        <div class="num" style="color:var(--gold)">$4.2B</div>
+        <div class="lbl">Digital rights management market 2025</div>
+        <div class="src">Grand View Research</div>
+      </div>
+      <div class="market-card">
+        <div class="num" style="color:var(--green)">$16.3B</div>
+        <div class="lbl">Projected DRM market 2030</div>
+        <div class="src">CAGR 31.2%</div>
+      </div>
+      <div class="market-card">
+        <div class="num" style="color:var(--red)">1B+</div>
+        <div class="lbl">AI images generated in 2025</div>
+        <div class="src">Everypixel Journal</div>
+      </div>
+      <div class="market-card">
+        <div class="num" style="color:var(--purple)">Aug 2026</div>
+        <div class="lbl">EU AI Act Article 50 deadline</div>
+        <div class="src">Mandatory AI labeling</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid rgba(212,168,71,0.1);border-radius:12px;padding:28px;margin-top:32px">
+      <h3 style="font-family:var(--sans);font-size:1.1rem;color:var(--gold);margin-bottom:12px">The Gap Soulprint Fills</h3>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center">
+        <div style="text-align:center">
+          <div style="font-family:var(--mono);font-size:1.3rem;color:var(--text3)">$45</div>
+          <div style="font-size:0.75rem;color:var(--text3)">Copyright office<br>(no examination, months wait)</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--gold)">$9 &mdash; $149</div>
+          <div style="font-size:0.8rem;color:var(--gold)">SOULPRINT<br>(30+ forensic analyses, 30 seconds)</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--mono);font-size:1.3rem;color:var(--text3)">$2,000+</div>
+          <div style="font-size:0.75rem;color:var(--text3)">Design patent<br>(full examination, 12+ months)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ONE-TIME PRICING -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container">
+    <p class="section-tag" style="color:var(--green)">Pricing</p>
+    <h2>One-Time Fee. Not a Subscription.</h2>
+    <p class="section-intro">
+      No artist or creative will pay a monthly fee to protect a single painting.
+      Soulprint charges per work, like a real authentication service. Pay once, protected forever.
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+      <div style="background:var(--bg3);border-radius:12px;padding:24px;text-align:center;border:1px solid rgba(255,255,255,0.05)">
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Quick Stamp</div>
+        <div style="font-family:var(--sans);font-size:2rem;font-weight:700;color:var(--text);margin-bottom:8px">$9</div>
+        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px">Content DNA + hash + timestamp + basic certificate</div>
+        <ul style="list-style:none;padding:0;font-size:0.75rem;color:var(--text2);text-align:left">
+          <li style="padding:3px 0">&#x2713; Content DNA fingerprint</li>
+          <li style="padding:3px 0">&#x2713; Perceptual hashing</li>
+          <li style="padding:3px 0">&#x2713; Trusted timestamp</li>
+          <li style="padding:3px 0">&#x2713; Basic certificate</li>
+        </ul>
+      </div>
+      <div style="background:var(--bg3);border-radius:12px;padding:24px;text-align:center;border:1px solid rgba(212,168,71,0.2)">
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Full Analysis</div>
+        <div style="font-family:var(--sans);font-size:2rem;font-weight:700;color:var(--gold);margin-bottom:8px">$49</div>
+        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px">Everything + deep forensics + AI detection + watermark</div>
+        <ul style="list-style:none;padding:0;font-size:0.75rem;color:var(--text2);text-align:left">
+          <li style="padding:3px 0">&#x2713; Everything in Quick Stamp</li>
+          <li style="padding:3px 0">&#x2713; FFT + ELA + noise analysis</li>
+          <li style="padding:3px 0">&#x2713; AI detection (5-signal)</li>
+          <li style="padding:3px 0">&#x2713; Invisible watermark</li>
+          <li style="padding:3px 0">&#x2713; Similarity search</li>
+        </ul>
+      </div>
+      <div style="background:var(--bg3);border-radius:12px;padding:24px;text-align:center;border:1px solid rgba(168,85,247,0.2)">
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Forensic Lab</div>
+        <div style="font-family:var(--sans);font-size:2rem;font-weight:700;color:var(--purple);margin-bottom:8px">$149</div>
+        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px">Everything + creation biometrics + expert report</div>
+        <ul style="list-style:none;padding:0;font-size:0.75rem;color:var(--text2);text-align:left">
+          <li style="padding:3px 0">&#x2713; Everything in Full Analysis</li>
+          <li style="padding:3px 0">&#x2713; Creation biometrics</li>
+          <li style="padding:3px 0">&#x2713; Expert-level report</li>
+          <li style="padding:3px 0">&#x2713; Priority monitoring</li>
+        </ul>
+      </div>
+      <div style="background:var(--bg3);border-radius:12px;padding:24px;text-align:center;border:1px solid rgba(20,184,166,0.2)">
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Portfolio</div>
+        <div style="font-family:var(--sans);font-size:2rem;font-weight:700;color:var(--teal);margin-bottom:8px">$299</div>
+        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px">10 Full Analysis + dashboard + monitoring</div>
+        <ul style="list-style:none;padding:0;font-size:0.75rem;color:var(--text2);text-align:left">
+          <li style="padding:3px 0">&#x2713; 10 Full Analysis certs</li>
+          <li style="padding:3px 0">&#x2713; Portfolio dashboard</li>
+          <li style="padding:3px 0">&#x2713; Continuous monitoring</li>
+          <li style="padding:3px 0">&#x2713; Enforcement assistance</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;font-size:0.8rem;color:var(--text3)">
+      Optional add-ons: Monitoring ($2/month/work) &bull; Enforcement (% of recovery, Pixsy model)
+    </div>
+  </div>
+</section>
+
+<!-- THE VIRTUAL GENERATION -->
+<section class="section">
+  <div class="container">
+    <p class="section-tag" style="color:var(--pink)">The Bigger Picture</p>
+    <h2>Virtual Is the New Real</h2>
+    <p class="section-intro">
+      There's an argument being missed by every authentication platform on the market.
+      The generation growing up right now doesn't distinguish between physical and virtual possessions.
+      For them, virtual IS real. And that changes everything about what needs protecting.
+    </p>
+
+    <!-- ENGAGEMENT DATA -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+      <div style="background:var(--bg2);border:1px solid rgba(236,72,153,0.12);border-radius:12px;padding:20px;text-align:center">
+        <div style="font-family:var(--mono);font-size:1.8rem;font-weight:700;color:var(--pink)">70M+</div>
+        <div style="font-size:0.75rem;color:var(--text2)">Daily active users on Roblox alone</div>
+        <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-top:6px">Most under 16</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid rgba(168,85,247,0.12);border-radius:12px;padding:20px;text-align:center">
+        <div style="font-family:var(--mono);font-size:1.8rem;font-weight:700;color:var(--purple)">4.2hrs</div>
+        <div style="font-size:0.75rem;color:var(--text2)">Average daily screen time for Gen Alpha</div>
+        <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-top:6px">More than school hours</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid rgba(59,130,246,0.12);border-radius:12px;padding:20px;text-align:center">
+        <div style="font-family:var(--mono);font-size:1.8rem;font-weight:700;color:var(--blue)">$50B+</div>
+        <div style="font-size:0.75rem;color:var(--text2)">Annual virtual goods market</div>
+        <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-top:6px">Skins, avatars, items, spaces</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid rgba(34,197,94,0.12);border-radius:12px;padding:20px;text-align:center">
+        <div style="font-family:var(--mono);font-size:1.8rem;font-weight:700;color:var(--green)">62%</div>
+        <div style="font-size:0.75rem;color:var(--text2)">Of Gen Z have purchased virtual goods</div>
+        <div style="font-family:var(--mono);font-size:0.55rem;color:var(--text3);margin-top:6px">Roblox, Fortnite, Minecraft</div>
+      </div>
+    </div>
+
+    <!-- THE ARGUMENT -->
+    <div style="background:var(--bg2);border:1px solid rgba(236,72,153,0.15);border-radius:16px;padding:32px;margin-bottom:32px">
+      <h3 style="font-family:var(--sans);font-size:1.2rem;color:var(--pink);margin-bottom:16px">The Identity Argument</h3>
+      <p style="font-size:0.95rem;color:var(--text2);line-height:1.8;margin-bottom:16px">
+        A 12-year-old today has spent more cumulative hours in Roblox, Fortnite, and Minecraft
+        than they have in any physical public space. Their identity &mdash; how they present themselves,
+        how they're recognized by peers, their social status &mdash; is <strong style="color:var(--text)">hard-wired into
+        these virtual environments</strong>. Their avatar IS them. Their virtual home IS their space.
+        The artifacts they've collected, built, and customized ARE their possessions.
+      </p>
+      <p style="font-size:0.95rem;color:var(--text2);line-height:1.8;margin-bottom:16px">
+        This isn't a phase. This is permanent. When these kids are 25, their sense of ownership,
+        identity, and value will be natively virtual. They won't distinguish between a sculpture in a
+        park and a sculpture in their metaverse world. In fact &mdash;
+        <strong style="color:var(--pink)">the virtual sculpture might matter more</strong>,
+        because more people see it, interact with it, and value it in the environment where they
+        actually spend their lives.
+      </p>
+      <p style="font-size:0.95rem;color:var(--text2);line-height:1.8">
+        The investment is real. Kids spend real money (or real time earning virtual currency)
+        on avatars, skins, virtual real estate, artifacts, and decorative items.
+        Fortnite alone has generated over <strong style="color:var(--text)">$26 billion</strong> from virtual item sales.
+        Roblox developers earned <strong style="color:var(--text)">$740 million</strong> in 2023.
+        These aren't toys. These are economies. And they need authentication infrastructure.
+      </p>
+    </div>
+
+    <!-- VIRTUAL vs IRL COMPARISON -->
+    <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:stretch;margin-bottom:32px">
+      <!-- IRL Column -->
+      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px 0 0 12px;padding:24px">
+        <div style="font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:16px">Physical World</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:var(--bg3);border-radius:8px;padding:14px">
+            <div style="font-size:0.85rem;margin-bottom:4px">Public sculpture in a park</div>
+            <div style="font-size:0.7rem;color:var(--text3)">Seen by ~200 people/day walking past</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:14px">
+            <div style="font-size:0.85rem;margin-bottom:4px">Painting in a gallery</div>
+            <div style="font-size:0.7rem;color:var(--text3)">Seen during opening hours, if you travel there</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:14px">
+            <div style="font-size:0.85rem;margin-bottom:4px">Artist's handmade textile</div>
+            <div style="font-size:0.7rem;color:var(--text3)">Owned by 1 person, shown to visitors</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:14px">
+            <div style="font-size:0.85rem;margin-bottom:4px">Theft detection</div>
+            <div style="font-size:0.7rem;color:var(--text3)">Discovered by accident, if ever</div>
+          </div>
+        </div>
+      </div>
+      <!-- VS -->
+      <div style="background:var(--bg4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px">
+        <div style="font-family:var(--mono);font-size:0.7rem;color:var(--gold);writing-mode:vertical-rl;transform:rotate(180deg)">VS</div>
+      </div>
+      <!-- Virtual Column -->
+      <div style="background:var(--bg2);border:1px solid rgba(236,72,153,0.1);border-radius:0 12px 12px 0;padding:24px">
+        <div style="font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--pink);margin-bottom:16px">Virtual World</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:var(--bg3);border-radius:8px;padding:14px;border-left:2px solid var(--pink)">
+            <div style="font-size:0.85rem;margin-bottom:4px">Sculpture in a metaverse world</div>
+            <div style="font-size:0.7rem;color:var(--pink)">Seen by 50,000+ visitors/day. Interacted with. Shared. Screenshotted.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:14px;border-left:2px solid var(--pink)">
+            <div style="font-size:0.85rem;margin-bottom:4px">Artwork in a virtual gallery</div>
+            <div style="font-size:0.7rem;color:var(--pink)">24/7 global access. No travel needed. Embeddable in any world.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:14px;border-left:2px solid var(--pink)">
+            <div style="font-size:0.85rem;margin-bottom:4px">Artist's texture pack / avatar skin</div>
+            <div style="font-size:0.7rem;color:var(--pink)">Worn by thousands simultaneously. Walking advertisements. Living brand.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:14px;border-left:2px solid var(--green)">
+            <div style="font-size:0.85rem;margin-bottom:4px">Theft detection</div>
+            <div style="font-size:0.7rem;color:var(--green)">Soulprint monitors every marketplace, every listing, automatically.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THE SHIFT -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:32px">
+      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:24px">
+        <div style="font-size:2rem;margin-bottom:10px">&#x1F3AE;</div>
+        <h4 style="font-family:var(--sans);font-size:0.95rem;color:var(--purple);margin-bottom:8px">Avatars Are Identity</h4>
+        <p style="font-size:0.82rem;color:var(--text2);line-height:1.6">
+          A kid's avatar is their face to the world. The skins, accessories, and customizations
+          they choose define how they're perceived socially. Counterfeiting someone's avatar design
+          is identity theft in the truest sense to this generation.
+        </p>
+      </div>
+      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:24px">
+        <div style="font-size:2rem;margin-bottom:10px">&#x1F3D7;&#xFE0F;</div>
+        <h4 style="font-family:var(--sans);font-size:0.95rem;color:var(--blue);margin-bottom:8px">Virtual Spaces Are Architecture</h4>
+        <p style="font-size:0.82rem;color:var(--text2);line-height:1.6">
+          Roblox worlds, Minecraft builds, Fortnite islands &mdash; these are designed environments.
+          Someone pouring 200 hours into building a virtual museum deserves the same protection
+          as an architect who designs a physical building. The labor is real.
+        </p>
+      </div>
+      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:24px">
+        <div style="font-size:2rem;margin-bottom:10px">&#x1F4B8;</div>
+        <h4 style="font-family:var(--sans);font-size:0.95rem;color:var(--green);margin-bottom:8px">Virtual Economy Is Real Economy</h4>
+        <p style="font-size:0.82rem;color:var(--text2);line-height:1.6">
+          A Roblox developer earning $500K/year from virtual items isn't playing a game.
+          A Fortnite skin designer whose work is copied onto unauthorized marketplaces
+          is losing real revenue. Virtual theft is real theft. It just needs real proof.
+        </p>
+      </div>
+    </div>
+
+    <!-- SOULPRINT'S ROLE -->
+    <div style="background:linear-gradient(135deg,rgba(236,72,153,0.04),rgba(168,85,247,0.04));border:1px solid rgba(236,72,153,0.12);border-radius:16px;padding:32px">
+      <h3 style="font-family:var(--sans);font-size:1.15rem;color:var(--gold);margin-bottom:16px;text-align:center">
+        Soulprint Bridges Both Worlds
+      </h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <h4 style="font-size:0.9rem;color:var(--text);margin-bottom:8px">For Physical Creators Going Virtual:</h4>
+          <ul style="list-style:none;padding:0;font-size:0.82rem;color:var(--text2)">
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">&#x2192;</span> Register the physical original</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">&#x2192;</span> Authorize specific virtual versions</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">&#x2192;</span> Each authorized copy carries the Soulprint watermark</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">&#x2192;</span> Unauthorized copies in any virtual world are caught</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">&#x2192;</span> Revenue from virtual licensing flows back to the creator</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-size:0.9rem;color:var(--text);margin-bottom:8px">For Virtual-Native Creators:</h4>
+          <ul style="list-style:none;padding:0;font-size:0.82rem;color:var(--text2)">
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--pink)">&#x2192;</span> Register avatar designs, skins, textures, 3D models</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--pink)">&#x2192;</span> Prove creation with biometric stroke data</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--pink)">&#x2192;</span> Detect copies across Roblox, Unity Store, Sketchfab, etc.</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--pink)">&#x2192;</span> Forensic evidence for DMCA against asset rippers</li>
+            <li style="padding:4px 0;padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--pink)">&#x2192;</span> Build a verified portfolio across virtual economies</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote" style="margin-top:24px;border-left-color:var(--pink)">
+      "An IRL statue in a park is seen by 200 people a day. The same statue in a virtual world
+      is seen by 50,000. Kids today invest more emotional energy, more social capital, and more
+      actual money in their virtual possessions than physical ones.
+      The virtual version might be the MORE important one to protect."
+      <div class="attr">&mdash; The Soulprint Thesis</div>
+    </div>
+  </div>
+</section>
+
+<!-- THE DIGITAL TWIN CONCEPT -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container">
+    <p class="section-tag" style="color:var(--gold)">The Vision</p>
+    <h2>Every Work Gets a Digital Twin &mdash; Physical or Virtual</h2>
+    <p class="section-intro">
+      Whether the original is a bronze in Johannesburg or a 3D model in a Roblox world,
+      Soulprint creates an authenticated digital twin that knows it's the original.
+      If anyone uses it without a certificate &mdash; they're caught.
+    </p>
+
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:20px;align-items:center;margin:32px 0">
+      <div style="background:var(--bg3);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:24px;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:8px">&#x1F5FF;</div>
+        <h4 style="font-family:var(--sans);font-size:0.95rem;margin-bottom:4px">Original Work</h4>
+        <p style="font-size:0.75rem;color:var(--text3)">Physical OR virtual.<br>Sculpture, avatar, skin,<br>painting, 3D model.</p>
+      </div>
+      <div style="font-family:var(--mono);font-size:1.5rem;color:var(--gold)">&#x2192;</div>
+      <div style="background:var(--bg3);border:1px solid rgba(212,168,71,0.2);border-radius:12px;padding:24px;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:8px">&#x1F9EC;</div>
+        <h4 style="font-family:var(--sans);font-size:0.95rem;color:var(--gold);margin-bottom:4px">Soulprint Analysis</h4>
+        <p style="font-size:0.75rem;color:var(--text3)">30+ forensic techniques.<br>Content DNA extracted.<br>Watermark embedded.</p>
+      </div>
+      <div style="font-family:var(--mono);font-size:1.5rem;color:var(--gold)">&#x2192;</div>
+      <div style="background:var(--bg3);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:24px;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:8px">&#x1F6E1;&#xFE0F;</div>
+        <h4 style="font-family:var(--sans);font-size:0.95rem;color:var(--green);margin-bottom:4px">Authenticated Twin</h4>
+        <p style="font-size:0.75rem;color:var(--text3)">Across every platform.<br>Every marketplace.<br>Always provable.</p>
+      </div>
+    </div>
+
+    <div class="quote">
+      "A painting in the real world can now have its digital twin in the virtual.
+      It knows it's an OG. If anyone is using it without permission and doesn't have a certificate,
+      they're doomed."
+      <div class="attr">&mdash; Mic Balkind, Founder</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p style="color:var(--gold);font-family:var(--sans);font-weight:600;margin-bottom:6px">SOULPRINT</p>
+    <p>Digital Forensic Authentication Lab for Creative Works</p>
+    <p style="margin-top:8px;font-family:var(--mono);font-size:0.65rem">SodaLabs &bull; 2026</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOULPRINT BUILD PLAN — Zero to Hero</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a28;--bg4:#222236;
+  --gold:#d4a847;--gold2:#e8c56a;--gold-dim:rgba(212,168,71,0.15);
+  --purple:#a855f7;--teal:#14b8a6;--red:#ef4444;--blue:#3b82f6;--green:#22c55e;--orange:#f97316;--pink:#ec4899;
+  --text:#e8e6e3;--text2:#a09c97;--text3:#6b6660;
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--body:'Outfit',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;overflow-x:hidden}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+/* NAV */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,71,0.1);padding:12px 0}
+.topbar .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--sans);font-weight:700;font-size:1.1rem;color:var(--gold);letter-spacing:0.5px}
+.nav-links{display:flex;gap:8px}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.8rem;padding:6px 12px;border-radius:6px;transition:all 0.2s}
+.nav-links a:hover{color:var(--gold);background:var(--gold-dim)}
+.nav-links a.active{color:var(--gold);background:var(--gold-dim)}
+
+/* HERO */
+.hero{padding:80px 0 60px;text-align:center;position:relative}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(212,168,71,0.06) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-family:var(--sans);font-size:clamp(2.2rem,5vw,3.5rem);font-weight:700;line-height:1.15;margin-bottom:16px}
+.hero h1 .gold{color:var(--gold)}
+.hero h1 .accent{color:var(--purple)}
+.hero-sub{font-size:1.15rem;color:var(--text2);max-width:700px;margin:0 auto 32px;line-height:1.7}
+.hero-badge{display:inline-block;padding:6px 16px;border:1px solid var(--gold-dim);border-radius:20px;font-size:0.75rem;color:var(--gold);margin-bottom:20px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px}
+
+/* SECTIONS */
+.section{padding:60px 0;border-top:1px solid rgba(255,255,255,0.04)}
+.section-tag{font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+.section h2{font-family:var(--sans);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;margin-bottom:12px;line-height:1.25}
+.section-intro{color:var(--text2);font-size:1rem;max-width:700px;margin-bottom:40px;line-height:1.7}
+
+/* APPROACH CARDS */
+.approach-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:40px}
+@media(max-width:768px){.approach-grid{grid-template-columns:1fr}}
+.approach-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:28px;position:relative;overflow:hidden}
+.approach-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.approach-card.yes::before{background:linear-gradient(90deg,var(--green),var(--teal))}
+.approach-card.no::before{background:linear-gradient(90deg,var(--red),var(--orange))}
+.approach-label{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+.approach-card.yes .approach-label{color:var(--green)}
+.approach-card.no .approach-label{color:var(--red)}
+.approach-card h3{font-family:var(--sans);font-size:1.1rem;margin-bottom:8px}
+.approach-card p{color:var(--text2);font-size:0.9rem;line-height:1.6}
+
+/* TEST SUBJECT */
+.test-subject{background:var(--bg2);border:1px solid rgba(212,168,71,0.15);border-radius:16px;padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:40px 0}
+@media(max-width:768px){.test-subject{grid-template-columns:1fr}}
+.test-subject h3{font-family:var(--sans);font-size:1.3rem;margin-bottom:12px;color:var(--gold)}
+.test-subject p{color:var(--text2);font-size:0.9rem;line-height:1.7;margin-bottom:12px}
+.test-subject .why{background:rgba(212,168,71,0.06);border:1px solid rgba(212,168,71,0.1);border-radius:8px;padding:16px;margin-top:16px}
+.test-subject .why h4{font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px}
+.test-subject .why li{color:var(--text2);font-size:0.85rem;margin-bottom:4px;padding-left:16px;position:relative}
+.test-subject .why li::before{content:'\2713';position:absolute;left:0;color:var(--green);font-size:0.7rem}
+.statue-visual{background:var(--bg3);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow:hidden;min-height:300px}
+.statue-visual::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(212,168,71,0.08) 0%,transparent 70%)}
+.statue-ascii{font-family:var(--mono);font-size:0.55rem;line-height:1.1;color:var(--gold);white-space:pre;text-align:center;position:relative;z-index:1;opacity:0.8}
+.statue-label{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-top:20px;position:relative;z-index:1}
+
+/* SPRINT TIMELINE */
+.sprint-timeline{position:relative;padding-left:40px}
+.sprint-timeline::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--purple),var(--teal),var(--blue),var(--green),var(--orange),var(--pink))}
+.sprint{position:relative;margin-bottom:40px}
+.sprint-dot{position:absolute;left:-33px;top:4px;width:18px;height:18px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-family:var(--mono);font-weight:700;background:var(--bg)}
+.sprint-header{display:flex;align-items:baseline;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.sprint-name{font-family:var(--sans);font-size:1.15rem;font-weight:600}
+.sprint-time{font-family:var(--mono);font-size:0.7rem;color:var(--text3);padding:3px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:4px}
+.sprint-desc{color:var(--text2);font-size:0.9rem;margin-bottom:16px;line-height:1.6}
+.sprint-deliverables{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.deliverable{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;position:relative}
+.deliverable::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.deliverable h4{font-size:0.85rem;margin-bottom:4px;font-family:var(--sans)}
+.deliverable p{font-size:0.8rem;color:var(--text2);line-height:1.5}
+.deliverable .tech{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.deliverable .tech span{font-family:var(--mono);font-size:0.6rem;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.04);color:var(--text3)}
+.deliverable .file{font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin-top:8px;word-break:break-all}
+
+/* SPRINT COLORS */
+.sprint[data-color="gold"] .sprint-dot{border-color:var(--gold);color:var(--gold)}
+.sprint[data-color="gold"] .deliverable::before{background:var(--gold)}
+.sprint[data-color="gold"] .sprint-name{color:var(--gold)}
+.sprint[data-color="purple"] .sprint-dot{border-color:var(--purple);color:var(--purple)}
+.sprint[data-color="purple"] .deliverable::before{background:var(--purple)}
+.sprint[data-color="purple"] .sprint-name{color:var(--purple)}
+.sprint[data-color="teal"] .sprint-dot{border-color:var(--teal);color:var(--teal)}
+.sprint[data-color="teal"] .deliverable::before{background:var(--teal)}
+.sprint[data-color="teal"] .sprint-name{color:var(--teal)}
+.sprint[data-color="blue"] .sprint-dot{border-color:var(--blue);color:var(--blue)}
+.sprint[data-color="blue"] .deliverable::before{background:var(--blue)}
+.sprint[data-color="blue"] .sprint-name{color:var(--blue)}
+.sprint[data-color="green"] .sprint-dot{border-color:var(--green);color:var(--green)}
+.sprint[data-color="green"] .deliverable::before{background:var(--green)}
+.sprint[data-color="green"] .sprint-name{color:var(--green)}
+.sprint[data-color="orange"] .sprint-dot{border-color:var(--orange);color:var(--orange)}
+.sprint[data-color="orange"] .deliverable::before{background:var(--orange)}
+.sprint[data-color="orange"] .sprint-name{color:var(--orange)}
+.sprint[data-color="pink"] .sprint-dot{border-color:var(--pink);color:var(--pink)}
+.sprint[data-color="pink"] .deliverable::before{background:var(--pink)}
+.sprint[data-color="pink"] .sprint-name{color:var(--pink)}
+
+/* ANALYSIS DEMO MOCKUP */
+.demo-mockup{background:var(--bg2);border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;margin:40px 0}
+.demo-header{background:var(--bg3);padding:16px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.demo-dots{display:flex;gap:6px}
+.demo-dots span{width:10px;height:10px;border-radius:50%}
+.demo-dots span:nth-child(1){background:#ef4444}
+.demo-dots span:nth-child(2){background:#f59e0b}
+.demo-dots span:nth-child(3){background:#22c55e}
+.demo-title{font-family:var(--mono);font-size:0.75rem;color:var(--text3)}
+.demo-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px;min-height:400px}
+@media(max-width:768px){.demo-body{grid-template-columns:1fr}}
+.demo-left{display:flex;flex-direction:column;gap:16px}
+.demo-right{display:flex;flex-direction:column;gap:12px}
+.demo-upload{background:var(--bg3);border:2px dashed rgba(212,168,71,0.2);border-radius:12px;padding:40px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.demo-upload .icon{font-size:2.5rem;opacity:0.5}
+.demo-upload p{font-size:0.85rem;color:var(--text2)}
+.demo-upload .hint{font-size:0.7rem;color:var(--text3)}
+.analysis-panel{background:var(--bg3);border-radius:8px;padding:16px;flex:1}
+.analysis-panel h4{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.analysis-panel .dot{width:6px;height:6px;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.progress-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.progress-label{font-size:0.75rem;color:var(--text2);min-width:120px;font-family:var(--mono)}
+.progress-bar{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;position:relative}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.progress-pct{font-family:var(--mono);font-size:0.65rem;color:var(--text3);min-width:35px;text-align:right}
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.analysis-cell{background:var(--bg);border-radius:6px;padding:10px;text-align:center}
+.analysis-cell .val{font-family:var(--mono);font-size:1.1rem;font-weight:600;margin-bottom:2px}
+.analysis-cell .lbl{font-size:0.65rem;color:var(--text3)}
+
+/* VISUAL GRIDS */
+.entropy-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin:12px 0}
+.entropy-cell{aspect-ratio:1;border-radius:2px;position:relative}
+.entropy-cell::after{content:attr(data-val);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.45rem;color:rgba(255,255,255,0.4)}
+
+/* SCORE GAUGE */
+.gauge-container{text-align:center;padding:20px}
+.gauge{width:160px;height:80px;margin:0 auto;position:relative;overflow:hidden}
+.gauge-bg{width:160px;height:80px;border-radius:80px 80px 0 0;background:var(--bg4);position:absolute;top:0}
+.gauge-fill{width:160px;height:80px;border-radius:80px 80px 0 0;position:absolute;top:0;transform-origin:bottom center;background:conic-gradient(from 0.75turn,var(--red),var(--orange),var(--gold),var(--green));clip-path:polygon(0 100%,0 0,100% 0,100% 100%)}
+.gauge-mask{width:120px;height:60px;border-radius:60px 60px 0 0;background:var(--bg2);position:absolute;top:20px;left:20px}
+.gauge-value{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:1.8rem;font-weight:700;color:var(--gold)}
+.gauge-label{font-family:var(--mono);font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:8px}
+
+/* ARCH DIAGRAM */
+.arch-flow{display:flex;align-items:center;justify-content:center;gap:0;margin:32px 0;flex-wrap:wrap}
+.arch-node{background:var(--bg2);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 20px;text-align:center;min-width:140px;position:relative}
+.arch-node h4{font-size:0.8rem;font-family:var(--sans);margin-bottom:4px}
+.arch-node p{font-size:0.7rem;color:var(--text3)}
+.arch-node .badge{position:absolute;top:-8px;right:-8px;font-family:var(--mono);font-size:0.55rem;padding:2px 8px;border-radius:10px;font-weight:600}
+.arch-arrow{font-size:1.5rem;color:var(--text3);padding:0 8px}
+@media(max-width:768px){.arch-arrow{transform:rotate(90deg);padding:8px 0}}
+
+/* STACK TABLE */
+.stack-table{width:100%;border-collapse:collapse;margin:24px 0}
+.stack-table th{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);text-align:left;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.stack-table td{padding:10px 16px;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.03)}
+.stack-table td:first-child{font-family:var(--mono);font-size:0.8rem;color:var(--gold)}
+.stack-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* DECISIONS */
+.decisions{display:grid;gap:16px;margin:24px 0}
+.decision{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:20px 24px;cursor:pointer;position:relative;overflow:hidden}
+.decision::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange)}
+.decision h4{font-size:0.9rem;font-family:var(--sans);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.decision .q{font-family:var(--mono);font-size:0.6rem;color:var(--orange);background:rgba(249,115,22,0.1);padding:2px 8px;border-radius:4px}
+.decision p{font-size:0.85rem;color:var(--text2);line-height:1.6}
+.decision .options{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.decision .opt{font-family:var(--mono);font-size:0.7rem;padding:4px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text2)}
+.decision .opt.rec{border-color:var(--green);color:var(--green);background:rgba(34,197,94,0.06)}
+
+/* FOOTER */
+.footer{padding:40px 0;text-align:center;border-top:1px solid rgba(255,255,255,0.04)}
+.footer p{font-size:0.8rem;color:var(--text3)}
+
+/* UTILITIES */
+.highlight{background:rgba(212,168,71,0.08);border:1px solid rgba(212,168,71,0.15);border-radius:8px;padding:20px 24px;margin:20px 0}
+.highlight h4{font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px}
+.highlight p{font-size:0.9rem;color:var(--text2);line-height:1.6}
+.file-tree{font-family:var(--mono);font-size:0.75rem;color:var(--text2);background:var(--bg3);border-radius:8px;padding:20px 24px;line-height:2;margin:20px 0}
+.file-tree .dir{color:var(--blue)}
+.file-tree .new{color:var(--green)}
+.file-tree .mod{color:var(--orange)}
+.file-tree .del{color:var(--red);text-decoration:line-through}
+.mt-lg{margin-top:40px}
+.mb-lg{margin-bottom:40px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topbar">
+  <div class="container">
+    <div class="logo">SOULPRINT /// BUILD PLAN</div>
+    <div class="nav-links">
+      <a href="#approach">Approach</a>
+      <a href="#test">Test Subject</a>
+      <a href="#sprints">Sprints</a>
+      <a href="#demo">Demo</a>
+      <a href="#stack">Stack</a>
+      <a href="#decisions">Decisions</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">Build Plan v1.0 &mdash; March 2026</div>
+    <h1>From <span class="accent">Zero</span> to <span class="gold">Hero</span></h1>
+    <p class="hero-sub">
+      A concrete build plan to take Soulprint from a filing cabinet to a forensic authentication lab.
+      Starting with a real public statue. Proving every layer works. Then scaling to everything.
+    </p>
+
+    <div class="highlight" style="max-width:700px;margin:0 auto;text-align:left">
+      <h4>The Philosophy</h4>
+      <p>
+        Every time someone uploads a work, they should <strong>feel the machine thinking</strong>.
+        Not a spinner. Not "processing..." Real forensic analysis visualised in real time &mdash;
+        entropy maps rendering, frequency spectra appearing, color channels separating,
+        edge detection sweeping across the image. The system earns trust by showing its work.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- APPROACH -->
+<section class="section" id="approach">
+  <div class="container">
+    <p class="section-tag">Strategy</p>
+    <h2>Build Approach: Why the Statue First</h2>
+    <p class="section-intro">
+      The statue POC is not a toy. It is the hardest possible test case &mdash; a 3D physical object
+      being authenticated through 2D photographs. If the system can extract meaningful forensic data
+      from photos of a bronze sculpture, it can handle anything.
+    </p>
+
+    <div class="approach-grid">
+      <div class="approach-card yes">
+        <div class="approach-label">Our approach</div>
+        <h3>Start Hard, Scale Easy</h3>
+        <p>
+          Begin with a 3D sculpture (hardest case: variable lighting, angles, weathering,
+          surface complexity). Prove forensic analysis on this. Then 2D paintings, prints,
+          digital art all become easier subsets of a proven system.
+        </p>
+      </div>
+      <div class="approach-card no">
+        <div class="approach-label">Not this</div>
+        <h3>Start Easy, Hope It Scales</h3>
+        <p>
+          Building for flat JPEG uploads first means you never solve the hard problems &mdash;
+          3D reconstruction, multi-angle correlation, surface material analysis.
+          Scaling up from easy to hard always means a rewrite.
+        </p>
+      </div>
+      <div class="approach-card yes">
+        <div class="approach-label">Our approach</div>
+        <h3>Real Analysis, Visible Power</h3>
+        <p>
+          Every forensic layer runs for real and renders its output visually.
+          The user watches entropy maps form, frequency spectra pulse, edge detection sweep.
+          This isn't theatre &mdash; these are the actual computations, visualised.
+        </p>
+      </div>
+      <div class="approach-card no">
+        <div class="approach-label">Not this</div>
+        <h3>Fake Progress Bars</h3>
+        <p>
+          v1 hashed a file and showed "Generating..." for 2 seconds. No real analysis.
+          No visual proof of computation. A spinner tells the user nothing.
+          We show every pixel of work.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEST SUBJECT -->
+<section class="section" id="test" style="background:var(--bg2)">
+  <div class="container">
+    <p class="section-tag">Proof of Concept</p>
+    <h2>Test Subject: Public Statue</h2>
+    <p class="section-intro">
+      The POC uses a real-world public sculpture. The user photographs it from multiple angles,
+      uploads the photos, and the system performs forensic authentication on all of them.
+    </p>
+
+    <div class="test-subject">
+      <div>
+        <h3>How the Test Works</h3>
+        <p>
+          1. Photographer takes 4-8 photos of a public statue from different angles, distances, and lighting conditions.
+        </p>
+        <p>
+          2. Photos are uploaded to Soulprint. The forensic engine activates &mdash; each photo is analysed independently, then cross-correlated.
+        </p>
+        <p>
+          3. The system builds a composite "Content DNA" across all photos &mdash; proving they show the same physical object, extracting surface characteristics, material signatures, and geometric relationships.
+        </p>
+        <p>
+          4. A Soulprint Certificate is generated with full forensic report, Soulprint Index score, and invisible watermark embedded in each image.
+        </p>
+
+        <div class="why">
+          <h4>Why This Proves the System</h4>
+          <ul style="list-style:none;padding:0">
+            <li>Multi-image correlation = harder than single image</li>
+            <li>Variable lighting = tests robustness of colour analysis</li>
+            <li>3D surface texture = tests edge / entropy analysis depth</li>
+            <li>Public object = anyone can independently verify</li>
+            <li>Physical + digital = proves the digital twin concept</li>
+            <li>Weathering / patina = natural noise for noise analysis testing</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="statue-visual">
+        <pre class="statue-ascii">
+           ___
+          /   \
+         |  o  |
+         | --- |
+          \ | /
+           \|/
+        ____!____
+       /    |    \
+      /  /  |  \  \
+     |  /   |   \  |
+     | |    |    | |
+      \|    |    |/
+       |    |    |
+       |    |    |
+      /|    |    |\
+     / |   / \   | \
+    /  |  /   \  |  \
+   /   | /     \ |   \
+  |    |/       \|    |
+  |    /   ___   \    |
+   \  /   /   \   \  /
+    \/   /     \   \/
+    |   |       |   |
+    |   |       |   |
+    |   |       |   |
+   _|___|_     _|___|_
+  /       \   /       \
+ /         \ /         \
+|___________||___________|
+        </pre>
+        <div class="statue-label">Any Public Sculpture</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPRINT TIMELINE -->
+<section class="section" id="sprints">
+  <div class="container">
+    <p class="section-tag">Build Timeline</p>
+    <h2>7 Sprints: Zero to Working Prototype</h2>
+    <p class="section-intro">
+      Each sprint produces a working, testable increment. After every sprint we can demo
+      what's working. Nothing is theoretical &mdash; every sprint ends with running code.
+    </p>
+
+    <div class="sprint-timeline">
+
+      <!-- SPRINT 0 -->
+      <div class="sprint" data-color="gold">
+        <div class="sprint-dot">0</div>
+        <div class="sprint-header">
+          <span class="sprint-name">Foundation &amp; Architecture</span>
+          <span class="sprint-time">~2 hours</span>
+        </div>
+        <p class="sprint-desc">
+          Rip out v1's form-only approach. Set up the forensic engine architecture.
+          New types, new file structure, new UI skeleton. The app becomes a lab, not a form.
+        </p>
+        <div class="sprint-deliverables">
+          <div class="deliverable">
+            <h4>New Type System</h4>
+            <p>ForensicReport, ContentDNA, AnalysisLayer, SoulprintIndex, CreationBiometrics &mdash; full TypeScript types for every forensic data structure.</p>
+            <div class="tech"><span>TypeScript</span></div>
+            <div class="file">src/types.ts</div>
+          </div>
+          <div class="deliverable">
+            <h4>Engine Architecture</h4>
+            <p>Modular analysis pipeline: each layer is an independent module that receives an image and returns typed results. Pipeline orchestrator runs them all and aggregates.</p>
+            <div class="tech"><span>TypeScript</span><span>Canvas API</span></div>
+            <div class="file">src/lib/engine.ts</div>
+          </div>
+          <div class="deliverable">
+            <h4>UI Shell Rebuild</h4>
+            <p>Replace form wizard with a forensic lab interface: upload zone + live analysis panels + results dashboard. Dark, technical, powerful aesthetic.</p>
+            <div class="tech"><span>React</span><span>CSS</span></div>
+            <div class="file">src/pages/AnalysisLab.tsx</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPRINT 1 -->
+      <div class="sprint" data-color="purple">
+        <div class="sprint-dot">1</div>
+        <div class="sprint-header">
+          <span class="sprint-name">Content DNA Engine</span>
+          <span class="sprint-time">~3 hours</span>
+        </div>
+        <p class="sprint-desc">
+          The mathematical fingerprint of the image. Every pixel is decomposed into independent
+          forensic signals. All runs client-side in the browser via Canvas API &mdash; no server needed.
+          This is where the user first sees "the machine thinking."
+        </p>
+        <div class="sprint-deliverables">
+          <div class="deliverable">
+            <h4>Color Channel Separation</h4>
+            <p>Extract RGB, HSV, and LAB color spaces. Generate channel histograms and dominant palette. Visualise as colour channel strips.</p>
+            <div class="tech"><span>Canvas API</span><span>Color Math</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Regional Entropy Map</h4>
+            <p>Divide image into 8x8 grid. Calculate Shannon entropy per cell. Render as heatmap overlay &mdash; high entropy regions glow hot, low entropy regions stay cold.</p>
+            <div class="tech"><span>Information Theory</span><span>Canvas</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Edge Detection &amp; Orientation</h4>
+            <p>Sobel operators extract gradient magnitude and direction. Visualise edge map. Compute edge orientation histograms (8 or 16 bins) as a radial signature.</p>
+            <div class="tech"><span>Sobel</span><span>Image Processing</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Statistical Moments</h4>
+            <p>Mean, variance, skewness, kurtosis per channel per region. These are the "vital signs" of the image &mdash; compact numerical identity that changes if even a single pixel is altered.</p>
+            <div class="tech"><span>Statistics</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Perceptual Hashing</h4>
+            <p>Generate dHash (difference hash) and pHash (DCT-based perceptual hash). These survive rotation, scaling, compression &mdash; the image's "face" for similarity matching.</p>
+            <div class="tech"><span>dHash</span><span>pHash</span><span>DCT</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Compressibility Curve</h4>
+            <p>Re-encode at 10 quality levels (10%-100%). Plot file size curve. AI-generated images compress differently than photographs &mdash; this is a silent AI detector.</p>
+            <div class="tech"><span>JPEG</span><span>Canvas</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPRINT 2 -->
+      <div class="sprint" data-color="teal">
+        <div class="sprint-dot">2</div>
+        <div class="sprint-header">
+          <span class="sprint-name">Deep Forensic Analysis</span>
+          <span class="sprint-time">~3 hours</span>
+        </div>
+        <p class="sprint-desc">
+          The heavy-hitting analysis. FFT reveals spectral signatures. ELA exposes tampering.
+          Noise analysis detects sensor patterns. These are the techniques museums and law
+          enforcement actually use &mdash; now running in the browser.
+        </p>
+        <div class="sprint-deliverables">
+          <div class="deliverable">
+            <h4>FFT Frequency Analysis</h4>
+            <p>Fast Fourier Transform of the image. Render power spectrum as visual plot. AI-generated images (GAN/diffusion) leave periodic artifacts in the frequency domain that are invisible to the eye but unmistakable in the spectrum.</p>
+            <div class="tech"><span>FFT</span><span>Spectral Analysis</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Error Level Analysis (ELA)</h4>
+            <p>Re-compress the image at a known quality level. Subtract from original. Inconsistent error levels reveal splicing, compositing, or localised editing. Visualised as a heat overlay.</p>
+            <div class="tech"><span>ELA</span><span>JPEG</span><span>Canvas</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Noise Pattern Analysis</h4>
+            <p>Apply wavelet denoising filter. Extract the residual noise. Natural photos have consistent noise patterns from the camera sensor (PRNU). AI images have unnaturally uniform or patterned noise. Render noise map.</p>
+            <div class="tech"><span>Wavelets</span><span>PRNU</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>EXIF / Metadata Forensics</h4>
+            <p>Extract all embedded metadata: camera model, GPS, timestamps, software, colour profile. Missing or inconsistent metadata is a red flag. Display as structured forensic report.</p>
+            <div class="tech"><span>EXIF</span><span>XMP</span><span>IPTC</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>AI Detection Heuristics</h4>
+            <p>Combined signal from: compressibility curve anomaly + frequency spectrum regularity + noise uniformity + metadata absence. Produces an "AI probability" score. Not perfect &mdash; but with convergence of signals, highly reliable.</p>
+            <div class="tech"><span>Heuristics</span><span>Signal Fusion</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPRINT 3 -->
+      <div class="sprint" data-color="blue">
+        <div class="sprint-dot">3</div>
+        <div class="sprint-header">
+          <span class="sprint-name">Visual Analysis Experience</span>
+          <span class="sprint-time">~3 hours</span>
+        </div>
+        <p class="sprint-desc">
+          This is the "computing power" sprint. Every analysis from Sprints 1-2 gets a real-time
+          visual rendering. The user uploads an image and watches the lab come alive &mdash;
+          panels lighting up, data streaming in, visualisations building stroke by stroke.
+        </p>
+        <div class="sprint-deliverables">
+          <div class="deliverable">
+            <h4>Live Analysis Dashboard</h4>
+            <p>Split-panel interface: source image on left, analysis panels on right. Each panel activates sequentially with real progress indicators. Status: Queued &rarr; Analysing &rarr; Complete.</p>
+            <div class="tech"><span>React</span><span>CSS Animation</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Entropy Heatmap Overlay</h4>
+            <p>8x8 coloured grid overlaid on the source image. Cells animate from transparent to coloured as entropy is calculated. Toggle between overlay and standalone view.</p>
+            <div class="tech"><span>Canvas</span><span>Animation</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Frequency Spectrum Visualiser</h4>
+            <p>2D power spectrum rendered as a luminance image. Concentric rings = natural frequency distribution. Bright spots or periodic patterns = AI artifacts. Animated render.</p>
+            <div class="tech"><span>Canvas</span><span>FFT Viz</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Edge Map Renderer</h4>
+            <p>Full edge detection overlay. Sobel magnitude rendered as white-on-black. Edge orientation rendered as directional colour wheel. Toggle between source and edge view.</p>
+            <div class="tech"><span>Sobel</span><span>Canvas</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Soulprint Index Gauge</h4>
+            <p>Animated radial gauge showing the convergence score (0-100). Each layer's contribution shown as weighted bar. Score animates up as each layer completes. Final verdict: colour-coded confidence level.</p>
+            <div class="tech"><span>SVG</span><span>Animation</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Color DNA Strip</h4>
+            <p>Horizontal bar showing dominant colour palette extracted from the image. Expandable to show full RGB/HSV/LAB channel histograms. Unique visual signature of the work.</p>
+            <div class="tech"><span>Canvas</span><span>Color Math</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPRINT 4 -->
+      <div class="sprint" data-color="green">
+        <div class="sprint-dot">4</div>
+        <div class="sprint-header">
+          <span class="sprint-name">Invisible Watermark + Certificate</span>
+          <span class="sprint-time">~2 hours</span>
+        </div>
+        <p class="sprint-desc">
+          The output layer. Every analysed work gets an invisible watermark embedded in its pixels
+          and a comprehensive forensic certificate. The certificate isn't a receipt &mdash;
+          it's a forensic report card.
+        </p>
+        <div class="sprint-deliverables">
+          <div class="deliverable">
+            <h4>Spread-Spectrum Watermark</h4>
+            <p>Embed certificate ID into the image's pixel data using spread-spectrum modulation. Survives JPEG compression, scaling, cropping. Extraction function for verification. Invisible to the eye, recoverable by the system.</p>
+            <div class="tech"><span>DSP</span><span>Canvas</span><span>Steganography</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Forensic Certificate Page</h4>
+            <p>Full-page certificate showing: Soulprint Index gauge, Content DNA strip, entropy heatmap thumbnail, edge map thumbnail, frequency spectrum, AI detection verdict, metadata summary, timestamp, and watermark status. Shareable URL.</p>
+            <div class="tech"><span>React</span><span>CSS</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Multi-Image Correlation</h4>
+            <p>For the statue POC: cross-reference forensic data from multiple photos of the same subject. Show similarity scores between photos. Prove they depict the same physical object from different angles.</p>
+            <div class="tech"><span>pHash</span><span>Statistics</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Certificate Storage</h4>
+            <p>Save forensic reports and certificates to IndexedDB (client-side for POC). Export as JSON. Structured for easy migration to Supabase later. Full Content DNA stored per certificate.</p>
+            <div class="tech"><span>IndexedDB</span><span>JSON</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPRINT 5 -->
+      <div class="sprint" data-color="orange">
+        <div class="sprint-dot">5</div>
+        <div class="sprint-header">
+          <span class="sprint-name">Statue POC Demo</span>
+          <span class="sprint-time">~2 hours</span>
+        </div>
+        <p class="sprint-desc">
+          The proof. Take real photos of a public statue. Run the full pipeline.
+          Generate the certificate. Then test adversarial scenarios: modify the image,
+          feed in an AI-generated version, strip the watermark. Prove the system catches it all.
+        </p>
+        <div class="sprint-deliverables">
+          <div class="deliverable">
+            <h4>Real Statue Analysis</h4>
+            <p>Upload 4-8 photos of a real public statue. Run full forensic pipeline. Demonstrate every visualisation working on real photographic data. Screenshot the results.</p>
+            <div class="tech"><span>Integration Test</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Adversarial Test: Modified Image</h4>
+            <p>Take one registered photo, crop it, adjust colours, add filter. Re-upload. System should: (a) detect similarity via pHash, (b) show different ELA signatures, (c) flag metadata inconsistency.</p>
+            <div class="tech"><span>Similarity</span><span>ELA</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Adversarial Test: AI-Generated Statue</h4>
+            <p>Generate a statue image via Midjourney/DALL-E. Upload it. System should: (a) flag anomalous frequency spectrum, (b) detect noise pattern inconsistency, (c) note missing EXIF, (d) produce low AI-authenticity score.</p>
+            <div class="tech"><span>AI Detection</span><span>FFT</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Demo Landing Page</h4>
+            <p>Rebuild the landing page around the forensic lab concept. Show real analysis results from the statue POC as proof. Replace v1's "SHA-256" messaging with forensic authentication.</p>
+            <div class="tech"><span>React</span><span>Marketing</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPRINT 6 -->
+      <div class="sprint" data-color="pink">
+        <div class="sprint-dot">6</div>
+        <div class="sprint-header">
+          <span class="sprint-name">Creation Biometrics (The Killer Feature)</span>
+          <span class="sprint-time">~3 hours</span>
+        </div>
+        <p class="sprint-desc">
+          The feature no competitor has. A browser-based canvas where artists can draw/paint,
+          and the system records every stroke's biometric signature: position, velocity,
+          acceleration, pressure, timing, hesitation. AI cannot produce this data.
+          This is Proof of Process.
+        </p>
+        <div class="sprint-deliverables">
+          <div class="deliverable">
+            <h4>Creation Canvas</h4>
+            <p>Full-screen browser canvas with drawing tools (pen, brush, eraser). Records PointerEvents with: x, y, timestamp, pressure (from tablet/stylus), tiltX, tiltY. Exports raw stroke data.</p>
+            <div class="tech"><span>Canvas API</span><span>PointerEvents</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Biometric Analysis</h4>
+            <p>Calculate per-stroke: velocity curve, acceleration, jerk (3rd derivative), pressure histogram, tilt patterns, pause durations between strokes. Build "Creation DNA" profile.</p>
+            <div class="tech"><span>Kinematics</span><span>Signal Processing</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Biometric Visualisation</h4>
+            <p>Pressure histogram, velocity heatmap over the canvas, stroke replay (timelapse), statistical summary cards. Show the human behind the art.</p>
+            <div class="tech"><span>D3/Canvas</span><span>Animation</span></div>
+          </div>
+          <div class="deliverable">
+            <h4>Proof-of-Process Certificate</h4>
+            <p>Certificate includes: total strokes, total time, average velocity, pressure profile, undo count, layer count. This is the data that proves a human made it &mdash; and which human.</p>
+            <div class="tech"><span>React</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sprint-timeline -->
+
+    <!-- TOTAL -->
+    <div class="highlight mt-lg">
+      <h4>Total Build Estimate</h4>
+      <p>
+        <strong>7 sprints. ~18 hours of build time.</strong> Each sprint produces a working demo.
+        After Sprint 5 (Statue POC Demo) we have a fully functional prototype that can be deployed
+        and shown to anyone. Sprint 6 adds the killer differentiator.
+        All client-side &mdash; no server costs for the POC.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO MOCKUP -->
+<section class="section" id="demo" style="background:var(--bg2)">
+  <div class="container">
+    <p class="section-tag">What It Looks Like</p>
+    <h2>The Analysis Lab Experience</h2>
+    <p class="section-intro">
+      When a user uploads an image, this is what they see. Real analysis. Real visualisations.
+      Real computing power, visible.
+    </p>
+
+    <div class="demo-mockup">
+      <div class="demo-header">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">soulprint.app/lab &mdash; Forensic Analysis in Progress</div>
+      </div>
+      <div class="demo-body">
+        <div class="demo-left">
+          <div class="demo-upload" style="flex:0 0 auto">
+            <div class="icon">&#x1F5FF;</div>
+            <p><strong>mandela_statue_front.jpg</strong></p>
+            <p class="hint">4032 x 3024 &bull; 4.2 MB &bull; iPhone 15 Pro</p>
+          </div>
+
+          <div class="analysis-panel" style="flex:1">
+            <h4>
+              <span class="dot" style="background:var(--green)"></span>
+              <span style="color:var(--green)">Analysis Pipeline</span>
+            </h4>
+            <div class="progress-row">
+              <span class="progress-label">Color DNA</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--green)"></div></div>
+              <span class="progress-pct" style="color:var(--green)">Done</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">Entropy Map</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--green)"></div></div>
+              <span class="progress-pct" style="color:var(--green)">Done</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">Edge Detection</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--green)"></div></div>
+              <span class="progress-pct" style="color:var(--green)">Done</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">Perceptual Hash</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--green)"></div></div>
+              <span class="progress-pct" style="color:var(--green)">Done</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">FFT Spectrum</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--teal)"></div></div>
+              <span class="progress-pct">72%</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">Error Levels</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--blue)"></div></div>
+              <span class="progress-pct">45%</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">Noise Pattern</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+              <span class="progress-pct" style="color:var(--text3)">Queue</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">AI Detection</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+              <span class="progress-pct" style="color:var(--text3)">Queue</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">Watermark</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+              <span class="progress-pct" style="color:var(--text3)">Queue</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-right">
+          <!-- Entropy -->
+          <div class="analysis-panel" style="flex:0 0 auto">
+            <h4 style="color:var(--purple)">
+              <span class="dot" style="background:var(--purple)"></span>
+              Entropy Map &mdash; 8x8 Regional
+            </h4>
+            <div class="entropy-grid">
+              <div class="entropy-cell" data-val="6.2" style="background:rgba(168,85,247,0.7)"></div>
+              <div class="entropy-cell" data-val="5.8" style="background:rgba(168,85,247,0.6)"></div>
+              <div class="entropy-cell" data-val="7.1" style="background:rgba(168,85,247,0.85)"></div>
+              <div class="entropy-cell" data-val="7.4" style="background:rgba(168,85,247,0.9)"></div>
+              <div class="entropy-cell" data-val="7.2" style="background:rgba(168,85,247,0.87)"></div>
+              <div class="entropy-cell" data-val="6.9" style="background:rgba(168,85,247,0.8)"></div>
+              <div class="entropy-cell" data-val="5.5" style="background:rgba(168,85,247,0.55)"></div>
+              <div class="entropy-cell" data-val="4.8" style="background:rgba(168,85,247,0.4)"></div>
+              <div class="entropy-cell" data-val="5.1" style="background:rgba(168,85,247,0.45)"></div>
+              <div class="entropy-cell" data-val="6.4" style="background:rgba(168,85,247,0.72)"></div>
+              <div class="entropy-cell" data-val="7.6" style="background:rgba(168,85,247,0.95)"></div>
+              <div class="entropy-cell" data-val="7.8" style="background:rgba(168,85,247,1)"></div>
+              <div class="entropy-cell" data-val="7.5" style="background:rgba(168,85,247,0.92)"></div>
+              <div class="entropy-cell" data-val="7.3" style="background:rgba(168,85,247,0.88)"></div>
+              <div class="entropy-cell" data-val="6.1" style="background:rgba(168,85,247,0.68)"></div>
+              <div class="entropy-cell" data-val="5.3" style="background:rgba(168,85,247,0.5)"></div>
+              <div class="entropy-cell" data-val="4.5" style="background:rgba(168,85,247,0.35)"></div>
+              <div class="entropy-cell" data-val="6.7" style="background:rgba(168,85,247,0.78)"></div>
+              <div class="entropy-cell" data-val="7.9" style="background:rgba(168,85,247,1)"></div>
+              <div class="entropy-cell" data-val="7.7" style="background:rgba(168,85,247,0.97)"></div>
+              <div class="entropy-cell" data-val="7.1" style="background:rgba(168,85,247,0.85)"></div>
+              <div class="entropy-cell" data-val="6.8" style="background:rgba(168,85,247,0.79)"></div>
+              <div class="entropy-cell" data-val="5.9" style="background:rgba(168,85,247,0.63)"></div>
+              <div class="entropy-cell" data-val="5.0" style="background:rgba(168,85,247,0.42)"></div>
+              <div class="entropy-cell" data-val="5.4" style="background:rgba(168,85,247,0.52)"></div>
+              <div class="entropy-cell" data-val="7.0" style="background:rgba(168,85,247,0.82)"></div>
+              <div class="entropy-cell" data-val="7.5" style="background:rgba(168,85,247,0.92)"></div>
+              <div class="entropy-cell" data-val="7.3" style="background:rgba(168,85,247,0.88)"></div>
+              <div class="entropy-cell" data-val="6.6" style="background:rgba(168,85,247,0.75)"></div>
+              <div class="entropy-cell" data-val="6.0" style="background:rgba(168,85,247,0.65)"></div>
+              <div class="entropy-cell" data-val="5.7" style="background:rgba(168,85,247,0.58)"></div>
+              <div class="entropy-cell" data-val="4.9" style="background:rgba(168,85,247,0.41)"></div>
+              <div class="entropy-cell" data-val="6.3" style="background:rgba(168,85,247,0.71)"></div>
+              <div class="entropy-cell" data-val="7.2" style="background:rgba(168,85,247,0.87)"></div>
+              <div class="entropy-cell" data-val="6.9" style="background:rgba(168,85,247,0.8)"></div>
+              <div class="entropy-cell" data-val="6.5" style="background:rgba(168,85,247,0.73)"></div>
+              <div class="entropy-cell" data-val="5.8" style="background:rgba(168,85,247,0.6)"></div>
+              <div class="entropy-cell" data-val="5.2" style="background:rgba(168,85,247,0.48)"></div>
+              <div class="entropy-cell" data-val="4.6" style="background:rgba(168,85,247,0.37)"></div>
+              <div class="entropy-cell" data-val="4.3" style="background:rgba(168,85,247,0.32)"></div>
+              <div class="entropy-cell" data-val="5.6" style="background:rgba(168,85,247,0.56)"></div>
+              <div class="entropy-cell" data-val="6.8" style="background:rgba(168,85,247,0.79)"></div>
+              <div class="entropy-cell" data-val="6.4" style="background:rgba(168,85,247,0.72)"></div>
+              <div class="entropy-cell" data-val="5.9" style="background:rgba(168,85,247,0.63)"></div>
+              <div class="entropy-cell" data-val="5.1" style="background:rgba(168,85,247,0.45)"></div>
+              <div class="entropy-cell" data-val="4.7" style="background:rgba(168,85,247,0.38)"></div>
+              <div class="entropy-cell" data-val="4.2" style="background:rgba(168,85,247,0.3)"></div>
+              <div class="entropy-cell" data-val="3.8" style="background:rgba(168,85,247,0.25)"></div>
+              <div class="entropy-cell" data-val="4.9" style="background:rgba(168,85,247,0.41)"></div>
+              <div class="entropy-cell" data-val="6.1" style="background:rgba(168,85,247,0.68)"></div>
+              <div class="entropy-cell" data-val="5.7" style="background:rgba(168,85,247,0.58)"></div>
+              <div class="entropy-cell" data-val="5.3" style="background:rgba(168,85,247,0.5)"></div>
+              <div class="entropy-cell" data-val="4.5" style="background:rgba(168,85,247,0.35)"></div>
+              <div class="entropy-cell" data-val="4.0" style="background:rgba(168,85,247,0.28)"></div>
+              <div class="entropy-cell" data-val="3.5" style="background:rgba(168,85,247,0.2)"></div>
+              <div class="entropy-cell" data-val="3.1" style="background:rgba(168,85,247,0.15)"></div>
+              <div class="entropy-cell" data-val="4.4" style="background:rgba(168,85,247,0.33)"></div>
+              <div class="entropy-cell" data-val="5.5" style="background:rgba(168,85,247,0.55)"></div>
+              <div class="entropy-cell" data-val="5.0" style="background:rgba(168,85,247,0.42)"></div>
+              <div class="entropy-cell" data-val="4.8" style="background:rgba(168,85,247,0.4)"></div>
+              <div class="entropy-cell" data-val="4.1" style="background:rgba(168,85,247,0.29)"></div>
+              <div class="entropy-cell" data-val="3.6" style="background:rgba(168,85,247,0.22)"></div>
+              <div class="entropy-cell" data-val="3.0" style="background:rgba(168,85,247,0.12)"></div>
+              <div class="entropy-cell" data-val="2.8" style="background:rgba(168,85,247,0.1)"></div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="analysis-panel" style="flex:0 0 auto">
+            <h4 style="color:var(--gold)">
+              <span class="dot" style="background:var(--gold)"></span>
+              Content DNA Summary
+            </h4>
+            <div class="analysis-grid">
+              <div class="analysis-cell">
+                <div class="val" style="color:var(--green)">92</div>
+                <div class="lbl">Soulprint Index</div>
+              </div>
+              <div class="analysis-cell">
+                <div class="val" style="color:var(--green)">0.03</div>
+                <div class="lbl">AI Probability</div>
+              </div>
+              <div class="analysis-cell">
+                <div class="val" style="color:var(--teal)">6.41</div>
+                <div class="lbl">Avg Entropy</div>
+              </div>
+              <div class="analysis-cell">
+                <div class="val" style="color:var(--purple)">a7f3</div>
+                <div class="lbl">pHash Prefix</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gauge -->
+          <div class="analysis-panel" style="flex:1">
+            <h4 style="color:var(--green)">
+              <span class="dot" style="background:var(--green)"></span>
+              Soulprint Index
+            </h4>
+            <div class="gauge-container">
+              <div class="gauge">
+                <div class="gauge-bg"></div>
+                <div class="gauge-fill" style="transform:rotate(-90deg)"></div>
+                <div class="gauge-mask"></div>
+                <div class="gauge-value" style="color:var(--green)">92</div>
+              </div>
+              <div class="gauge-label">HIGH CONFIDENCE &bull; AUTHENTIC</div>
+            </div>
+            <div style="display:grid;gap:4px;margin-top:12px">
+              <div class="progress-row">
+                <span class="progress-label" style="min-width:100px;font-size:0.65rem">Content DNA</span>
+                <div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--purple)"></div></div>
+                <span class="progress-pct" style="font-size:0.6rem">95</span>
+              </div>
+              <div class="progress-row">
+                <span class="progress-label" style="min-width:100px;font-size:0.65rem">Forensics</span>
+                <div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--teal)"></div></div>
+                <span class="progress-pct" style="font-size:0.6rem">90</span>
+              </div>
+              <div class="progress-row">
+                <span class="progress-label" style="min-width:100px;font-size:0.65rem">Metadata</span>
+                <div class="progress-bar"><div class="progress-fill" style="width:88%;background:var(--blue)"></div></div>
+                <span class="progress-pct" style="font-size:0.6rem">88</span>
+              </div>
+              <div class="progress-row">
+                <span class="progress-label" style="min-width:100px;font-size:0.65rem">Watermark</span>
+                <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--green)"></div></div>
+                <span class="progress-pct" style="font-size:0.6rem">100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section" id="stack">
+  <div class="container">
+    <p class="section-tag">Architecture</p>
+    <h2>Tech Stack &amp; Data Flow</h2>
+    <p class="section-intro">
+      The POC is 100% client-side. No server costs. No API keys. No backend infrastructure.
+      Everything runs in the user's browser. Server-side deep analysis is Phase 2.
+    </p>
+
+    <div class="arch-flow">
+      <div class="arch-node" style="border-color:rgba(212,168,71,0.3)">
+        <div class="badge" style="background:var(--gold);color:var(--bg)">INPUT</div>
+        <h4 style="color:var(--gold)">Image Upload</h4>
+        <p>JPEG / PNG / WebP</p>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-node" style="border-color:rgba(168,85,247,0.3)">
+        <div class="badge" style="background:var(--purple);color:white">ENGINE</div>
+        <h4 style="color:var(--purple)">Forensic Pipeline</h4>
+        <p>9 analysis modules</p>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-node" style="border-color:rgba(20,184,166,0.3)">
+        <div class="badge" style="background:var(--teal);color:var(--bg)">SCORE</div>
+        <h4 style="color:var(--teal)">Soulprint Index</h4>
+        <p>Convergence 0-100</p>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-node" style="border-color:rgba(34,197,94,0.3)">
+        <div class="badge" style="background:var(--green);color:var(--bg)">OUTPUT</div>
+        <h4 style="color:var(--green)">Certificate</h4>
+        <p>Report + Watermark</p>
+      </div>
+    </div>
+
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Technology</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Framework</td>
+          <td>React 19 + TypeScript + Vite 7</td>
+          <td>Already set up. Fast HMR. Type safety for complex forensic data structures.</td>
+        </tr>
+        <tr>
+          <td>Image Processing</td>
+          <td>Canvas API (browser native)</td>
+          <td>No dependencies. Pixel-level access. GPU-accelerated in modern browsers.</td>
+        </tr>
+        <tr>
+          <td>FFT</td>
+          <td>Custom implementation (~100 lines)</td>
+          <td>Cooley-Tukey radix-2. No library needed for 2D image FFT. Keeps bundle small.</td>
+        </tr>
+        <tr>
+          <td>Colour Science</td>
+          <td>Custom RGB&rarr;HSV/LAB conversion</td>
+          <td>Standard formulas. ~50 lines. No library dependency.</td>
+        </tr>
+        <tr>
+          <td>Perceptual Hash</td>
+          <td>Custom dHash + pHash</td>
+          <td>dHash = 8x8 difference. pHash = DCT-based. ~80 lines total. Hamming distance for similarity.</td>
+        </tr>
+        <tr>
+          <td>Watermarking</td>
+          <td>Custom spread-spectrum</td>
+          <td>Embed bits in DCT domain. ~120 lines. Survives JPEG 70%+ compression.</td>
+        </tr>
+        <tr>
+          <td>EXIF Parsing</td>
+          <td>exif-js (4KB) or custom parser</td>
+          <td>Extract camera, GPS, timestamps, software. Lightweight.</td>
+        </tr>
+        <tr>
+          <td>Storage (POC)</td>
+          <td>IndexedDB + localStorage</td>
+          <td>Client-side persistence. Stores certificates, hashes, forensic reports.</td>
+        </tr>
+        <tr>
+          <td>Storage (Phase 2)</td>
+          <td>Supabase + PostgreSQL + pgvector</td>
+          <td>Server-side database. Vector similarity search. Already in project deps.</td>
+        </tr>
+        <tr>
+          <td>Visualisation</td>
+          <td>Canvas API + CSS + SVG</td>
+          <td>Heatmaps, spectra, gauges, histograms. All custom, no charting library.</td>
+        </tr>
+        <tr>
+          <td>Deploy</td>
+          <td>Netlify (app) + Firebase (docs)</td>
+          <td>Existing infrastructure. Zero cost for static hosting.</td>
+        </tr>
+        <tr>
+          <td>Biometrics</td>
+          <td>PointerEvent API</td>
+          <td>Captures pressure, tilt, position at full sensor rate. Browser native.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- FILE TREE -->
+    <h3 style="font-family:var(--sans);font-size:1.1rem;margin-top:40px;margin-bottom:16px">Project Structure After Build</h3>
+    <div class="file-tree">
+<span class="dir">src/</span>
+  <span class="dir">lib/</span>
+    <span class="new">  engine.ts</span>          &larr; Pipeline orchestrator
+    <span class="new">  content-dna.ts</span>      &larr; Color, entropy, edges, hashing, stats
+    <span class="new">  forensics.ts</span>        &larr; FFT, ELA, noise, AI detection
+    <span class="new">  watermark.ts</span>        &larr; Spread-spectrum embed/extract
+    <span class="new">  creation-recorder.ts</span> &larr; Stroke biometric capture
+    <span class="new">  color-science.ts</span>    &larr; RGB/HSV/LAB conversions
+    <span class="new">  fft.ts</span>              &larr; Cooley-Tukey FFT implementation
+    <span class="new">  perceptual-hash.ts</span>  &larr; dHash + pHash
+    <span class="new">  exif.ts</span>             &larr; Metadata extraction
+    <span class="mod">  certificates.ts</span>     &larr; Updated for forensic data
+    <span class="mod">  crypto.ts</span>           &larr; Keep SHA-256 + add Content DNA hash
+    <span class="mod">  storage.ts</span>          &larr; IndexedDB for forensic reports
+  <span class="dir">pages/</span>
+    <span class="new">  AnalysisLab.tsx</span>     &larr; The main forensic lab interface
+    <span class="new">  CreationStudio.tsx</span>  &larr; Drawing canvas with biometrics
+    <span class="mod">  Landing.tsx</span>         &larr; Rebuild around forensic lab concept
+    <span class="mod">  CertificateView.tsx</span> &larr; Forensic report certificate
+    <span class="mod">  Register.tsx</span>        &larr; Redirect to AnalysisLab
+    <span class="mod">  Dashboard.tsx</span>       &larr; Show forensic certificates
+    <span class="del">  Verify.tsx</span>          &larr; Merged into AnalysisLab
+  <span class="dir">components/</span>
+    <span class="new">  EntropyMap.tsx</span>      &larr; 8x8 heatmap component
+    <span class="new">  FrequencySpectrum.tsx</span> &larr; FFT visualisation
+    <span class="new">  EdgeMap.tsx</span>         &larr; Sobel edge overlay
+    <span class="new">  ColorDNA.tsx</span>        &larr; Channel histograms + palette
+    <span class="new">  ScoreGauge.tsx</span>      &larr; Animated Soulprint Index
+    <span class="new">  ELAOverlay.tsx</span>      &larr; Error Level Analysis view
+    <span class="new">  NoiseMap.tsx</span>        &larr; Noise pattern visualisation
+    <span class="new">  AnalysisProgress.tsx</span> &larr; Pipeline progress tracker
+    <span class="new">  BiometricPanel.tsx</span>  &larr; Stroke biometric charts
+    <span class="mod">  Layout.tsx</span>          &larr; Updated nav
+  <span class="mod">types.ts</span>               &larr; Full forensic type system
+  <span class="mod">App.tsx</span>                 &larr; Updated routes
+  <span class="mod">index.css</span>              &larr; Lab aesthetic + visualisation styles
+    </div>
+  </div>
+</section>
+
+<!-- DECISIONS -->
+<section class="section" id="decisions" style="background:var(--bg2)">
+  <div class="container">
+    <p class="section-tag">Discussion Points</p>
+    <h2>Decisions to Confirm</h2>
+    <p class="section-intro">
+      These are the design choices that could go either way. Each has a recommended approach
+      but I want your input before building.
+    </p>
+
+    <div class="decisions">
+      <div class="decision">
+        <h4><span class="q">D1</span> Build Order: Sequential or Parallel?</h4>
+        <p>
+          I can build sprints sequentially (each sprint complete before the next) or focus on getting
+          a working demo fast by building the visual layer (Sprint 3) in parallel with the analysis engines
+          (Sprints 1-2). Sequential is cleaner code. Parallel gets to a demo faster.
+        </p>
+        <div class="options">
+          <div class="opt rec">Sequential (recommended &mdash; cleaner)</div>
+          <div class="opt">Parallel (faster to demo)</div>
+        </div>
+      </div>
+
+      <div class="decision">
+        <h4><span class="q">D2</span> Statue Test Subject</h4>
+        <p>
+          I need photos of a public statue to test with. Options: (a) Use freely licensed photos from
+          Wikimedia Commons of a well-known statue, (b) you photograph a local statue and upload,
+          or (c) I find a 3D model on Sketchfab and render test images from it.
+        </p>
+        <div class="options">
+          <div class="opt rec">Wikimedia photos (recommended &mdash; immediate)</div>
+          <div class="opt">You photograph a local statue</div>
+          <div class="opt">Sketchfab 3D model renders</div>
+        </div>
+      </div>
+
+      <div class="decision">
+        <h4><span class="q">D3</span> Where to Deploy POC</h4>
+        <p>
+          The existing React app is on Netlify (soulprint-app.netlify.app).
+          Should I rebuild in-place, or stand up a separate "lab" deployment so v1 stays as a reference?
+        </p>
+        <div class="options">
+          <div class="opt rec">Rebuild in-place (recommended &mdash; v1 has no value)</div>
+          <div class="opt">Separate deployment</div>
+        </div>
+      </div>
+
+      <div class="decision">
+        <h4><span class="q">D4</span> Pricing on Landing Page</h4>
+        <p>
+          We agreed on one-time pricing ($9/$49/$149/$299). Should the POC landing page show pricing
+          (signals commercial intent) or just the lab demo (signals technical capability)?
+        </p>
+        <div class="options">
+          <div class="opt rec">Lab demo first (recommended &mdash; prove it works first)</div>
+          <div class="opt">Include pricing (commercial signal)</div>
+        </div>
+      </div>
+
+      <div class="decision">
+        <h4><span class="q">D5</span> Creation Biometrics: Sprint 6 or Sooner?</h4>
+        <p>
+          The creation canvas (Proof of Process) is the killer feature, but it's in Sprint 6 because
+          it's independent of image analysis. Should I bump it earlier to have it sooner, or keep it last
+          because the image analysis is more core?
+        </p>
+        <div class="options">
+          <div class="opt rec">Keep as Sprint 6 (recommended &mdash; prove core first)</div>
+          <div class="opt">Move to Sprint 3 (get killer feature earlier)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight mt-lg">
+      <h4>How This Works</h4>
+      <p>
+        Review this plan. Tell me what to change, debate what you want to debate, confirm what
+        feels right. Once you give the green light, I build the whole thing &mdash; sprint by sprint,
+        every deliverable, deployed and working. You'll see real forensic analysis running on a real statue
+        photo by the end of it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT COMES AFTER -->
+<section class="section">
+  <div class="container">
+    <p class="section-tag">After the POC</p>
+    <h2>Phase 2: What Comes Next</h2>
+    <p class="section-intro">
+      The POC proves the concept with client-side analysis. Phase 2 adds the heavy backend
+      infrastructure that turns it from a demo into a real service.
+    </p>
+
+    <div class="approach-grid">
+      <div class="approach-card yes" style="border-color:rgba(59,130,246,0.2)">
+        <div class="approach-label" style="color:var(--blue)">Phase 2A: Backend</div>
+        <h3>Supabase + Python Pipeline</h3>
+        <p>
+          Server-side deep analysis: FIRE AI detection (CVPR 2025), wavelet decomposition,
+          fractal dimension, CLIP embeddings. PostgreSQL + pgvector for similarity search
+          across all registered works.
+        </p>
+      </div>
+      <div class="approach-card yes" style="border-color:rgba(236,72,153,0.2)">
+        <div class="approach-label" style="color:var(--pink)">Phase 2B: Marketplace</div>
+        <h3>Stripe + Certificate Commerce</h3>
+        <p>
+          Payment integration. One-time fees ($9/$49/$149/$299).
+          Certificate verification API for third parties.
+          Enforcement monitoring add-on.
+        </p>
+      </div>
+      <div class="approach-card yes" style="border-color:rgba(168,85,247,0.2)">
+        <div class="approach-label" style="color:var(--purple)">Phase 2C: Integrations</div>
+        <h3>Procreate / Photoshop Plugin</h3>
+        <p>
+          Native creation biometrics capture from professional tools.
+          Automatic Soulprint registration on export.
+          Real pen-tablet pressure data (not just mouse).
+        </p>
+      </div>
+      <div class="approach-card yes" style="border-color:rgba(249,115,22,0.2)">
+        <div class="approach-label" style="color:var(--orange)">Phase 2D: Standards</div>
+        <h3>C2PA + RFC 3161 + ISO 27037</h3>
+        <p>
+          Content credentials standard integration.
+          Trusted timestamping with HSM-backed servers.
+          Court-admissible digital evidence chain.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p style="color:var(--gold);font-family:var(--sans);font-weight:600;margin-bottom:8px">
+      SOULPRINT &mdash; Digital Forensic Authentication Lab
+    </p>
+    <p>Build Plan v1.0 &bull; March 2026 &bull; SodaLabs</p>
+    <p style="margin-top:12px;font-family:var(--mono);font-size:0.7rem">
+      "The machine earns trust by showing its work."
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
